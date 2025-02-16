@@ -1,4 +1,4 @@
-import { renderCharacterSelection, startGame } from "./ui";
+import { renderCharacterSelection, startGame } from "./web/ui";
 
 document.addEventListener("DOMContentLoaded", () => {
   renderCharacterSelection();

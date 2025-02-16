@@ -1,6 +1,6 @@
-import { Ability } from "./models/ability.model";
-import { Character } from "./models/character.model";
-import { Player } from "./models/player.model";
+import { Ability } from "./ability.model";
+import { Character } from "./character.model";
+import { Player } from "./player.model";
 
 export class GameEngine {
   turn: number = 0;
