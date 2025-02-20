@@ -56,7 +56,12 @@ export default function Modal({
         >
           Confirmar
         </button>
-        <button onClick={onClose}>Cancelar</button>
+        <button
+          className="modal-close-btn modal-close-btn:hover"
+          onClick={onClose}
+        >
+          Cancelar
+        </button>
       </div>
     </div>
   );

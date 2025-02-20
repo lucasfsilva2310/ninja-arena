@@ -2,7 +2,7 @@ import { Ability } from "./ability.model";
 import {
   Chakra,
   ChakraType,
-  initialChakraObj,
+  chakraTypes,
   InitialChakraObjType,
 } from "./chakra.model";
 import { Character } from "./character.model";
@@ -29,7 +29,12 @@ export class Player {
         acc[key] = (acc[key] || 0) + 1;
         return acc;
       },
-      { ...initialChakraObj } as InitialChakraObjType
+      {
+        [chakraTypes.Ninjutsu]: 0,
+        [chakraTypes.Taijutsu]: 0,
+        [chakraTypes.Genjutsu]: 0,
+        [chakraTypes.Bloodline]: 0,
+      } as InitialChakraObjType
     );
   }
 

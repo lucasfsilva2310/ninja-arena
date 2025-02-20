@@ -85,6 +85,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     game.nextTurn();
     setShowModal(false);
   };
+  console.log(game.player1.chakras);
 
   return (
     <div className="battle-container">
@@ -103,20 +104,67 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         </div>
       </div>
 
-      <div className="team-container">
-        <h3 className="team-title">Seu Time</h3>
-        {game.player1.characters.map((char) => (
-          <div
-            key={char.name}
-            className="character-card"
-            onClick={() => handleTargetClick(char)}
-          >
-            <h4
-              className={`character-name ${
-                char.hp > 0 ? "character-alive" : "character-dead"
-              } ${possibleTargets.includes(char) ? "character-selected" : ""}`}
+      <div className="teams-container">
+        <div className="team-container">
+          <h3 className="team-title">Seu Time</h3>
+          {game.player1.characters.map((char) => (
+            // TODO implementar sistema de exibir efeitos ativos no turno
+            // Kawarimi, efeitos stack, efeitos permanentes
+            <div
+              key={char.name}
+              className="character-card"
+              onClick={() => handleTargetClick(char)}
             >
-              {char.name} (HP: {char.hp})
+              <h4
+                className={`character-name ${
+                  char.hp > 0 ? "character-alive" : "character-dead"
+                } ${
+                  possibleTargets.includes(char) ? "character-selected" : ""
+                }`}
+              >
+                {char.name} (HP: {char.hp})
+                {selectedActions.find((action) => action.target === char) && (
+                  <p className="ability-selected">
+                    {
+                      selectedActions.find((action) => action.target === char)
+                        ?.ability.name
+                    }
+                  </p>
+                )}
+              </h4>
+              <div className="flex gap-2">
+                {char.abilities.map((ability) => (
+                  <button
+                    key={ability.name}
+                    onClick={() => handleAbilityClick(char, ability)}
+                    disabled={!ability.canUse(game.player1.chakras)}
+                    className={`ability-button ${
+                      ability.canUse(game.player1.chakras)
+                        ? "ability-active"
+                        : "ability-inactive"
+                    }`}
+                  >
+                    {ability.name} ({ability.requiredChakra.join(", ")})
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="team-container">
+          <h3 className="team-title">Time Inimigo</h3>
+          {game.player2.characters.map((char) => (
+            <div
+              key={char.name}
+              className={`enemy-card ${
+                possibleTargets.includes(char) ? "enemy-selected" : ""
+              } enemy-hover`}
+              onClick={() => handleTargetClick(char)}
+            >
+              <h4 className="font-medium">
+                {char.name} (HP: {char.hp})
+              </h4>
               {selectedActions.find((action) => action.target === char) && (
                 <p className="ability-selected">
                   {
@@ -125,52 +173,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                   }
                 </p>
               )}
-            </h4>
-            <div className="flex gap-2">
-              {char.abilities.map((ability) => (
-                <button
-                  key={ability.name}
-                  onClick={() => handleAbilityClick(char, ability)}
-                  disabled={!ability.canUse(game.player1.chakras)}
-                  className={`ability-button ${
-                    ability.canUse(game.player1.chakras)
-                      ? "ability-active"
-                      : "ability-inactive"
-                  }`}
-                >
-                  {ability.name} ({ability.requiredChakra.join(", ")})
-                </button>
-              ))}
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-
-      <div>
-        <h3 className="team-title">Time Inimigo</h3>
-        {game.player2.characters.map((char) => (
-          <div
-            key={char.name}
-            className={`enemy-card ${
-              possibleTargets.includes(char) ? "enemy-selected" : ""
-            } enemy-hover`}
-            onClick={() => handleTargetClick(char)}
-          >
-            <h4 className="font-medium">
-              {char.name} (HP: {char.hp})
-            </h4>
-            {selectedActions.find((action) => action.target === char) && (
-              <p className="ability-selected">
-                {
-                  selectedActions.find((action) => action.target === char)
-                    ?.ability.name
-                }
-              </p>
-            )}
-          </div>
-        ))}
-      </div>
-
       <button onClick={executeTurn} className="turn-button">
         Finalizar Turno
       </button>

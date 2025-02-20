@@ -31,7 +31,6 @@ export default function CharacterSelection() {
       "Inteligência Artificial",
       AICharacters.slice(0, 3)
     );
-    console.log("player", player, "aiPlayer", aiPlayer);
     const newGame = new GameEngine(player, aiPlayer);
     newGame.startGame();
     setGame(newGame);

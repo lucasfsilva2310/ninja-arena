@@ -27,7 +27,16 @@
   margin-right: 4px;
 }
 
+.teams-container {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid black;
+
+  justify-content: space-between;
+}
+
 .team-container {
+  width: 50%;
   margin-bottom: 16px;
 }
 
