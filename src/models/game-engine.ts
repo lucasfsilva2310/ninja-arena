@@ -26,12 +26,11 @@ export class GameEngine {
         console.log(
           `${action.character.name} usou ${action.ability.name} em ${action.target.name}!`
         );
-        action.target.takeDamage(action.ability.damage);
+        action.ability.applyEffect(action.target);
       }
     });
 
     this.checkGameOver();
-    this.nextTurn();
   }
 
   checkGameOver(): boolean {

@@ -1,5 +1,10 @@
 import { Ability } from "./ability.model";
-import { Chakra, ChakraType } from "./chakra.model";
+import {
+  Chakra,
+  ChakraType,
+  initialChakraObj,
+  InitialChakraObjType,
+} from "./chakra.model";
 import { Character } from "./character.model";
 
 export class Player {
@@ -8,7 +13,24 @@ export class Player {
   constructor(public name: string, public characters: Character[] = []) {}
 
   receiveChakra() {
-    this.chakras = [new Chakra().type, new Chakra().type, new Chakra().type];
+    this.chakras = [
+      ...this.chakras,
+      new Chakra().type,
+      new Chakra().type,
+      new Chakra().type,
+    ];
+  }
+
+  getChakraCount() {
+    return this.chakras.reduce(
+      (acc, chakra: string) => {
+        const key = chakra as ChakraType;
+
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+      },
+      { ...initialChakraObj } as InitialChakraObjType
+    );
   }
 
   chooseAbility(character: Character): Ability | null {

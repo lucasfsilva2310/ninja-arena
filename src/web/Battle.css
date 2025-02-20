@@ -1,0 +1,117 @@
+/* Battle.css */
+.battle-container {
+  padding: 16px;
+}
+
+.battle-header {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.chakra-container {
+  margin-bottom: 16px;
+}
+
+.chakra-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.chakra-item {
+  border: 1px solid #ccc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #e2e8f0;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.team-container {
+  margin-bottom: 16px;
+}
+
+.team-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.character-card {
+  margin-bottom: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.character-name {
+  font-weight: 500;
+}
+
+.character-alive {
+  color: #374151;
+}
+
+.character-dead {
+  color: #ef4444;
+}
+
+.character-selected {
+  border: 2px solid #ef4444;
+}
+
+.ability-button {
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.ability-active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.ability-inactive {
+  background-color: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.enemy-card {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.enemy-selected {
+  border-color: #ef4444;
+}
+
+.enemy-hover:hover {
+  background-color: #f3f4f6;
+}
+
+.turn-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  background-color: #10b981;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.turn-button:hover {
+  background-color: #059669;
+}
+
+.turn-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.ability-selected {
+  font-style: italic;
+  color: #3b82f6;
+}
