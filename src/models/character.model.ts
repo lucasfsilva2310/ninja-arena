@@ -1,7 +1,11 @@
 import { Ability } from "./ability.model";
 
 type EffectType = {
-  damageReduction?: { amount: number; duration: number };
+  damageReduction?: {
+    amount: number;
+    duration: number;
+    applied?: boolean;
+  };
   transformation?: {
     originalAbility: Ability;
     newAbility: Ability;
@@ -50,7 +54,7 @@ export class Character {
 
   addDamageReduction(amount: number, duration: number) {
     console.log(
-      `${this.name} recebeu ${amount} de redução de dano por ${duration} turnos. `
+      `recebeu ${amount} de redução de dano por ${duration} turnos. `
     );
     this.activeEffects.push({ damageReduction: { amount, duration } });
   }

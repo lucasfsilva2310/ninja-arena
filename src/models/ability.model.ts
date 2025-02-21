@@ -10,6 +10,7 @@ export type EffectType =
   | "Stacking";
 
 export interface AbilityEffect {
+  description: string;
   type: EffectType;
   value: number;
   increment?: number;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChakraType } from "../models/chakra.model";
+import { ChakraType } from "../../models/chakra.model";
 
 interface ModalProps {
   availableChakras: ChakraType[];

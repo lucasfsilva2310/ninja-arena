@@ -4,37 +4,59 @@ import { Character } from "../models/character.model";
 const fireball = new Ability(
   "fireball",
   ["Ninjutsu", "Random"],
-  [{ type: "Stacking", value: 20, increment: 5 }],
+  [
+    {
+      description: "Throws a fireball jutsu",
+      type: "Stacking",
+      value: 20,
+      increment: 5,
+    },
+  ],
   "Enemy"
 );
 const narutoKick = new Ability(
   "narutoKick",
   ["Taijutsu", "Random"],
-  [{ type: "Damage", value: 20 }],
+  [{ description: "Naruto throws a kick", type: "Damage", value: 20 }],
   "Enemy"
 );
 const kawarimi = new Ability(
   "Kawarimi",
   ["Random"],
-  [{ type: "DamageReduction", value: Infinity, duration: 1 }],
+  [
+    {
+      description: "Character become invunerable",
+      type: "DamageReduction",
+      value: Infinity,
+      duration: 1,
+    },
+  ],
   "Self"
 );
 const hiddenLotus = new Ability(
   "Hidden Lotus",
   ["Taijutsu", "Random"],
-  [{ type: "Damage", value: 40 }],
+  [{ description: "Do 40 damage", type: "Damage", value: 40 }],
   "Self"
 );
 const primaryLotus = new Ability(
   "Primary Lotus",
   ["Taijutsu"],
-  [{ type: "Transform", value: 30, duration: 1, transformation: hiddenLotus }],
+  [
+    {
+      description: "Do 30 damage",
+      type: "Transform",
+      value: 30,
+      duration: 1,
+      transformation: hiddenLotus,
+    },
+  ],
   "Enemy"
 );
 const healing = new Ability(
   "Heal",
   ["Ninjutsu"],
-  [{ type: "Heal", value: 15 }],
+  [{ description: "heals 15 damage", type: "Heal", value: 15 }],
   "Ally"
 );
 

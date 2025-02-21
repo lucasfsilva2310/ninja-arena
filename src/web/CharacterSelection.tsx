@@ -3,7 +3,7 @@ import { GameEngine } from "../models/game-engine";
 import { Character } from "../models/character.model";
 import { Player } from "../models/player.model";
 import { AICharacters, availableCharacters } from "../database/characters";
-import Battle from "./Battle";
+import Battle from "./Battle/Battle";
 
 export default function CharacterSelection() {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);

@@ -43,6 +43,10 @@ export class GameEngine {
       player.characters.forEach((character) => {
         character.activeEffects = character.activeEffects.filter((effect) => {
           if (effect.damageReduction) {
+            if (!effect.damageReduction.applied) {
+              effect.damageReduction.applied = true;
+              return true;
+            }
             effect.damageReduction.duration--;
             return effect.damageReduction.duration > 0;
           }
