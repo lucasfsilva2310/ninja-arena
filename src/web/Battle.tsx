@@ -14,6 +14,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [selectedActions, setSelectedActions] = useState<
     { character: Character; ability: Ability; target: Character }[]
   >([]);
+  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
+    null
+  );
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
   const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -27,6 +30,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   }, [onGameOver]);
 
   const handleAbilityClick = (character: Character, ability: Ability) => {
+    setSelectedCharacter(character);
     setSelectedAbility(ability);
     let targets: Character[] = [];
 
@@ -50,12 +54,15 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     setPossibleTargets([...targets]);
   };
-
   const handleTargetClick = (target: Character) => {
     if (selectedAbility) {
       setSelectedActions([
         ...selectedActions,
-        { character: target, ability: selectedAbility, target },
+        {
+          character: selectedCharacter || target,
+          ability: selectedAbility,
+          target,
+        },
       ]);
       setSelectedAbility(null);
       setPossibleTargets([]);
@@ -78,8 +85,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     finalizeTurn();
   };
-
   const finalizeTurn = () => {
+    // TODO: implementar sistema de exibir efeitos ativos no turno
+    // E aplicar active effects no execute turn
     game.executeTurn(selectedActions);
     setSelectedActions([]);
     game.nextTurn();

@@ -33,9 +33,7 @@ export class Ability {
     );
   }
 
-  applyEffect(target: Character) {
-    console.log(this.effects);
-    console.log(target);
+  applyEffect(character: Character, ability: Ability, target: Character) {
     this.effects.forEach((effect) => {
       switch (effect.type) {
         case "Damage":
@@ -48,7 +46,11 @@ export class Ability {
           target.addDamageReduction(effect.value, effect.duration || 1);
           break;
         case "Transform":
-          target.applyTransformation(
+          if (effect.value > 0) {
+            target.takeDamage(effect.value);
+          }
+          character.applyTransformation(
+            ability,
             effect.transformation!,
             effect.duration || 1
           );

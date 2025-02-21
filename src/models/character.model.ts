@@ -2,7 +2,12 @@ import { Ability } from "./ability.model";
 
 type EffectType = {
   damageReduction?: { amount: number; duration: number };
-  transformation?: { newAbility: Ability; remainingTurns: number };
+  transformation?: {
+    originalAbility: Ability;
+    newAbility: Ability;
+    remainingTurns: number;
+    applied?: boolean;
+  };
   persistentEffects?: Ability[];
   stackingEffect?: { baseDamage: number; increment: number };
 };
@@ -19,15 +24,13 @@ export class Character {
 
   takeDamage(damage: number) {
     let reducedDamage = damage;
-    console.log(
-      `${this.name} recebeu ${damage} de dano. Dano reduzido: ${reducedDamage}`
-    );
+    console.log(`${this.name} recebeu ${damage} de dano`);
     this.activeEffects.forEach((effect) => {
       console.log(effect);
       if (effect.damageReduction) {
         reducedDamage = Math.max(0, damage - effect.damageReduction.amount);
         console.log(
-          `${this.name} recebeu ${damage} de dano e ${effect.damageReduction.amount} de dano reduzido. Dano reduzido: ${reducedDamage}`
+          `${this.name} teve ${effect.damageReduction.amount} de dano reduzido. Dano reduzido: ${reducedDamage}`
         );
       }
     });
@@ -52,13 +55,52 @@ export class Character {
     this.activeEffects.push({ damageReduction: { amount, duration } });
   }
 
-  applyTransformation(newAbility: Ability, duration: number) {
+  applyTransformation(
+    originalAbility: Ability,
+    newAbility: Ability,
+    duration: number
+  ) {
     console.log(
-      `${this.name} trocou habilidade para ${newAbility.name} por ${duration} turnos. `
+      `${this.name} trocou habilidade de ${originalAbility.name} para ${newAbility.name} por ${duration} turnos. `
     );
+
+    this.replaceAbility(originalAbility, newAbility);
+
     this.activeEffects.push({
-      transformation: { newAbility, remainingTurns: duration },
+      transformation: { originalAbility, newAbility, remainingTurns: duration },
     });
+  }
+
+  revertTransformation(newAbility: Ability) {
+    const transformationEffect = this.activeEffects.find(
+      (effect) =>
+        effect.transformation && effect.transformation.newAbility === newAbility
+    );
+
+    if (transformationEffect && transformationEffect.transformation) {
+      this.replaceAbility(
+        transformationEffect.transformation.newAbility,
+        transformationEffect.transformation.originalAbility
+      );
+      console.log(
+        `${this.name} reverteu a transformação de ${transformationEffect.transformation.newAbility.name} para ${transformationEffect.transformation.originalAbility.name}.`
+      );
+      this.activeEffects = this.activeEffects.filter(
+        (effect) => effect !== transformationEffect
+      );
+    }
+  }
+
+  replaceAbility(oldAbility: Ability, newAbility: Ability) {
+    const abilityIndex = this.abilities.findIndex(
+      (ability) => ability === oldAbility
+    );
+    if (abilityIndex !== -1) {
+      this.abilities[abilityIndex] = newAbility;
+      console.log(
+        `${this.name} substituiu ${oldAbility.name} por ${newAbility.name}.`
+      );
+    }
   }
 
   applyPersistentEffect(ability: Ability) {
