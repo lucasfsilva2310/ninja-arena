@@ -10,7 +10,6 @@ export type EffectType =
   | "Stacking";
 
 export interface AbilityEffect {
-  description: string;
   type: EffectType;
   value: number;
   increment?: number;
@@ -21,6 +20,7 @@ export interface AbilityEffect {
 export class Ability {
   constructor(
     public name: string,
+    public description: (name: string, value?: number) => string,
     public requiredChakra: ChakraType[],
     public effects: AbilityEffect[],
     public target: "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies",
