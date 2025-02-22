@@ -21,6 +21,13 @@ export class Player {
     ];
   }
 
+  consumeChakra(chakra: ChakraType) {
+    const index = this.chakras.indexOf(chakra);
+    if (index !== -1) {
+      this.chakras.splice(index, 1);
+    }
+  }
+
   getChakraCount() {
     return this.chakras.reduce(
       (acc, chakra: string) => {
