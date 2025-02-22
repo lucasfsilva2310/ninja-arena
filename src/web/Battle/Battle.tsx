@@ -389,7 +389,10 @@ const Abilities = ({
               isAbilitiesDisabled ? "ability-inactive" : "ability-active"
             }`}
           >
-            {ability.name} ({ability.requiredChakra.join(", ")})
+            {ability.name} ({ability.requiredChakra.join(", ")}){" "}
+            {ability.currentCooldown > 0
+              ? `Cooldown: ${ability.currentCooldown}`
+              : ""}
           </button>
         );
       })}

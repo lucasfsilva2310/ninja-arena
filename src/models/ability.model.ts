@@ -18,11 +18,13 @@ export interface AbilityEffect {
 }
 
 export class Ability {
+  public currentCooldown: number = 0;
+
   constructor(
     public name: string,
     public description: (name: string, value?: number) => string,
     public requiredChakra: ChakraType[],
-    public cooldown: number,
+    public defaultCooldown: number,
     public effects: AbilityEffect[],
     public target: "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies",
     public isPermanent: boolean = false,
@@ -30,8 +32,12 @@ export class Ability {
   ) {}
 
   canUse(chakras: ChakraType[]): boolean {
-    return this.requiredChakra.every(
-      (req) => req === "Random" || chakras.includes(req)
+    // TODO: Check if player1 has no chakra if button will be enabled
+    return (
+      !this.isOnCooldown() &&
+      this.requiredChakra.every(
+        (req) => req === "Random" || chakras.includes(req)
+      )
     );
   }
 
@@ -68,6 +74,16 @@ export class Ability {
           target.applyStackingEffect(effect.value, effect.increment!);
           break;
       }
+
+      if (!this.isOnCooldown()) {
+        // Add one because processCooldown from game-engine already subtracts 1 after
+        // executing the turn
+        this.currentCooldown = this.defaultCooldown + 1;
+      }
     });
+  }
+
+  isOnCooldown(): boolean {
+    return this.currentCooldown > 0;
   }
 }

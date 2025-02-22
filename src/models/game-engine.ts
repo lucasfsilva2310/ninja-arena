@@ -16,6 +16,7 @@ export class GameEngine {
     this.turn++;
     this.player1.receiveChakra();
     this.player2.receiveChakra();
+    this.processCooldowns();
     this.processActiveEffects();
   }
 
@@ -44,6 +45,18 @@ export class GameEngine {
     });
 
     this.checkGameOver();
+  }
+
+  processCooldowns() {
+    [this.player1, this.player2].forEach((player) => {
+      player.characters.forEach((character) => {
+        character.abilities.forEach((ability) => {
+          if (ability.isOnCooldown()) {
+            ability.currentCooldown--;
+          }
+        });
+      });
+    });
   }
 
   processActiveEffects() {

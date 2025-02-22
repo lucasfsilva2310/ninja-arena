@@ -20,9 +20,25 @@ type EffectType = {
 
 export class Character {
   hp: number = 100;
+  public abilities: Ability[] = [];
   activeEffects: EffectType[] = [];
 
-  constructor(public name: string, public abilities: Ability[]) {}
+  constructor(public name: string, public baseAbilities: Ability[]) {
+    // Creating ability in memory so it wont conflict with the one in the database
+    this.abilities = baseAbilities.map(
+      (ability) =>
+        new Ability(
+          ability.name,
+          ability.description,
+          [...ability.requiredChakra],
+          ability.defaultCooldown,
+          [...ability.effects],
+          ability.target,
+          ability.isPermanent,
+          ability.isStacking
+        )
+    );
+  }
 
   isAlive(): boolean {
     return this.hp > 0;
