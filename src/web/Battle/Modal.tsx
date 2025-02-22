@@ -8,17 +8,19 @@ import {
 interface ModalProps {
   availableChakras: ChakraType[];
   requiredRandomCount: number;
-  selectedChakras: ChakraType[];
-  setSelectedChakras: React.Dispatch<React.SetStateAction<ChakraType[]>>;
-  onConfirm: (selectedChakras: ChakraType[]) => void;
+  chakrasToSwitchFromRandom: ChakraType[];
+  setChakrasToSwitchFromRandom: React.Dispatch<
+    React.SetStateAction<ChakraType[]>
+  >;
+  onConfirm: (chakrasToSwitchFromRandom: ChakraType[]) => void;
   onClose: () => void;
 }
 
 export default function Modal({
   availableChakras,
   requiredRandomCount,
-  selectedChakras,
-  setSelectedChakras,
+  chakrasToSwitchFromRandom,
+  setChakrasToSwitchFromRandom,
   onConfirm,
   onClose,
 }: ModalProps) {
@@ -31,27 +33,27 @@ export default function Modal({
 
   const handleAddChakra = (chakra: ChakraType) => {
     if (
-      selectedChakras.length < requiredRandomCount &&
+      chakrasToSwitchFromRandom.length < requiredRandomCount &&
       chakraCounts[chakra] > 0
     ) {
-      setSelectedChakras([...selectedChakras, chakra]);
+      setChakrasToSwitchFromRandom([...chakrasToSwitchFromRandom, chakra]);
       setChakraCounts((prev) => ({ ...prev, [chakra]: prev[chakra] - 1 }));
     }
   };
 
   const handleRemoveChakra = (chakra: ChakraType) => {
-    const index = selectedChakras.lastIndexOf(chakra);
+    const index = chakrasToSwitchFromRandom.lastIndexOf(chakra);
     if (index !== -1) {
-      const newSelectedChakras = [...selectedChakras];
-      newSelectedChakras.splice(index, 1);
-      setSelectedChakras(newSelectedChakras);
+      const newchakrasToSwitchFromRandom = [...chakrasToSwitchFromRandom];
+      newchakrasToSwitchFromRandom.splice(index, 1);
+      setChakrasToSwitchFromRandom(newchakrasToSwitchFromRandom);
       setChakraCounts((prev) => ({ ...prev, [chakra]: prev[chakra] + 1 }));
     }
   };
 
   const handleConfirm = () => {
-    if (selectedChakras.length === requiredRandomCount) {
-      onConfirm(selectedChakras);
+    if (chakrasToSwitchFromRandom.length === requiredRandomCount) {
+      onConfirm(chakrasToSwitchFromRandom);
       onClose();
     }
   };
@@ -74,7 +76,7 @@ export default function Modal({
               </button>
               <button
                 onClick={() => handleRemoveChakra(chakra)}
-                disabled={!selectedChakras.includes(chakra)}
+                disabled={!chakrasToSwitchFromRandom.includes(chakra)}
               >
                 -
               </button>
@@ -82,11 +84,11 @@ export default function Modal({
           ))}
         </div>
         <div className="selected-chakras">
-          <h3>Total Selecionado: {selectedChakras.length}</h3>
+          <h3>Total Selecionado: {chakrasToSwitchFromRandom.length}</h3>
         </div>
         <button
           onClick={handleConfirm}
-          disabled={selectedChakras.length < requiredRandomCount}
+          disabled={chakrasToSwitchFromRandom.length < requiredRandomCount}
         >
           Confirmar
         </button>

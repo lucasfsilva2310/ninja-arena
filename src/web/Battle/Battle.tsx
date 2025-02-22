@@ -5,6 +5,7 @@ import { Character } from "../../models/character.model";
 import Modal from "./Modal";
 import "./Battle.css";
 import { ChakraType } from "../../models/chakra.model";
+import { Player } from "../../models/player.model";
 
 interface BattleProps {
   game: GameEngine;
@@ -12,6 +13,7 @@ interface BattleProps {
 }
 
 interface SelectedAction {
+  player: Player;
   character: Character;
   ability: Ability;
   target: Character;
@@ -26,12 +28,17 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [randomChakraCount, setRandomChakraCount] = useState(0);
+  const [chakrasToSwitchFromRandom, setChakrasToSwitchFromRandom] = useState<
+    ChakraType[]
+  >([]);
   const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
 
   const clearStates = () => {
     setSelectedCharacter(null);
     setSelectedAbility(null);
     setPossibleTargets([]);
+    setChakrasToSwitchFromRandom([]);
+    setSelectedChakras([]);
   };
 
   useEffect(() => {
@@ -70,7 +77,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     setPossibleTargets([...targets]);
   };
-  const handleTargetClick = (target: Character) => {
+  const handleTargetClick = (player: Player, target: Character) => {
     if (!possibleTargets.includes(target)) {
       return;
     }
@@ -79,14 +86,36 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       setSelectedActions([
         ...selectedActions,
         {
+          player,
           character: selectedCharacter || target,
           ability: selectedAbility,
           target,
         },
       ]);
+
+      setSelectedChakras((prevChakras) => [
+        ...prevChakras,
+        ...selectedAbility.requiredChakra,
+      ]);
+
       setSelectedAbility(null);
       setPossibleTargets([]);
     }
+  };
+
+  const removeSelectedAction = (index: number) => {
+    setSelectedActions((prevActions) => {
+      const updatedActions = [...prevActions];
+      const removedAction = updatedActions.splice(index, 1)[0];
+
+      setSelectedChakras((prevChakras) => {
+        return prevChakras.filter(
+          (_, i) => i >= removedAction.ability.requiredChakra.length
+        );
+      });
+
+      return updatedActions;
+    });
   };
 
   const executeTurn = () => {
@@ -106,7 +135,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     finalizeTurn();
   };
   const finalizeTurn = () => {
-    selectedChakras.forEach((chakra) => game.player1.consumeChakra(chakra));
+    chakrasToSwitchFromRandom.forEach((chakra) =>
+      game.player1.consumeChakra(chakra)
+    );
 
     game.executeTurn(selectedActions);
     setSelectedActions([]);
@@ -123,6 +154,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   // TODO: Randomized AI Turn
   const executeAITurn = () => {
     const aiActions: {
+      player: Player;
       character: Character;
       ability: Ability;
       target: Character;
@@ -161,7 +193,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
           if (targets.length > 0) {
             const target = targets[Math.floor(Math.random() * targets.length)];
-            aiActions.push({ character: char, ability: randomAbility, target });
+            aiActions.push({
+              player: game.player2,
+              character: char,
+              ability: randomAbility,
+              target,
+            });
           }
         }
       }
@@ -169,51 +206,73 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     game.executeTurn(aiActions);
   };
-  console.log(selectedActions);
+
+  // Logic to get unused chakras
+  // TODO: isolate
+  const player1ActiveChakras: ChakraType[] = [];
+
+  const getNotUsedChakras = () => {
+    Object.entries(game.player1.getChakraCount()).forEach(([chakra, count]) => {
+      const chakraCount =
+        count - selectedChakras.filter((c) => c === chakra).length;
+
+      for (let i = 0; i < chakraCount; i++) {
+        player1ActiveChakras.push(chakra as ChakraType);
+      }
+    });
+  };
+
+  getNotUsedChakras();
+
+  const player1ActiveChakrasComponent = Object.entries(
+    game.player1.getChakraCount()
+  ).map(([chakra, count]) => (
+    <span key={chakra} className="chakra-item">
+      {chakra}: {count - selectedChakras.filter((c) => c === chakra).length}
+    </span>
+  ));
+
   return (
     <div className="battle-container">
       <h2 className="battle-header">Turno {game.turn}</h2>
 
       <div className="chakra-container">
         <h3 className="chakra-title">Chakra Disponível</h3>
-        <div className="flex gap-2">
-          {Object.entries(game.player1.getChakraCount()).map(
-            ([chakra, count]) => (
-              <span key={chakra} className="chakra-item">
-                {chakra}: {count}
-              </span>
-            )
-          )}
-        </div>
+        <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
       </div>
 
       <div className="teams-container">
         <div className="team-container">
           <h3 className="team-title">Seu Time</h3>
-          {game.player1.characters.map((char, index) => (
+          {game.player1.characters.map((char, charIndex) => (
             <>
               <div
-                key={char.name + index}
+                key={char.name + charIndex}
                 className="character-card"
-                onClick={() => handleTargetClick(char)}
+                onClick={() => handleTargetClick(game.player1, char)}
               >
                 <PlayerCharacterName
                   character={char}
                   possibleTargets={possibleTargets}
                 />
               </div>
-              {selectedActions.find((action) => action.target === char) && (
-                <p className="ability-selected">
-                  {
-                    selectedActions.find((action) => action.target === char)
-                      ?.ability.name
-                  }
-                </p>
-              )}
+              {selectedActions
+                .filter((action) => action.target === char)
+                .map((_, actionIndex) => (
+                  <p
+                    className="ability-selected"
+                    onClick={() => removeSelectedAction(actionIndex)}
+                  >
+                    {
+                      selectedActions.find((action) => action.target === char)
+                        ?.ability.name
+                    }
+                  </p>
+                ))}
               <div className="flex gap-2">
                 {char.abilities.map((ability) => {
                   const isAbilitiesDisabled =
-                    !ability.canUse(game.player1.chakras) ||
+                    !ability.canUse(player1ActiveChakras) ||
                     selectedActions.some((action) => action.character === char);
                   return (
                     <button
@@ -238,27 +297,31 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
         <div className="team-container">
           <h3 className="team-title">Time Inimigo</h3>
-          {game.player2.characters.map((char) => (
+          {game.player2.characters.map((char, charIndex) => (
             <>
               <div
-                key={char.name}
+                key={char.name + charIndex + 1}
                 className={`character-card${
                   possibleTargets.includes(char) ? "enemy-selected" : ""
                 } enemy-hover`}
-                onClick={() => handleTargetClick(char)}
+                onClick={() => handleTargetClick(game.player1, char)}
               >
                 <EnemyCharacterName
                   character={char}
                   possibleTargets={possibleTargets}
                 />
               </div>
-              {selectedActions.find((action) => action.target === char) && (
-                <p className="ability-selected">
-                  {
-                    selectedActions.find((action) => action.target === char)
-                      ?.ability.name
-                  }
-                </p>
+              {selectedActions.map(
+                (action, actionIndex) =>
+                  action.target === char && (
+                    <p
+                      key={actionIndex}
+                      className="ability-selected"
+                      onClick={() => removeSelectedAction(actionIndex)}
+                    >
+                      {action.ability.name}
+                    </p>
+                  )
               )}
               <Effects character={char} />
             </>
@@ -271,10 +334,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
       {showModal && (
         <Modal
-          availableChakras={game.player1.chakras}
+          availableChakras={player1ActiveChakras}
           requiredRandomCount={randomChakraCount}
-          selectedChakras={selectedChakras}
-          setSelectedChakras={setSelectedChakras}
+          chakrasToSwitchFromRandom={chakrasToSwitchFromRandom}
+          setChakrasToSwitchFromRandom={setChakrasToSwitchFromRandom}
           onConfirm={finalizeTurn}
           onClose={() => setShowModal(false)}
         />

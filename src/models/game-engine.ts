@@ -20,7 +20,12 @@ export class GameEngine {
   }
 
   executeTurn(
-    actions: { character: Character; ability: Ability; target: Character }[]
+    actions: {
+      player: Player;
+      character: Character;
+      ability: Ability;
+      target: Character;
+    }[]
   ) {
     actions.forEach((action) => {
       if (action.character.isAlive()) {
@@ -32,6 +37,9 @@ export class GameEngine {
           action.ability,
           action.target
         );
+        action.ability.requiredChakra.forEach((chakra) => {
+          action.player.consumeChakra(chakra);
+        });
       }
     });
 
