@@ -4,6 +4,7 @@ import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
 import Modal from "./Modal";
 import "./Battle.css";
+import { ChakraType } from "../../models/chakra.model";
 
 interface BattleProps {
   game: GameEngine;
@@ -25,6 +26,13 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [randomChakraCount, setRandomChakraCount] = useState(0);
+  const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
+
+  const clearStates = () => {
+    setSelectedCharacter(null);
+    setSelectedAbility(null);
+    setPossibleTargets([]);
+  };
 
   useEffect(() => {
     if (game.checkGameOver()) {
@@ -32,14 +40,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onGameOver]);
-  console.log(selectedAbility);
-  console.log(selectedCharacter);
-  console.log(possibleTargets);
+
   const handleAbilityClick = (character: Character, ability: Ability) => {
     if (selectedAbility === ability && selectedCharacter === character) {
-      setSelectedCharacter(null);
-      setSelectedAbility(null);
-      setPossibleTargets([]);
+      clearStates();
       return;
     }
 
@@ -103,14 +107,16 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     finalizeTurn();
   };
   const finalizeTurn = () => {
-    // TODO: implementar sistema de exibir efeitos ativos no turno
-    // E aplicar active effects no execute turn
+    selectedChakras.forEach((chakra) => game.player1.consumeChakra(chakra));
+
     game.executeTurn(selectedActions);
     setSelectedActions([]);
     setShowModal(false);
 
     // AI Action
     executeAITurn();
+
+    clearStates();
 
     game.nextTurn();
   };
@@ -195,9 +201,16 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 <PlayerCharacterName
                   character={char}
                   possibleTargets={possibleTargets}
-                  selectedActions={selectedActions}
                 />
               </div>
+              {selectedActions.find((action) => action.target === char) && (
+                <p className="ability-selected">
+                  {
+                    selectedActions.find((action) => action.target === char)
+                      ?.ability.name
+                  }
+                </p>
+              )}
               <div className="flex gap-2">
                 {char.abilities.map((ability) => (
                   <button
@@ -225,21 +238,24 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             <>
               <div
                 key={char.name}
-                className={`enemy-card ${
+                className={`character-card${
                   possibleTargets.includes(char) ? "enemy-selected" : ""
                 } enemy-hover`}
                 onClick={() => handleTargetClick(char)}
               >
-                <EnemyCharacterName character={char} />
-                {selectedActions.find((action) => action.target === char) && (
-                  <p className="ability-selected">
-                    {
-                      selectedActions.find((action) => action.target === char)
-                        ?.ability.name
-                    }
-                  </p>
-                )}
+                <EnemyCharacterName
+                  character={char}
+                  possibleTargets={possibleTargets}
+                />
               </div>
+              {selectedActions.find((action) => action.target === char) && (
+                <p className="ability-selected">
+                  {
+                    selectedActions.find((action) => action.target === char)
+                      ?.ability.name
+                  }
+                </p>
+              )}
               <Effects character={char} />
             </>
           ))}
@@ -253,6 +269,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         <Modal
           availableChakras={game.player1.chakras}
           requiredRandomCount={randomChakraCount}
+          selectedChakras={selectedChakras}
+          setSelectedChakras={setSelectedChakras}
           onConfirm={finalizeTurn}
           onClose={() => setShowModal(false)}
         />
@@ -264,20 +282,27 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 const Effects = ({ character }: { character: Character }) => {
   return (
     <p className="active-effects">
-      {character.activeEffects.length > 0 && (
-        <span className="text-red-500" key="effects">
-          Efeitos:{" "}
-          {character.activeEffects.map((effect, index) => (
-            <>
-              {effect.name && (
-                <p key={effect.name + index}>
-                  {effect.name}- {effect.description}
-                </p>
-              )}
-            </>
-          ))}
-        </span>
-      )}
+      {/* Validate if the effect is not a transformation to not render empty span */}
+      {character.activeEffects.find((effect) => !effect.transformation) &&
+        character.activeEffects.length > 0 && (
+          <span className="effect-label" key="effects">
+            Efeitos:{" "}
+            {character.activeEffects.map((effect, index) => {
+              console.log(effect);
+              if (!effect.name) {
+                return null;
+              }
+
+              return (
+                <span key={effect.name + index} className="effect-item">
+                  {effect.name}
+                  <span className="tooltip">{effect.description}</span>
+                  {index < character.activeEffects.length - 1 && ", "}
+                </span>
+              );
+            })}
+          </span>
+        )}
     </p>
   );
 };
@@ -285,11 +310,9 @@ const Effects = ({ character }: { character: Character }) => {
 const PlayerCharacterName = ({
   character,
   possibleTargets,
-  selectedActions,
 }: {
   character: Character;
   possibleTargets: Character[];
-  selectedActions: SelectedAction[];
 }) => {
   return (
     <h4
@@ -298,21 +321,23 @@ const PlayerCharacterName = ({
       } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
     >
       {character.name} (HP: {character.hp})
-      {selectedActions.find((action) => action.target === character) && (
-        <p className="ability-selected">
-          {
-            selectedActions.find((action) => action.target === character)
-              ?.ability.name
-          }
-        </p>
-      )}
     </h4>
   );
 };
 
-const EnemyCharacterName = ({ character }: { character: Character }) => {
+const EnemyCharacterName = ({
+  character,
+  possibleTargets,
+}: {
+  character: Character;
+  possibleTargets: Character[];
+}) => {
   return (
-    <h4 className="font-medium">
+    <h4
+      className={`character-name ${
+        character.hp > 0 ? "character-alive" : "character-dead"
+      } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
+    >
       {character.name} (HP: {character.hp})
     </h4>
   );
