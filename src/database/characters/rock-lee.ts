@@ -5,6 +5,7 @@ const hiddenLotus = new Ability(
   "Hidden Lotus",
   (name: string) => `${name} open its 5th chakra gate, dealing 40 damage.`,
   ["Taijutsu", "Random"],
+  0,
   [{ type: "Damage", value: 40 }],
   "Enemy"
 );
@@ -13,6 +14,7 @@ const primaryLotus = new Ability(
   (name: string, value?: number | undefined) =>
     `${name} extends its arm bandages around its opponent, dealing ${value} damage. This ability becomes Hidden Lotus for the next turn`,
   ["Taijutsu"],
+  0,
   [
     {
       type: "Transform",
@@ -29,6 +31,7 @@ const powerOfYouth = new Ability(
   (name: string, value?: number | undefined) =>
     `${name}  encourage itself, healing ${value} health.`,
   ["Taijutsu"],
+  1,
   [
     {
       type: "Heal",
@@ -43,6 +46,7 @@ export const backflip = new Ability(
   (name: string) =>
     `${name} do a big backflip avoiding all danger, becoming invunerable for the next turn.`,
   ["Random"],
+  1,
   [
     {
       type: "DamageReduction",

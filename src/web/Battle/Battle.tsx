@@ -256,41 +256,18 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                   possibleTargets={possibleTargets}
                 />
               </div>
-              {selectedActions
-                .filter((action) => action.target === char)
-                .map((_, actionIndex) => (
-                  <p
-                    className="ability-selected"
-                    onClick={() => removeSelectedAction(actionIndex)}
-                  >
-                    {
-                      selectedActions.find((action) => action.target === char)
-                        ?.ability.name
-                    }
-                  </p>
-                ))}
-              <div className="flex gap-2">
-                {char.abilities.map((ability) => {
-                  const isAbilitiesDisabled =
-                    !ability.canUse(player1ActiveChakras) ||
-                    selectedActions.some((action) => action.character === char);
-                  return (
-                    <button
-                      key={ability.name}
-                      onClick={() => handleAbilityClick(char, ability)}
-                      disabled={isAbilitiesDisabled}
-                      className={`ability-button ${
-                        isAbilitiesDisabled
-                          ? "ability-inactive"
-                          : "ability-active"
-                      }`}
-                    >
-                      {ability.name} ({ability.requiredChakra.join(", ")})
-                    </button>
-                  );
-                })}
-              </div>
-              <Effects character={char} />
+              <CurrentActions
+                character={char}
+                selectedActions={selectedActions}
+                removeSelectedAction={removeSelectedAction}
+              />
+              <Abilities
+                character={char}
+                activeChakras={player1ActiveChakras}
+                selectedActions={selectedActions}
+                handleAbilityClick={handleAbilityClick}
+              />
+              <ActiveEffects character={char} />
             </>
           ))}
         </div>
@@ -311,19 +288,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                   possibleTargets={possibleTargets}
                 />
               </div>
-              {selectedActions.map(
-                (action, actionIndex) =>
-                  action.target === char && (
-                    <p
-                      key={actionIndex}
-                      className="ability-selected"
-                      onClick={() => removeSelectedAction(actionIndex)}
-                    >
-                      {action.ability.name}
-                    </p>
-                  )
-              )}
-              <Effects character={char} />
+              <CurrentActionsOnEnemy
+                character={char}
+                selectedActions={selectedActions}
+                removeSelectedAction={removeSelectedAction}
+              />
+              <ActiveEffects character={char} />
             </>
           ))}
         </div>
@@ -346,7 +316,88 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   );
 }
 
-const Effects = ({ character }: { character: Character }) => {
+const CurrentActions = ({
+  character,
+  selectedActions,
+  removeSelectedAction,
+}: {
+  character: Character;
+  selectedActions: SelectedAction[];
+  removeSelectedAction: (index: number) => void;
+}) => {
+  return selectedActions
+    .filter((action) => action.target === character)
+    .map((_, actionIndex) => (
+      <p
+        className="ability-selected"
+        onClick={() => removeSelectedAction(actionIndex)}
+      >
+        {
+          selectedActions.find((action) => action.target === character)?.ability
+            .name
+        }
+      </p>
+    ));
+};
+
+const CurrentActionsOnEnemy = ({
+  character,
+  selectedActions,
+  removeSelectedAction,
+}: {
+  character: Character;
+  selectedActions: SelectedAction[];
+  removeSelectedAction: (index: number) => void;
+}) => {
+  return selectedActions.map(
+    (action, actionIndex) =>
+      action.target === character && (
+        <p
+          key={actionIndex}
+          className="ability-selected"
+          onClick={() => removeSelectedAction(actionIndex)}
+        >
+          {action.ability.name}
+        </p>
+      )
+  );
+};
+
+const Abilities = ({
+  character,
+  activeChakras,
+  selectedActions,
+  handleAbilityClick,
+}: {
+  character: Character;
+  activeChakras: ChakraType[];
+  selectedActions: SelectedAction[];
+  handleAbilityClick: (character: Character, ability: Ability) => void;
+}) => {
+  return (
+    <div className="flex gap-2">
+      {character.abilities.map((ability) => {
+        const isAbilitiesDisabled =
+          !ability.canUse(activeChakras) ||
+          selectedActions.some((action) => action.character === character);
+        return (
+          <button
+            key={ability.name}
+            onClick={() => handleAbilityClick(character, ability)}
+            disabled={isAbilitiesDisabled}
+            className={`ability-button ${
+              isAbilitiesDisabled ? "ability-inactive" : "ability-active"
+            }`}
+          >
+            {ability.name} ({ability.requiredChakra.join(", ")})
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
+const ActiveEffects = ({ character }: { character: Character }) => {
   return (
     <p className="active-effects">
       {/* Validate if the effect is not a transformation to not render empty span */}

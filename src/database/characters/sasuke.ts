@@ -7,6 +7,7 @@ const fireball = new Ability(
   (name: string, value: number | undefined) =>
     `${name} throws a fireball jutsu, dealing ${value} damage.`,
   ["Ninjutsu", "Random"],
+  1,
   [
     {
       type: "Damage",
@@ -21,6 +22,7 @@ const chidori = new Ability(
   (name: string, value: number | undefined) =>
     `${name} creates lighting chakra around his hand, dealing ${value} damage.`,
   ["Ninjutsu", "Random"],
+  1,
   [
     {
       type: "Damage",

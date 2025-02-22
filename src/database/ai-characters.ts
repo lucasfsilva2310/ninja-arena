@@ -7,6 +7,7 @@ const narutoKick = new Ability(
   (name: string, value: number | undefined) =>
     `${name} throws a kick with his clones, dealing ${value} damage`,
   ["Taijutsu", "Random"],
+  0,
   [{ type: "Damage", value: 20 }],
   "Enemy"
 );
@@ -15,6 +16,7 @@ const rasengan = new Ability(
   "Rasengan",
   (name: string) => `${name} throws a rasengan`,
   ["Ninjutsu", "Random"],
+  1,
   [
     {
       type: "Damage",
@@ -29,6 +31,7 @@ const escapeClone = new Ability(
   (name: string) =>
     `${name} creates an clone to be targeted, becoming invunerable for the next turn.`,
   ["Random"],
+  1,
   [
     {
       type: "DamageReduction",
@@ -44,6 +47,7 @@ const fireball = new Ability(
   (name: string, value: number | undefined) =>
     `${name} throws a fireball jutsu, dealing ${value} damage.`,
   ["Ninjutsu", "Random"],
+  1,
   [
     {
       type: "Damage",
@@ -58,6 +62,7 @@ const chidori = new Ability(
   (name: string, value: number | undefined) =>
     `${name} creates lighting chakra around his hand, dealing ${value} damage.`,
   ["Ninjutsu", "Random"],
+  1,
   [
     {
       type: "Damage",
@@ -71,6 +76,7 @@ const superPunch = new Ability(
   "Super Punch",
   (name: string) => `${name} throws a super punch`,
   ["Taijutsu"],
+  0,
   [{ type: "Damage", value: 15 }],
   "Enemy"
 );
@@ -79,6 +85,7 @@ const healing = new Ability(
   "Heal",
   (name: string) => `${name} chose an ally to use a healing jutsu.`,
   ["Ninjutsu"],
+  0,
   [{ type: "Heal", value: 15 }],
   "Ally"
 );

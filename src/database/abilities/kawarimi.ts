@@ -5,6 +5,7 @@ export const kawarimi = new Ability(
   (name: string) =>
     `${name} swap places with a log, becoming invunerable for the next turn.`,
   ["Random"],
+  1,
   [
     {
       type: "DamageReduction",

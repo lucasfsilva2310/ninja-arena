@@ -22,6 +22,7 @@ export class Ability {
     public name: string,
     public description: (name: string, value?: number) => string,
     public requiredChakra: ChakraType[],
+    public cooldown: number,
     public effects: AbilityEffect[],
     public target: "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies",
     public isPermanent: boolean = false,
