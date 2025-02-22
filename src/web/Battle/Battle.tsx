@@ -36,9 +36,11 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const clearStates = () => {
     setSelectedCharacter(null);
     setSelectedAbility(null);
+    setSelectedActions([]);
     setPossibleTargets([]);
     setChakrasToSwitchFromRandom([]);
     setSelectedChakras([]);
+    setShowModal(false);
   };
 
   useEffect(() => {
@@ -138,17 +140,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     chakrasToSwitchFromRandom.forEach((chakra) =>
       game.player1.consumeChakra(chakra)
     );
-
     game.executeTurn(selectedActions);
-    setSelectedActions([]);
-    setShowModal(false);
+    clearStates();
+    game.nextTurn(game.player1);
 
     // AI Action
     executeAITurn();
-
-    clearStates();
-
-    game.nextTurn();
   };
 
   // TODO: Randomized AI Turn
@@ -205,6 +202,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     });
 
     game.executeTurn(aiActions);
+    game.nextTurn(game.player2);
   };
 
   // Logic to get unused chakras
@@ -245,9 +243,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         <div className="team-container">
           <h3 className="team-title">Seu Time</h3>
           {game.player1.characters.map((char, charIndex) => (
-            <>
+            <React.Fragment key={char.name + charIndex}>
               <div
-                key={char.name + charIndex}
                 className="character-card"
                 onClick={() => handleTargetClick(game.player1, char)}
               >
@@ -268,16 +265,15 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 handleAbilityClick={handleAbilityClick}
               />
               <ActiveEffects character={char} />
-            </>
+            </React.Fragment>
           ))}
         </div>
 
         <div className="team-container">
           <h3 className="team-title">Time Inimigo</h3>
           {game.player2.characters.map((char, charIndex) => (
-            <>
+            <React.Fragment key={char.name + charIndex + 1}>
               <div
-                key={char.name + charIndex + 1}
                 className={`character-card${
                   possibleTargets.includes(char) ? "enemy-selected" : ""
                 } enemy-hover`}
@@ -294,7 +290,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 removeSelectedAction={removeSelectedAction}
               />
               <ActiveEffects character={char} />
-            </>
+            </React.Fragment>
           ))}
         </div>
       </div>
