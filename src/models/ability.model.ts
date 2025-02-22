@@ -44,7 +44,11 @@ export class Ability {
           target.heal(effect.value);
           break;
         case "DamageReduction":
-          target.addDamageReduction(effect.value, effect.duration || 1);
+          target.addDamageReduction(
+            ability,
+            effect.value,
+            effect.duration || 1
+          );
           break;
         case "Transform":
           if (effect.value > 0) {

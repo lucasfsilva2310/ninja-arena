@@ -107,3 +107,5 @@ O jogo continua até que um dos lados vença.
 
 - Ao abrir o modal de seleção de chakras para substituir chakra random, os chakras devem ser agrupados. Deve se exibir cada tipo de chakra, o seu total acumulado e um botão de + e um de -, indicando quantos chakras daquele tipo o usuário quer utilizar para substituir o Random. E a cada chakra selecionado no mais, os chakras randoms são diminuidos até todos estarem zerados.
   Quando o chakra random estiver zerado nao deve ser mais possível clicar no botão de +, somente no de -. QUando o chakra random estiver zerado o botão de confirmar deve ficar habilitado.
+
+- adicionar cooldown nas habilidades

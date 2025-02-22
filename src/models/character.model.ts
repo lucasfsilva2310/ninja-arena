@@ -1,6 +1,8 @@
 import { Ability } from "./ability.model";
 
 type EffectType = {
+  name?: string;
+  description?: string;
   damageReduction?: {
     amount: number;
     duration: number;
@@ -34,11 +36,10 @@ export class Character {
       if (effect.damageReduction) {
         reducedDamage = Math.max(0, damage - effect.damageReduction.amount);
         console.log(
-          `${this.name} teve ${effect.damageReduction.amount} de dano reduzido. Dano reduzido: ${reducedDamage}`
+          `${this.name} tem ${effect.damageReduction.amount} de dano reduzido. Dano reduzido: ${reducedDamage}`
         );
       }
     });
-    console.log(Math.max(0, this.hp - reducedDamage));
     this.hp = Math.max(0, this.hp - reducedDamage);
   }
 
@@ -52,11 +53,15 @@ export class Character {
     this.hp = Math.min(100, this.hp + amount);
   }
 
-  addDamageReduction(amount: number, duration: number) {
+  addDamageReduction(ability: Ability, amount: number, duration: number) {
     console.log(
       `recebeu ${amount} de redução de dano por ${duration} turnos. `
     );
-    this.activeEffects.push({ damageReduction: { amount, duration } });
+    this.activeEffects.push({
+      name: ability.name,
+      description: ability.description(this.name, amount),
+      damageReduction: { amount, duration },
+    });
   }
 
   applyTransformation(
@@ -127,8 +132,3 @@ export class Character {
     }
   }
 }
-// TODO: Criar sistema de aplicação de efeitos ativos quando finalizar o turno
-// iterar pelo array, somando todos os persistentes para devolver o total
-// iterar pelo array, somando todos os stackings para devolver o total
-// aplica o baseDamage somente na primeira vez, e utiliza o total stacking para a função especifica
-// EX: aumentar dano no total stackado

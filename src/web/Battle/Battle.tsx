@@ -172,10 +172,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       <div className="teams-container">
         <div className="team-container">
           <h3 className="team-title">Seu Time</h3>
-          {game.player1.characters.map((char) => (
+          {game.player1.characters.map((char, index) => (
             <>
               <div
-                key={char.name}
+                key={char.name + index}
                 className="character-card"
                 onClick={() => handleTargetClick(char)}
               >
@@ -252,11 +252,16 @@ const Effects = ({ character }: { character: Character }) => {
   return (
     <p className="active-effects">
       {character.activeEffects.length > 0 && (
-        <span className="text-red-500">
+        <span className="text-red-500" key="effects">
           Efeitos:{" "}
-          {character.activeEffects.map((effect) => (
-            // TODO: add remaining effects
-            <p>{effect?.damageReduction?.name}</p>
+          {character.activeEffects.map((effect, index) => (
+            <>
+              {effect.name && (
+                <p key={effect.name + index}>
+                  {effect.name}- {effect.description}
+                </p>
+              )}
+            </>
           ))}
         </span>
       )}
