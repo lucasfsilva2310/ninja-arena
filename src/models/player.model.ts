@@ -13,11 +13,13 @@ export class Player {
   constructor(public name: string, public characters: Character[] = []) {}
 
   receiveChakra() {
+    const aliveCharacters = this.characters.filter((character) =>
+      character.isAlive()
+    );
+
     this.chakras = [
       ...this.chakras,
-      new Chakra().type,
-      new Chakra().type,
-      new Chakra().type,
+      ...aliveCharacters.map(() => new Chakra().type),
     ];
   }
 

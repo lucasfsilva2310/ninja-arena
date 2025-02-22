@@ -8,7 +8,7 @@ export class GameEngine {
   constructor(public player1: Player, public player2: Player) {}
 
   startGame() {
-    console.log(`🎮 Jogo iniciado!`);
+    console.log(`🎮 Jogo iniciado! Turno de ${this.player1.name}`);
     this.nextTurn(this.player1);
   }
 

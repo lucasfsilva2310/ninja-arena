@@ -142,7 +142,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     );
     game.executeTurn(selectedActions);
     clearStates();
-    game.nextTurn(game.player1);
+    game.nextTurn(game.player2);
 
     // AI Action
     executeAITurn();
@@ -202,7 +202,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     });
 
     game.executeTurn(aiActions);
-    game.nextTurn(game.player2);
+    game.nextTurn(game.player1);
   };
 
   // Logic to get unused chakras
@@ -323,9 +323,10 @@ const CurrentActions = ({
 }) => {
   return selectedActions
     .filter((action) => action.target === character)
-    .map((_, actionIndex) => (
+    .map((action, actionIndex) => (
       <p
         className="ability-selected"
+        key={action.ability.name + actionIndex}
         onClick={() => removeSelectedAction(actionIndex)}
       >
         {
