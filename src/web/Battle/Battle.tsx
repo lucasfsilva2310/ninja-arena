@@ -32,8 +32,17 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onGameOver]);
-
+  console.log(selectedAbility);
+  console.log(selectedCharacter);
+  console.log(possibleTargets);
   const handleAbilityClick = (character: Character, ability: Ability) => {
+    if (selectedAbility === ability) {
+      setSelectedCharacter(null);
+      setSelectedAbility(null);
+      setPossibleTargets([]);
+      return;
+    }
+
     setSelectedCharacter(character);
     setSelectedAbility(ability);
     let targets: Character[] = [];
@@ -59,6 +68,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setPossibleTargets([...targets]);
   };
   const handleTargetClick = (target: Character) => {
+    if (!possibleTargets.includes(target)) {
+      return;
+    }
+
     if (selectedAbility) {
       setSelectedActions([
         ...selectedActions,
@@ -184,22 +197,22 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                   possibleTargets={possibleTargets}
                   selectedActions={selectedActions}
                 />
-                <div className="flex gap-2">
-                  {char.abilities.map((ability) => (
-                    <button
-                      key={ability.name}
-                      onClick={() => handleAbilityClick(char, ability)}
-                      disabled={!ability.canUse(game.player1.chakras)}
-                      className={`ability-button ${
-                        ability.canUse(game.player1.chakras)
-                          ? "ability-active"
-                          : "ability-inactive"
-                      }`}
-                    >
-                      {ability.name} ({ability.requiredChakra.join(", ")})
-                    </button>
-                  ))}
-                </div>
+              </div>
+              <div className="flex gap-2">
+                {char.abilities.map((ability) => (
+                  <button
+                    key={ability.name}
+                    onClick={() => handleAbilityClick(char, ability)}
+                    disabled={!ability.canUse(game.player1.chakras)}
+                    className={`ability-button ${
+                      ability.canUse(game.player1.chakras)
+                        ? "ability-active"
+                        : "ability-inactive"
+                    }`}
+                  >
+                    {ability.name} ({ability.requiredChakra.join(", ")})
+                  </button>
+                ))}
               </div>
               <Effects character={char} />
             </>
