@@ -99,13 +99,16 @@ O jogo continua até que um dos lados vença.
 
 ## TODO List
 
-- Após selecionar uma habilidade e selecionar o personagem onde a habilidade fica registrada no personagem, deve ser possível clicar na habilidade novamente para removê-la da lista de ações. Isolar a div "Efeitos" para abaixo da div do personagem, para que seja possível clicar em uma habilidade de forma independente e removê-la da seleção se necessário
+- Só é possivel utilizar uma habilidade por turno. adaptar lógica para ser possível selecionar até uma habilidade POR PLAYER. Apos selecionar uma habilidade e selecionar seu target os botôes de habilidade devem ser desabilitados para aquele personagem.
 
-- Exibir activeEffects em todos os personagens durante o turno ( atualizar activeEffects para que tenha o nome da habilidade, descrição etc.)
-
-- Cada personagem pode utilizar somente uma habilidade por turno, ao selecionar uma habilidade e selecionar seu target os botôes de habilidade devem ser desabilitados
-
-- Ao abrir o modal de seleção de chakras para substituir chakra random, os chakras devem ser agrupados. Deve se exibir cada tipo de chakra, o seu total acumulado e um botão de + e um de -, indicando quantos chakras daquele tipo o usuário quer utilizar para substituir o Random. E a cada chakra selecionado no mais, os chakras randoms são diminuidos até todos estarem zerados.
-  Quando o chakra random estiver zerado nao deve ser mais possível clicar no botão de +, somente no de -. QUando o chakra random estiver zerado o botão de confirmar deve ficar habilitado.
+- Após selecionar uma habilidade e selecionar o personagem onde a habilidade fica registrada no personagem, deve ser possível clicar na habilidade novamente para removê-la da lista de ações.
 
 - adicionar cooldown nas habilidades
+
+- adaptar código para que seja possível selecionar mais
+
+- Adicionar tooltip ao botão de habilidades, para exibir seu efeito
+
+- Adicionar lógica de caso vc comece o turno, vc inicia com somente 1 chakra. Os chakras subsequentes dos proximos turnos que vc vai receber é equivalente a quantidade de personagens vivos do seu time.
+
+- Desenvolver outros tipos de habilidades, como por exemplo clone das sombras que da damageReduction E aumenta a força de rasengan

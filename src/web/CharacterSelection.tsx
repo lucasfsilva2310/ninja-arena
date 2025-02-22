@@ -37,7 +37,8 @@ export default function CharacterSelection() {
     setGame(newGame);
   };
 
-  const handleGameOver = () => {
+  const handleGameOver = (text: string) => {
+    alert(text);
     setGame(null);
     setSelectedCharacters([]);
   };

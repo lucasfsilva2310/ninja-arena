@@ -38,8 +38,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     if (game.checkGameOver()) {
       onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onGameOver]);
+  }, [onGameOver, game, selectedActions]);
 
   const handleAbilityClick = (character: Character, ability: Ability) => {
     if (selectedAbility === ability && selectedCharacter === character) {
@@ -288,7 +287,6 @@ const Effects = ({ character }: { character: Character }) => {
           <span className="effect-label" key="effects">
             Efeitos:{" "}
             {character.activeEffects.map((effect, index) => {
-              console.log(effect);
               if (!effect.name) {
                 return null;
               }
