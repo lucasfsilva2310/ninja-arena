@@ -36,7 +36,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   console.log(selectedCharacter);
   console.log(possibleTargets);
   const handleAbilityClick = (character: Character, ability: Ability) => {
-    if (selectedAbility === ability) {
+    if (selectedAbility === ability && selectedCharacter === character) {
       setSelectedCharacter(null);
       setSelectedAbility(null);
       setPossibleTargets([]);
