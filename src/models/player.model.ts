@@ -12,10 +12,17 @@ export class Player {
 
   constructor(public name: string, public characters: Character[] = []) {}
 
-  receiveChakra() {
+  receiveChakra(turn: number) {
     const aliveCharacters = this.characters.filter((character) =>
       character.isAlive()
     );
+
+    const isStartOfGame = turn === 1;
+
+    if (isStartOfGame) {
+      this.chakras = [new Chakra().type];
+      return;
+    }
 
     this.chakras = [
       ...this.chakras,

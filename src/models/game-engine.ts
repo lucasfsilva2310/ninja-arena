@@ -15,7 +15,7 @@ export class GameEngine {
   nextTurn(player: Player) {
     this.turn++;
     console.log(`🎮 Turno ${this.turn}!`);
-    player.receiveChakra();
+    player.receiveChakra(this.turn);
     player.processCooldowns();
     player.processActiveEffects();
   }

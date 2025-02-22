@@ -91,15 +91,12 @@ Ability: Representa as habilidades dos personagens.
 Escolha habilidades para cada personagem.
 
 Selecione os alvos apropriados.
-W
 
 Aguarde a IA executar suas ações.
 
 O jogo continua até que um dos lados vença.
 
 ## TODO List
-
-- Adicionar lógica de caso vc comece o turno, vc inicia com somente 1 chakra. Os chakras subsequentes dos proximos turnos que vc vai receber é equivalente a quantidade de personagens vivos do seu time.
 
 - Desenvolver outros tipos de habilidades, como por exemplo clone das sombras que da damageReduction E aumenta a força de rasengan
 
