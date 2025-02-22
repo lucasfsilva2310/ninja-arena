@@ -8,6 +8,13 @@ export const chakraTypes = {
   Random: "Random",
 } as const;
 
+export const chakraTypesWithoutRandom: ChakraType[] = [
+  chakraTypes.Ninjutsu,
+  chakraTypes.Taijutsu,
+  chakraTypes.Genjutsu,
+  chakraTypes.Bloodline,
+];
+
 export const initialChakraObj: InitialChakraObjType = {
   [chakraTypes.Ninjutsu]: 0,
   [chakraTypes.Taijutsu]: 0,
