@@ -169,7 +169,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     game.executeTurn(aiActions);
   };
-
+  console.log(selectedActions);
   return (
     <div className="battle-container">
       <h2 className="battle-header">Turno {game.turn}</h2>
@@ -211,20 +211,25 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 </p>
               )}
               <div className="flex gap-2">
-                {char.abilities.map((ability) => (
-                  <button
-                    key={ability.name}
-                    onClick={() => handleAbilityClick(char, ability)}
-                    disabled={!ability.canUse(game.player1.chakras)}
-                    className={`ability-button ${
-                      ability.canUse(game.player1.chakras)
-                        ? "ability-active"
-                        : "ability-inactive"
-                    }`}
-                  >
-                    {ability.name} ({ability.requiredChakra.join(", ")})
-                  </button>
-                ))}
+                {char.abilities.map((ability) => {
+                  const isAbilitiesDisabled =
+                    !ability.canUse(game.player1.chakras) ||
+                    selectedActions.some((action) => action.character === char);
+                  return (
+                    <button
+                      key={ability.name}
+                      onClick={() => handleAbilityClick(char, ability)}
+                      disabled={isAbilitiesDisabled}
+                      className={`ability-button ${
+                        isAbilitiesDisabled
+                          ? "ability-inactive"
+                          : "ability-active"
+                      }`}
+                    >
+                      {ability.name} ({ability.requiredChakra.join(", ")})
+                    </button>
+                  );
+                })}
               </div>
               <Effects character={char} />
             </>
