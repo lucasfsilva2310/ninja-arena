@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { GameEngine } from "../../models/game-engine";
 import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
-import Modal from "./Modal";
 import "./Battle.css";
 import { ChakraType } from "../../models/chakra.model";
 import { Player } from "../../models/player.model";
+import ExchangeRandomChakraFinalModal from "./ExchangeRandomChakraFinalModal";
 
 interface BattleProps {
   game: GameEngine;
@@ -26,7 +26,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   );
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
   const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showExchangeRandomFinalModal, setShowExchangeRandomFinalModal] =
+    useState(false);
   const [randomChakraCount, setRandomChakraCount] = useState(0);
   const [chakrasToSwitchFromRandom, setChakrasToSwitchFromRandom] = useState<
     ChakraType[]
@@ -40,7 +41,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setPossibleTargets([]);
     setChakrasToSwitchFromRandom([]);
     setSelectedChakras([]);
-    setShowModal(false);
+    setShowExchangeRandomFinalModal(false);
   };
 
   useEffect(() => {
@@ -130,7 +131,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     if (totalRandoms > 0) {
       setRandomChakraCount(totalRandoms);
-      setShowModal(true);
+      setShowExchangeRandomFinalModal(true);
       return;
     }
 
@@ -298,14 +299,14 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         Finalizar Turno
       </button>
 
-      {showModal && (
-        <Modal
+      {showExchangeRandomFinalModal && (
+        <ExchangeRandomChakraFinalModal
           availableChakras={player1ActiveChakras}
           requiredRandomCount={randomChakraCount}
           chakrasToSwitchFromRandom={chakrasToSwitchFromRandom}
           setChakrasToSwitchFromRandom={setChakrasToSwitchFromRandom}
           onConfirm={finalizeTurn}
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowExchangeRandomFinalModal(false)}
         />
       )}
     </div>

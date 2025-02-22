@@ -4,6 +4,7 @@ import {
   chakraTypesWithoutRandom,
   initialChakraObj,
 } from "../../models/chakra.model";
+import "./ExchangeRandomChakraFinalModal.css";
 
 interface ModalProps {
   availableChakras: ChakraType[];
@@ -16,7 +17,7 @@ interface ModalProps {
   onClose: () => void;
 }
 
-export default function Modal({
+export default function ExchangeRandomChakraFinalModal({
   availableChakras,
   requiredRandomCount,
   chakrasToSwitchFromRandom,
