@@ -6,7 +6,7 @@ const hiddenLotus = new Ability(
   (name: string) => `${name} open its 5th chakra gate, dealing 40 damage.`,
   ["Taijutsu", "Random"],
   [{ type: "Damage", value: 40 }],
-  "Self"
+  "Enemy"
 );
 const primaryLotus = new Ability(
   "Primary Lotus",
