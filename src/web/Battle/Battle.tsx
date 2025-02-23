@@ -346,20 +346,18 @@ const CurrentActions = ({
   selectedActions: SelectedAction[];
   removeSelectedAction: (index: number) => void;
 }) => {
-  return selectedActions
-    .filter((action) => action.target === character)
-    .map((action, actionIndex) => (
-      <p
-        className="ability-selected"
-        key={action.ability.name + actionIndex}
-        onClick={() => removeSelectedAction(actionIndex)}
-      >
-        {
-          selectedActions.find((action) => action.target === character)?.ability
-            .name
-        }
-      </p>
-    ));
+  return selectedActions.map(
+    (action, actionIndex) =>
+      action.target === character && (
+        <p
+          className="ability-selected"
+          key={action.ability.name + actionIndex}
+          onClick={() => removeSelectedAction(actionIndex)}
+        >
+          {action.ability.name}
+        </p>
+      )
+  );
 };
 
 const CurrentActionsOnEnemy = ({

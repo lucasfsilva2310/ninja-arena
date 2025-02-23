@@ -14,7 +14,6 @@ interface ChakraTransformModalProps {
   ) => void;
   onClose: () => void;
 }
-
 export default function ChakraTransformModal({
   availableChakras,
   onTransform,
@@ -22,7 +21,6 @@ export default function ChakraTransformModal({
 }: ChakraTransformModalProps) {
   const [chakraCounts, setChakraCounts] = useState<Record<ChakraType, number>>(
     chakraTypesWithoutRandom.reduce((acc, chakra) => {
-      console.log(availableChakras);
       acc[chakra] = availableChakras.filter((c) => c === chakra).length;
       return acc;
     }, initialChakraObj as Record<ChakraType, number>)

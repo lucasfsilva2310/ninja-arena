@@ -102,8 +102,4 @@ O jogo continua até que um dos lados vença.
 
 - Colocar tempo de 60 segundos para executar as ações. Caso o player finalize o turno antes do tempo final, o tempo é resetado para o próximo player. Caso o player não finalize o turno somente as ações dentro de selectedActions serão executadas.
 
-- Adicionar lógica para poder substituir 5 chakras random por um de sua escolha. Criar um novo modal que terá o botão habilitado caso o player tenha 5 ou mais chakras. Ao abrir o modal, será bem semelhante ao modal de substituição de Random, só que agora 5 devem ser selecionados e também deve ter a opção de selecionar o tipo de chakra que os 5 irão se transformar. Ao selecionar os 5 e clicar no botão habilitado, player.chakras deve ser atualizado removendo os chakras utilizados e adicionando o novo, também atualizando os estados do componente Battle.
-
-- Ajustar quando 2 habilidades ou mais são selecionadas no mesmo personagem para o player 1, fica listado somente a primeira habilidade utilizada
-
 - Ajustar para quem começar no primeiro turno receber somente 1 de chakra, independente da quantidade de personagens vivos
