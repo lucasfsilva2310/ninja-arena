@@ -6,6 +6,7 @@ import "./Battle.css";
 import { ChakraType } from "../../models/chakra.model";
 import { Player } from "../../models/player.model";
 import ExchangeRandomChakraFinalModal from "./ExchangeRandomChakraFinalModal";
+import ChakraTransformModal from "./ChakraTransformModal";
 
 interface BattleProps {
   game: GameEngine;
@@ -28,6 +29,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
   const [showExchangeRandomFinalModal, setShowExchangeRandomFinalModal] =
     useState(false);
+  const [showChakraTransformModal, setChakraTransformModal] = useState(false);
   const [randomChakraCount, setRandomChakraCount] = useState(0);
   const [chakrasToSwitchFromRandom, setChakrasToSwitchFromRandom] = useState<
     ChakraType[]
@@ -149,6 +151,38 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     executeAITurn();
   };
 
+  // Logic to get unused chakras
+  // TODO: isolate
+  const player1ActiveChakras: ChakraType[] = [];
+
+  const getNotUsedChakras = () => {
+    Object.entries(game.player1.getChakraCount()).forEach(([chakra, count]) => {
+      const chakraCount =
+        count - selectedChakras.filter((c) => c === chakra).length;
+
+      for (let i = 0; i < chakraCount; i++) {
+        player1ActiveChakras.push(chakra as ChakraType);
+      }
+    });
+  };
+
+  getNotUsedChakras();
+
+  const player1ActiveChakrasComponent = Object.entries(
+    game.player1.getChakraCount()
+  ).map(([chakra, count]) => (
+    <span key={chakra} className="chakra-item">
+      {chakra}: {count - selectedChakras.filter((c) => c === chakra).length}
+    </span>
+  ));
+
+  const handleTransformChakras = (
+    chakrasToTransform: ChakraType[],
+    targetChakra: ChakraType
+  ) => {
+    game.player1.transformChakras(chakrasToTransform, targetChakra);
+  };
+
   // TODO: Randomized AI Turn
   const executeAITurn = () => {
     const aiActions: {
@@ -206,99 +240,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     game.nextTurn(game.player1);
   };
 
-  // Logic to get unused chakras
-  // TODO: isolate
-  const player1ActiveChakras: ChakraType[] = [];
-
-  const getNotUsedChakras = () => {
-    Object.entries(game.player1.getChakraCount()).forEach(([chakra, count]) => {
-      const chakraCount =
-        count - selectedChakras.filter((c) => c === chakra).length;
-
-      for (let i = 0; i < chakraCount; i++) {
-        player1ActiveChakras.push(chakra as ChakraType);
-      }
-    });
-  };
-
-  getNotUsedChakras();
-
-  const player1ActiveChakrasComponent = Object.entries(
-    game.player1.getChakraCount()
-  ).map(([chakra, count]) => (
-    <span key={chakra} className="chakra-item">
-      {chakra}: {count - selectedChakras.filter((c) => c === chakra).length}
-    </span>
-  ));
-
   return (
-    <div className="battle-container">
-      <h2 className="battle-header">Turno {game.turn}</h2>
-
-      <div className="chakra-container">
-        <h3 className="chakra-title">Chakra Disponível</h3>
-        <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
-      </div>
-
-      <div className="teams-container">
-        <div className="team-container">
-          <h3 className="team-title">Seu Time</h3>
-          {game.player1.characters.map((char, charIndex) => (
-            <React.Fragment key={char.name + charIndex}>
-              <div
-                className="character-card"
-                onClick={() => handleTargetClick(game.player1, char)}
-              >
-                <PlayerCharacterName
-                  character={char}
-                  possibleTargets={possibleTargets}
-                />
-              </div>
-              <CurrentActions
-                character={char}
-                selectedActions={selectedActions}
-                removeSelectedAction={removeSelectedAction}
-              />
-              <Abilities
-                character={char}
-                activeChakras={player1ActiveChakras}
-                selectedActions={selectedActions}
-                handleAbilityClick={handleAbilityClick}
-              />
-              <ActiveEffects character={char} />
-            </React.Fragment>
-          ))}
-        </div>
-
-        <div className="team-container">
-          <h3 className="team-title">Time Inimigo</h3>
-          {game.player2.characters.map((char, charIndex) => (
-            <React.Fragment key={char.name + charIndex + 1}>
-              <div
-                className={`character-card${
-                  possibleTargets.includes(char) ? "enemy-selected" : ""
-                } enemy-hover`}
-                onClick={() => handleTargetClick(game.player1, char)}
-              >
-                <EnemyCharacterName
-                  character={char}
-                  possibleTargets={possibleTargets}
-                />
-              </div>
-              <CurrentActionsOnEnemy
-                character={char}
-                selectedActions={selectedActions}
-                removeSelectedAction={removeSelectedAction}
-              />
-              <ActiveEffects character={char} />
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
-      <button onClick={executeTurn} className="turn-button">
-        Finalizar Turno
-      </button>
-
+    <>
       {showExchangeRandomFinalModal && (
         <ExchangeRandomChakraFinalModal
           availableChakras={player1ActiveChakras}
@@ -309,7 +252,88 @@ export default function Battle({ game, onGameOver }: BattleProps) {
           onClose={() => setShowExchangeRandomFinalModal(false)}
         />
       )}
-    </div>
+      {showChakraTransformModal && (
+        <ChakraTransformModal
+          availableChakras={player1ActiveChakras}
+          onClose={() => setChakraTransformModal(false)}
+          onTransform={handleTransformChakras}
+        />
+      )}
+      <div className="battle-container">
+        <h2 className="battle-header">Turno {game.turn}</h2>
+
+        <div className="chakra-container">
+          <h3 className="chakra-title">Chakra Disponível</h3>
+          <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
+          <button
+            onClick={() => setChakraTransformModal(true)}
+            className="chakra-button"
+            disabled={player1ActiveChakras.length < 5}
+          >
+            Trocar Chakra
+          </button>
+        </div>
+
+        <div className="teams-container">
+          <div className="team-container">
+            <h3 className="team-title">Seu Time</h3>
+            {game.player1.characters.map((char, charIndex) => (
+              <React.Fragment key={char.name + charIndex}>
+                <div
+                  className="character-card"
+                  onClick={() => handleTargetClick(game.player1, char)}
+                >
+                  <PlayerCharacterName
+                    character={char}
+                    possibleTargets={possibleTargets}
+                  />
+                </div>
+                <CurrentActions
+                  character={char}
+                  selectedActions={selectedActions}
+                  removeSelectedAction={removeSelectedAction}
+                />
+                <Abilities
+                  character={char}
+                  activeChakras={player1ActiveChakras}
+                  selectedActions={selectedActions}
+                  handleAbilityClick={handleAbilityClick}
+                />
+                <ActiveEffects character={char} />
+              </React.Fragment>
+            ))}
+          </div>
+
+          <div className="team-container">
+            <h3 className="team-title">Time Inimigo</h3>
+            {game.player2.characters.map((char, charIndex) => (
+              <React.Fragment key={char.name + charIndex + 1}>
+                <div
+                  className={`character-card${
+                    possibleTargets.includes(char) ? "enemy-selected" : ""
+                  } enemy-hover`}
+                  onClick={() => handleTargetClick(game.player1, char)}
+                >
+                  <EnemyCharacterName
+                    character={char}
+                    possibleTargets={possibleTargets}
+                  />
+                </div>
+                <CurrentActionsOnEnemy
+                  character={char}
+                  selectedActions={selectedActions}
+                  removeSelectedAction={removeSelectedAction}
+                />
+                <ActiveEffects character={char} />
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+        <button onClick={executeTurn} className="turn-button">
+          Finalizar Turno
+        </button>
+      </div>
+    </>
   );
 }
 

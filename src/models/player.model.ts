@@ -37,6 +37,11 @@ export class Player {
     }
   }
 
+  transformChakras(chakrasToTransform: ChakraType[], targetChakra: ChakraType) {
+    chakrasToTransform.forEach((chakra) => this.consumeChakra(chakra));
+    this.chakras.push(targetChakra);
+  }
+
   getChakraCount() {
     return this.chakras.reduce(
       (acc, chakra: string) => {
