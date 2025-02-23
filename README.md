@@ -98,8 +98,8 @@ O jogo continua até que um dos lados vença.
 
 ## TODO List
 
-- Desenvolver outros tipos de habilidades, como por exemplo clone das sombras que da damageReduction E aumenta a força de rasengan
+- Desenvolver outros tipos de habilidades, como por exemplo pensar na lógica de ter uma habilidade "Buff", que pode deixar uma outra habilidade mais forte ( recebe uma lista de habilidades ), também "Enabled" que recebe uma lista de habilidades que ela habilita para uso, sem ela ativa não é possivel utilizar uma habilidade.
 
 - Colocar tempo de 60 segundos para executar as ações. Caso o player finalize o turno antes do tempo final, o tempo é resetado para o próximo player. Caso o player não finalize o turno somente as ações dentro de selectedActions serão executadas.
 
-- Ajustar para quem começar no primeiro turno receber somente 1 de chakra, independente da quantidade de personagens vivos
+- adicionar tela embaixo exibindo histórico das ações em cada turno e descrição da habilidade ao no botão dela (se clicar em um inimigo também deve exibir todas as habilidades dele e descrição)
