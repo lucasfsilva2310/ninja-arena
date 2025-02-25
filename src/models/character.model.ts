@@ -1,11 +1,11 @@
-import { Ability } from "./ability.model";
+import { Ability, AbilityEffect, BuffEffect } from "./ability.model";
 
 type EffectType = {
   name?: string;
   description?: string;
   damageReduction?: {
     amount: number;
-    duration: number;
+    remainingTurns: number;
     applied?: boolean;
   };
   transformation?: {
@@ -16,6 +16,13 @@ type EffectType = {
   };
   persistentEffects?: Ability[];
   stackingEffect?: { baseDamage: number; increment: number };
+  buff?: {
+    buffedAbilites: string[];
+    buffType: "Damage" | "Heal" | "CooldownReduction";
+    value: number;
+    remainingTurns: number;
+    applied?: boolean;
+  };
 };
 
 export class Character {
@@ -44,19 +51,23 @@ export class Character {
     return this.hp > 0;
   }
 
-  takeDamage(damage: number) {
+  takeDamage(damage: number, increasedDamage: number = 0) {
     let reducedDamage = damage;
-    console.log(`${this.name} recebeu ${damage} de dano`);
+    console.log(
+      `${this.name} recebeu ${damage} de dano com mais ${increasedDamage} de dano aumentado`
+    );
     this.activeEffects.forEach((effect) => {
-      console.log(effect);
       if (effect.damageReduction) {
-        reducedDamage = Math.max(0, damage - effect.damageReduction.amount);
+        reducedDamage = Math.max(
+          0,
+          damage - (reducedDamage + effect.damageReduction.amount)
+        );
         console.log(
           `${this.name} tem ${effect.damageReduction.amount} de dano reduzido. Dano reduzido: ${reducedDamage}`
         );
       }
     });
-    this.hp = Math.max(0, this.hp - reducedDamage);
+    this.hp = Math.max(0, this.hp - (reducedDamage + increasedDamage));
   }
 
   heal(amount: number) {
@@ -69,14 +80,14 @@ export class Character {
     this.hp = Math.min(100, this.hp + amount);
   }
 
-  addDamageReduction(ability: Ability, amount: number, duration: number) {
+  addDamageReduction(ability: Ability, amount: number, remainingTurns: number) {
     console.log(
-      `recebeu ${amount} de redução de dano por ${duration} turnos. `
+      `recebeu ${amount} de redução de dano por ${remainingTurns} turnos. `
     );
     this.activeEffects.push({
       name: ability.name,
       description: ability.description(this.name, amount),
-      damageReduction: { amount, duration },
+      damageReduction: { amount, remainingTurns },
     });
   }
 
@@ -146,5 +157,16 @@ export class Character {
       console.log(`${this.name} aplicou baseDamage ${baseDamage}. `);
       this.activeEffects.push({ stackingEffect: { baseDamage, increment } });
     }
+  }
+
+  applyBuff(buff: BuffEffect, value: number) {
+    console.log(`${this.name} aplicou buff de ${buff.buffType}. `);
+    this.activeEffects.push({ buff: { ...buff, value } });
+  }
+
+  removeActiveEffect(currentEffect: AbilityEffect) {
+    this.activeEffects = this.activeEffects.filter(
+      (effect) => effect !== currentEffect
+    );
   }
 }

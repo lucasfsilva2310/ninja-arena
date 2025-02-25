@@ -7,14 +7,30 @@ export type EffectType =
   | "DamageReduction"
   | "Transform"
   | "Persistent"
-  | "Stacking";
+  | "Stacking"
+  | "Buff";
 
 export interface AbilityEffect {
   type: EffectType;
   value: number;
-  increment?: number;
+
+  // Specific Effects
   duration?: number;
+
+  // Stacking
+  increment?: number;
+
+  // Transform
   transformation?: Ability;
+
+  // Buff
+  buff?: BuffEffect;
+}
+
+export interface BuffEffect {
+  buffedAbilites: string[];
+  remainingTurns: number;
+  buffType: "Damage" | "Heal";
 }
 
 export class Ability {
@@ -32,20 +48,53 @@ export class Ability {
   ) {}
 
   canUse(chakras: ChakraType[]): boolean {
-    // TODO: Check if player1 has no chakra if button will be enabled
-    return (
-      !this.isOnCooldown() &&
-      this.requiredChakra.every(
-        (req) => req === "Random" || chakras.includes(req)
-      )
+    if (this.isOnCooldown()) return false;
+
+    // Map with availableChakras
+    const availableChakras: Record<ChakraType, number> = chakras.reduce(
+      (acc, chakra) => {
+        acc[chakra] = (acc[chakra] || 0) + 1;
+        return acc;
+      },
+      {} as Record<ChakraType, number>
     );
+
+    // Map with needed Chakras
+    const requiredChakras: Record<ChakraType, number> =
+      this.requiredChakra.reduce((acc, chakra) => {
+        acc[chakra] = (acc[chakra] || 0) + 1;
+        return acc;
+      }, {} as Record<ChakraType, number>);
+
+    // Check if has enough chakra
+    for (const [chakra, requiredAmount] of Object.entries(requiredChakras)) {
+      if (chakra === "Random") continue; //Ignore random
+
+      const availableAmount = availableChakras[chakra as ChakraType] || 0;
+      if (availableAmount < requiredAmount) return false;
+    }
+
+    // Deal with random
+    const totalRequiredChakras = this.requiredChakra.length;
+    const totalAvailableChakras = chakras.length;
+
+    return totalAvailableChakras >= totalRequiredChakras;
   }
 
   applyEffect(character: Character, ability: Ability, target: Character) {
     this.effects.forEach((effect) => {
+      let increasedDamage: number = 0;
       switch (effect.type) {
         case "Damage":
-          target.takeDamage(effect.value);
+          character.activeEffects.forEach((effect) => {
+            if (
+              effect.buff &&
+              effect.buff.buffedAbilites.includes(ability.name)
+            ) {
+              increasedDamage += effect.buff.value;
+            }
+          });
+          target.takeDamage(effect.value, increasedDamage);
           break;
         case "Heal":
           target.heal(effect.value);
@@ -73,12 +122,18 @@ export class Ability {
         case "Stacking":
           target.applyStackingEffect(effect.value, effect.increment!);
           break;
+        case "Buff":
+          character.applyBuff(effect.buff!, effect.value);
+          break;
       }
 
       if (!this.isOnCooldown()) {
-        // Add one because processCooldown from game-engine already subtracts 1 after
-        // executing the turn
+        // Add one because processCooldown from game-engine already subtracts 1 after executing the turn
         this.currentCooldown = this.defaultCooldown + 1;
+      }
+
+      if (this.currentCooldown === 0) {
+        character.removeActiveEffect(effect);
       }
     });
   }

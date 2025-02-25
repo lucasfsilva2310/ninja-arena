@@ -67,8 +67,8 @@ export class Player {
             effect.damageReduction.applied = true;
             return true;
           }
-          effect.damageReduction.duration--;
-          return effect.damageReduction.duration > 0;
+          effect.damageReduction.remainingTurns--;
+          return effect.damageReduction.remainingTurns > 0;
         }
         if (effect.transformation) {
           if (!effect.transformation.applied) {
@@ -101,6 +101,15 @@ export class Player {
             `${character.name} teve seu efeito stack aumentado para ${effect.stackingEffect.baseDamage}.`
           );
           return true;
+        }
+
+        if (effect.buff) {
+          if (!effect.buff.applied) {
+            effect.buff.applied = true;
+            return true;
+          }
+          effect.buff.remainingTurns--;
+          return effect.buff.remainingTurns > 0;
         }
 
         return true;
