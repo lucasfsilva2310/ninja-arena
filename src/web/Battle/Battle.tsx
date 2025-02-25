@@ -195,7 +195,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     game.player2.characters.forEach((char) => {
       if (char.hp > 0) {
         const availableAbilities = char.abilities.filter((ability) =>
-          ability.canUse(game.player2.chakras)
+          ability.canUse(char, game.player2.chakras)
         );
 
         if (availableAbilities.length > 0) {
@@ -398,7 +398,7 @@ const Abilities = ({
     <div className="flex gap-2">
       {character.abilities.map((ability) => {
         const isAbilitiesDisabled =
-          !ability.canUse(activeChakras) ||
+          !ability.canUse(character, activeChakras) ||
           selectedActions.some((action) => action.character === character);
         return (
           <button

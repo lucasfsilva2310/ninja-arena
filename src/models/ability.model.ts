@@ -47,8 +47,9 @@ export class Ability {
     public isStacking: boolean = false
   ) {}
 
-  canUse(chakras: ChakraType[]): boolean {
+  canUse(char: Character, chakras: ChakraType[]): boolean {
     if (this.isOnCooldown()) return false;
+    if (!char.isAlive()) return false;
 
     // Map with availableChakras
     const availableChakras: Record<ChakraType, number> = chakras.reduce(
