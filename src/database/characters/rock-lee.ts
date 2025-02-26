@@ -3,7 +3,7 @@ import { Character } from "../../models/character.model";
 
 export const hiddenLotus = new Ability(
   "Hidden Lotus",
-  (name: string) => `${name} open its 5th chakra gate, dealing 40 damage.`,
+  "Rock Lee open its 5th chakra gate, dealing 40 damage.",
   ["Taijutsu", "Random"],
   0,
   [{ type: "Damage", value: 40 }],
@@ -11,8 +11,7 @@ export const hiddenLotus = new Ability(
 );
 export const primaryLotus = new Ability(
   "Primary Lotus",
-  (name: string, value?: number | undefined) =>
-    `${name} extends its arm bandages around its opponent, dealing ${value} damage. This ability becomes Hidden Lotus for the next turn`,
+  "Rock Lee extends its arm bandages around its opponent, dealing 30 damage. This ability becomes Hidden Lotus for the next turn",
   ["Taijutsu"],
   1,
   [
@@ -28,8 +27,7 @@ export const primaryLotus = new Ability(
 
 export const powerOfYouth = new Ability(
   "Power of Youth",
-  (name: string, value?: number | undefined) =>
-    `${name}  encourage itself, healing ${value} health.`,
+  "Rock Lee encourage itself, healing 15 health.",
   ["Taijutsu"],
   1,
   [
@@ -43,8 +41,7 @@ export const powerOfYouth = new Ability(
 
 export const backflip = new Ability(
   "Backflip",
-  (name: string) =>
-    `${name} do a big backflip avoiding all danger, becoming invunerable for the next turn.`,
+  "Rock Lee do a big backflip avoiding all danger, becoming invunerable for the next turn.",
   ["Random"],
   1,
   [

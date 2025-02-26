@@ -4,8 +4,8 @@ import { kawarimi } from "../abilities/kawarimi";
 
 export const fireball = new Ability(
   "fireball",
-  (name: string, value: number | undefined) =>
-    `${name} throws a fireball jutsu, dealing ${value} damage.`,
+
+  "Sasuke throws a fireball jutsu, dealing 25 damage.",
   ["Ninjutsu"],
   1,
   [
@@ -19,8 +19,7 @@ export const fireball = new Ability(
 
 export const chidori = new Ability(
   "Chidori",
-  (name: string, value: number | undefined) =>
-    `${name} creates lighting chakra around his hand, dealing ${value} damage.`,
+  "Sasuke creates lighting chakra around his hand, dealing 35 damage. If Sharingan is active, it will deal 10 more damage",
   ["Ninjutsu", "Random"],
   1,
   [
@@ -34,8 +33,7 @@ export const chidori = new Ability(
 
 export const sharingan = new Ability(
   "Sharingan",
-  (name: string) =>
-    `${name} uses the Sharingan, receiving 15 damage reduction. If chidori is used it will deal 10 more damage`,
+  "Sasuke uses the Sharingan, receiving 15 damage reduction. If chidori is used it will deal 10 more damage",
   ["Bloodline", "Random"],
   4,
   [

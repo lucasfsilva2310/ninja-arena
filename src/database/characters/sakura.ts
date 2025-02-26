@@ -4,7 +4,7 @@ import { kawarimi } from "../abilities/kawarimi";
 
 export const superPunch = new Ability(
   "Super Punch",
-  (name: string) => `${name} throws a super punch`,
+  "Sakura throws a super punch",
   ["Taijutsu"],
   0,
   [{ type: "Damage", value: 15 }],
@@ -13,7 +13,7 @@ export const superPunch = new Ability(
 
 export const healing = new Ability(
   "Heal",
-  (name: string) => `${name} chose an ally to use a healing jutsu.`,
+  "Sakura chose an ally to use a healing jutsu.",
   ["Ninjutsu"],
   0,
   [{ type: "Heal", value: 15 }],

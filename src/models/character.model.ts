@@ -6,6 +6,7 @@ type EffectType = {
   damageReduction?: {
     amount: number;
     remainingTurns: number;
+    isPercent?: boolean;
     applied?: boolean;
   };
   transformation?: {
@@ -92,8 +93,12 @@ export class Character {
     );
     this.activeEffects.push({
       name: ability.name,
-      description: ability.description(this.name, amount),
-      damageReduction: { amount, remainingTurns },
+      description: ability.description,
+      damageReduction: {
+        amount,
+        isPercent: ability.isPercent,
+        remainingTurns,
+      },
     });
   }
 

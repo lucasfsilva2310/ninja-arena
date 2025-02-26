@@ -38,11 +38,12 @@ export class Ability {
 
   constructor(
     public name: string,
-    public description: (name: string, value?: number) => string,
+    public description: string,
     public requiredChakra: ChakraType[],
     public defaultCooldown: number,
     public effects: AbilityEffect[],
     public target: "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies",
+    public isPercent: boolean = false,
     public isPermanent: boolean = false,
     public isStacking: boolean = false
   ) {}

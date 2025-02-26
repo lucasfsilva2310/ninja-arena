@@ -2,9 +2,8 @@ import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
 
 export const narutoKick = new Ability(
-  "narutoKick",
-  (name: string, value: number | undefined) =>
-    `${name} throws a kick with his clones, dealing ${value} damage`,
+  "Naruto Kick",
+  "Naruto throws a kick with his clones, dealing 20 damage. If Kagebunshin is active, it deals 30 damage.",
   ["Taijutsu", "Random"],
   0,
   [{ type: "Damage", value: 20 }],
@@ -13,7 +12,7 @@ export const narutoKick = new Ability(
 
 export const rasengan = new Ability(
   "Rasengan",
-  (name: string) => `${name} throws a rasengan`,
+  "Naruto throws a rasengan",
   ["Ninjutsu", "Random"],
   1,
   [
@@ -26,9 +25,8 @@ export const rasengan = new Ability(
 );
 
 export const escapeClone = new Ability(
-  "escapeClone",
-  (name: string) =>
-    `${name} creates an clone to be targeted, becoming invunerable for the next turn.`,
+  "Escape Clone",
+  "Naruto creates an clone to be used as a distraction, becoming invunerable for the next turn.",
   ["Random"],
   1,
   [
@@ -41,7 +39,29 @@ export const escapeClone = new Ability(
   "Self"
 );
 
+export const kagebunshin = new Ability(
+  "Kage Bunshin",
+  "Naruto creates clones, gaining 15% damage reduction for three turns. Naruto Kick now deals 30 damage. Rasengan now can be used(add enable logic).",
+  ["Random"],
+  4,
+  [
+    { type: "DamageReduction", value: 15, duration: 3 },
+    {
+      type: "Buff",
+      value: 10,
+      buff: {
+        buffedAbilites: ["Naruto Kick"],
+        buffType: "Damage",
+        remainingTurns: 3,
+      },
+    },
+  ],
+  "Self",
+  true
+);
+
 export const naruto = new Character("Naruto", [
+  kagebunshin,
   narutoKick,
   rasengan,
   escapeClone,
