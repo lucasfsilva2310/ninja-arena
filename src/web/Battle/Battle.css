@@ -79,24 +79,113 @@
   transition: all 0.2s ease;
 }
 
-/* Character Name Box */
-.character-name-box {
-  width: 150px;
-  height: 150px;
-  padding: 1rem;
+/* Character Name Container */
+.character-name-container {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
-  background-color: #fff;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #f8fafc;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
 }
 
+.character-name-container.enemy {
+  flex-direction: row-reverse;
+}
+
+/* Character Portrait */
+.character-portrait {
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #3b82f6;
+  flex-shrink: 0;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.character-image:hover {
+  transform: scale(1.1);
+}
+
+/* Character Details */
+.character-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Character Name */
 .character-name {
+  font-size: 1rem;
   font-weight: 600;
-  text-align: center;
   margin: 0;
+  padding: 0.25rem 0;
+  transition: color 0.2s ease;
+}
+
+/* Character States */
+.character-alive {
+  color: #1e293b;
+}
+
+.character-dead {
+  color: #94a3b8;
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.character-selected {
+  color: #3b82f6;
+  position: relative;
+}
+
+.character-selected::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #3b82f6;
+  animation: selectPulse 2s infinite;
+}
+
+/* Hover Effects */
+.character-name-container:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+}
+
+/* Enemy-specific styles */
+.enemy .character-details {
+  text-align: right;
+}
+
+/* Animations */
+@keyframes selectPulse {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
 }
 
 /* Actions and Effects Layout */
@@ -178,19 +267,6 @@
   background-color: #eff6ff;
 }
 
-/* Character States */
-.character-alive {
-  color: #374151;
-}
-
-.character-dead {
-  color: #ef4444;
-}
-
-.character-selected {
-  border: 2px solid #3b82f6;
-}
-
 /* Abilities Section */
 .abilities-container {
   display: flex;
@@ -256,9 +332,18 @@
 }
 
 @media (max-width: 640px) {
-  .character-name-box {
-    width: 120px;
-    height: 120px;
+  .character-name-container {
+    padding: 0.25rem;
+    gap: 0.5rem;
+  }
+
+  .character-portrait {
+    width: 48px;
+    height: 48px;
+  }
+
+  .character-name {
+    font-size: 0.875rem;
   }
 
   .character-info-container {

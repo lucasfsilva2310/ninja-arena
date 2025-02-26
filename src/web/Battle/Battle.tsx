@@ -10,6 +10,7 @@ import ExchangeRandomChakraFinalModal from "./Modals/ExchangeRandomChakra/Exchan
 import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";
 
 import AbilityFooter from "./AbilityFooter/AbilityFooter";
+import HealthBar from "../components/HealthBar/HealthBar";
 
 interface BattleProps {
   game: GameEngine;
@@ -498,13 +499,29 @@ const PlayerCharacterName = ({
   possibleTargets: Character[];
 }) => {
   return (
-    <h4
-      className={`character-name ${
-        character.hp > 0 ? "character-alive" : "character-dead"
-      } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
-    >
-      {character.name} (HP: {character.hp})
-    </h4>
+    <div className="character-name-container">
+      <div className="character-portrait">
+        <img
+          src={`/characters/${character.name.toLowerCase()}/${character.name.toLowerCase()}.png`}
+          alt={character.name}
+          className="character-image"
+          onError={(e) => {
+            // Fallback to default image if character image doesn't exist
+            e.currentTarget.src = "/characters/default.png";
+          }}
+        />
+      </div>
+      <div className="character-details">
+        <h4
+          className={`character-name ${
+            character.hp > 0 ? "character-alive" : "character-dead"
+          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
+        >
+          {character.name}
+        </h4>
+        <HealthBar currentHP={character.hp} />
+      </div>
+    </div>
   );
 };
 
@@ -516,12 +533,28 @@ const EnemyCharacterName = ({
   possibleTargets: Character[];
 }) => {
   return (
-    <h4
-      className={`character-name ${
-        character.hp > 0 ? "character-alive" : "character-dead"
-      } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
-    >
-      {character.name} (HP: {character.hp})
-    </h4>
+    <div className="character-name-container enemy">
+      <div className="character-details">
+        <h4
+          className={`character-name ${
+            character.hp > 0 ? "character-alive" : "character-dead"
+          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
+        >
+          {character.name}
+        </h4>
+        <HealthBar currentHP={character.hp} />
+      </div>
+      <div className="character-portrait">
+        <img
+          src={`/characters/${character.name.toLowerCase()}/${character.name.toLowerCase()}.png`}
+          alt={character.name}
+          className="character-image"
+          onError={(e) => {
+            // Fallback to default image if character image doesn't exist
+            e.currentTarget.src = "/characters/default.png";
+          }}
+        />
+      </div>
+    </div>
   );
 };
