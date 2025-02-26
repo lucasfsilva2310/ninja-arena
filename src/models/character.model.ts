@@ -65,12 +65,19 @@ export class Character {
     );
     this.activeEffects.forEach((effect) => {
       if (effect.damageReduction) {
-        reducedDamage = Math.max(
-          0,
-          damage - (reducedDamage + effect.damageReduction.amount)
-        );
+        if (effect.damageReduction.isPercent) {
+          const reduction = damage * (effect.damageReduction.amount / 100);
+          reducedDamage = Math.max(0, damage - reduction);
+        } else {
+          reducedDamage = Math.max(
+            0,
+            damage - (reducedDamage + effect.damageReduction.amount)
+          );
+        }
         console.log(
-          `${this.name} tem ${effect.damageReduction.amount} de dano reduzido. Dano reduzido: ${reducedDamage}`
+          `${this.name} tem ${effect.damageReduction.amount}${
+            effect.damageReduction.isPercent ? "%" : ""
+          } de dano reduzido. Dano reduzido: ${reducedDamage}`
         );
       }
     });
