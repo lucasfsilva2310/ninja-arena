@@ -51,6 +51,12 @@ export class Character {
     return this.hp > 0;
   }
 
+  isInvulnerable(): boolean {
+    return this.activeEffects.some(
+      (effect) => effect.damageReduction?.amount === Infinity
+    );
+  }
+
   takeDamage(damage: number, increasedDamage: number = 0) {
     let reducedDamage = damage;
     console.log(

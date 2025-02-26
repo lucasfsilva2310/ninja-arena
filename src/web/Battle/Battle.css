@@ -1,62 +1,165 @@
 /* Battle.css */
 .battle-container {
-  padding: 16px;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 2rem;
 }
 
 .battle-header {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 16px;
+  text-align: center;
+  margin-bottom: 2rem;
 }
 
+/* Chakra Section */
 .chakra-container {
-  margin-bottom: 16px;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .chakra-title {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .chakra-item {
-  border: 1px solid #ccc;
-  padding: 4px 8px;
-  border-radius: 4px;
-  background-color: #e2e8f0;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background-color: #fff;
   display: inline-block;
-  margin-right: 4px;
+  margin-right: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
+/* Teams Layout */
 .teams-container {
   display: flex;
-  flex-direction: row;
-  border: 1px solid black;
-
   justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
 }
 
 .team-container {
-  width: 50%;
-  margin-bottom: 16px;
+  flex: 1;
+  max-width: 600px;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .team-title {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
+/* Character Cards */
 .character-card {
-  margin-bottom: 8px;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid black;
-  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+/* Character Name Box */
+.character-name-box {
+  width: 150px;
+  height: 150px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .character-name {
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+}
+
+/* Actions and Effects Layout */
+.character-info-container {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Player 1 Team Specific */
+.team-container:first-child .character-info-container {
+  flex-direction: row;
+}
+
+.team-container:first-child .character-actions,
+.team-container:first-child .character-effects {
+  margin-left: 1rem;
+}
+
+/* Player 2 Team Specific */
+.team-container:last-child .character-info-container {
+  flex-direction: row-reverse;
+}
+
+.team-container:last-child .character-actions,
+.team-container:last-child .character-effects {
+  margin-right: 1rem;
+}
+
+/* Actions Styling */
+.character-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ability-selected {
+  color: #22c55e; /* Green color for selected actions */
+  font-weight: 500;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: #f0fdf4;
+  cursor: pointer;
+}
+
+/* Effects Styling */
+.character-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.effect-label {
+  color: #3b82f6; /* Blue color for active effects */
   font-weight: 500;
 }
 
+.effect-item {
+  position: relative;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background-color: #eff6ff;
+}
+
+/* Character States */
 .character-alive {
   color: #374151;
 }
@@ -66,14 +169,23 @@
 }
 
 .character-selected {
-  border: 2px solid #ef4444;
+  border: 2px solid #3b82f6;
+}
+
+/* Abilities Section */
+.abilities-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .ability-button {
-  padding: 4px 12px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .ability-active {
@@ -81,35 +193,27 @@
   color: white;
 }
 
+.ability-active:hover {
+  background-color: #2563eb;
+}
+
 .ability-inactive {
-  background-color: #d1d5db;
-  color: #6b7280;
+  background-color: #e2e8f0;
+  color: #94a3b8;
   cursor: not-allowed;
 }
 
-.enemy-card {
-  padding: 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-
-.enemy-selected {
-  border-color: #ef4444;
-}
-
-.enemy-hover:hover {
-  background-color: #f3f4f6;
-}
-
+/* Turn Button */
 .turn-button {
-  margin-top: 16px;
-  padding: 8px 16px;
+  width: 100%;
+  padding: 1rem;
   background-color: #10b981;
   color: white;
-  border-radius: 4px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .turn-button:hover {
@@ -117,48 +221,88 @@
 }
 
 .turn-button:disabled {
-  background-color: #9ca3af;
+  background-color: #94a3b8;
   cursor: not-allowed;
 }
 
-.ability-selected {
-  font-style: italic;
-  color: #3b82f6;
-}
-
-/* Effects */
-.effect-label {
-  font-weight: bold;
-  color: #ff4d4d;
-}
-
-.effect-item {
-  position: relative;
-  cursor: pointer;
-  text-decoration: underline;
-}
-
+/* Tooltip */
 .tooltip {
-  margin-left: 110px;
-
   visibility: hidden;
-  width: auto;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  text-align: center;
-  padding: 5px;
-  border-radius: 5px;
   position: absolute;
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  font-size: 14px;
+  padding: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.875rem;
   white-space: nowrap;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .effect-item:hover .tooltip {
   visibility: visible;
   opacity: 1;
+}
+
+/* Sprite Animations */
+.character-sprite {
+  width: 96px;
+  height: 96px;
+  position: relative;
+  margin: 0 auto;
+}
+
+.sprite {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.enemy-sprite {
+  transform: scaleX(-1);
+}
+
+.player-sprite {
+  transform: scaleX(1);
+}
+
+/* Animation keyframes */
+@keyframes attack-motion {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(20px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes hurt-motion {
+  0% { transform: translateX(0); opacity: 1; }
+  25% { transform: translateX(-10px); opacity: 0.7; }
+  75% { transform: translateX(5px); opacity: 0.7; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .teams-container {
+    flex-direction: column;
+  }
+
+  .team-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .character-name-box {
+    width: 120px;
+    height: 120px;
+  }
+
+  .character-info-container {
+    flex-direction: column;
+  }
 }

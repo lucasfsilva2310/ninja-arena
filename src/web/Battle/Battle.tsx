@@ -64,16 +64,16 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     switch (ability.target) {
       case "Enemy":
-        targets = game.player2.characters.filter((char) => char.hp > 0);
+        targets = game.player2.characters.filter((char) => char.isAlive() && !char.isInvulnerable());
         break;
       case "AllEnemies":
-        targets = game.player2.characters;
+        targets = game.player2.characters.filter((char) => char.isAlive() && !char.isInvulnerable());
         break;
       case "Ally":
-        targets = game.player1.characters.filter((char) => char.hp > 0);
+        targets = game.player1.characters.filter((char) => char.isAlive());
         break;
       case "AllAllies":
-        targets = game.player1.characters;
+        targets = game.player1.characters.filter((char) => char.isAlive());
         break;
       case "Self":
         targets = [character];
@@ -275,57 +275,74 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         </div>
 
         <div className="teams-container">
+          {/* Player 1 Team */}
           <div className="team-container">
             <h3 className="team-title">Seu Time</h3>
             {game.player1.characters.map((char, charIndex) => (
-              <React.Fragment key={char.name + charIndex}>
-                <div
-                  className="character-card"
-                  onClick={() => handleTargetClick(game.player1, char)}
-                >
-                  <PlayerCharacterName
+              <div className="character-card" key={char.name + charIndex}>
+                <div className="character-info-container">
+                  <div className="character-name-box">
+                    {/* <CharacterSprite character={char} isEnemy={false} /> */}
+                    <div className="character-actions" onClick={() => handleTargetClick(game.player1, char)}>
+                      <PlayerCharacterName
+                        character={char}
+                        possibleTargets={possibleTargets}
+                      />
+                    </div>
+                  </div>
+                  <div className="character-actions">
+                    <CurrentActions
+                      character={char}
+                      selectedActions={selectedActions}
+                      removeSelectedAction={removeSelectedAction}
+                    />
+                  </div>
+                  <div className="character-effects">
+                    <ActiveEffects character={char} />
+                  </div>
+                </div>
+                <div className="abilities-container">
+                  <Abilities
                     character={char}
-                    possibleTargets={possibleTargets}
+                    activeChakras={player1ActiveChakras}
+                    selectedActions={selectedActions}
+                    handleAbilityClick={handleAbilityClick}
                   />
                 </div>
-                <CurrentActions
-                  character={char}
-                  selectedActions={selectedActions}
-                  removeSelectedAction={removeSelectedAction}
-                />
-                <Abilities
-                  character={char}
-                  activeChakras={player1ActiveChakras}
-                  selectedActions={selectedActions}
-                  handleAbilityClick={handleAbilityClick}
-                />
-                <ActiveEffects character={char} />
-              </React.Fragment>
+              </div>
             ))}
           </div>
 
+          {/* Player 2 Team */}
           <div className="team-container">
             <h3 className="team-title">Time Inimigo</h3>
             {game.player2.characters.map((char, charIndex) => (
-              <React.Fragment key={char.name + charIndex + 1}>
-                <div
-                  className={`character-card${
-                    possibleTargets.includes(char) ? "enemy-selected" : ""
-                  } enemy-hover`}
-                  onClick={() => handleTargetClick(game.player1, char)}
-                >
-                  <EnemyCharacterName
-                    character={char}
-                    possibleTargets={possibleTargets}
-                  />
+              <div className="character-card" key={char.name + charIndex + "enemy"}>
+                <div className="character-info-container">
+                  <div className="character-effects">
+                    <ActiveEffects character={char} />
+                  </div>
+                  <div className="character-actions">
+                    <CurrentActionsOnEnemy
+                      character={char}
+                      selectedActions={selectedActions}
+                      removeSelectedAction={removeSelectedAction}
+                    />
+                  </div>
+                  <div className="character-name-box">
+                    {/* <CharacterSprite character={char} isEnemy={true} /> */}
+                    <div 
+                      className={`enemy-hover ${possibleTargets.includes(char) ? "enemy-selected" : ""}`}
+                      onClick={() => handleTargetClick(game.player1, char)}
+                    >
+                      <EnemyCharacterName
+                        character={char}
+                        possibleTargets={possibleTargets}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <CurrentActionsOnEnemy
-                  character={char}
-                  selectedActions={selectedActions}
-                  removeSelectedAction={removeSelectedAction}
-                />
-                <ActiveEffects character={char} />
-              </React.Fragment>
+              </div>
             ))}
           </div>
         </div>
@@ -482,3 +499,40 @@ const EnemyCharacterName = ({
     </h4>
   );
 };
+
+// Character sprite component
+// const CharacterSprite = ({ 
+//   character, 
+//   isEnemy,
+//   animationState 
+// }: { 
+//   character: Character; 
+//   isEnemy: boolean;
+//   animationState?: "idle" | "attack" | "hurt" | "victory" | "defeat";
+// }) => {
+//   const getSpritePath = () => {
+//     const baseSpritePath = `/sprites/${character.name.toLowerCase()}`;
+//     switch (animationState) {
+//       case "attack":
+//         return `${baseSpritePath}_attack.gif`;
+//       case "hurt":
+//         return `${baseSpritePath}_hurt.gif`;
+//       case "victory":
+//         return `${baseSpritePath}_victory.gif`;
+//       case "defeat":
+//         return `${baseSpritePath}_defeat.gif`;
+//       default:
+//         return `${baseSpritePath}_idle.gif`;
+//     }
+//   };
+
+//   return (
+//     <div className={`character-sprite ${isEnemy ? 'enemy-sprite' : 'player-sprite'}`}>
+//       <img 
+//         src={getSpritePath()} 
+//         alt={character.name} 
+//         className={`sprite ${animationState || 'idle'}`}
+//       />
+//     </div>
+//   );
+// };

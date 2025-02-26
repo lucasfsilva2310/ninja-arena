@@ -2,7 +2,7 @@ import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
 import { kawarimi } from "../abilities/kawarimi";
 
-const fireball = new Ability(
+export const fireball = new Ability(
   "fireball",
   (name: string, value: number | undefined) =>
     `${name} throws a fireball jutsu, dealing ${value} damage.`,
@@ -17,7 +17,7 @@ const fireball = new Ability(
   "Enemy"
 );
 
-const chidori = new Ability(
+export const chidori = new Ability(
   "Chidori",
   (name: string, value: number | undefined) =>
     `${name} creates lighting chakra around his hand, dealing ${value} damage.`,
@@ -32,7 +32,7 @@ const chidori = new Ability(
   "Enemy"
 );
 
-const sharingan = new Ability(
+export const sharingan = new Ability(
   "Sharingan",
   (name: string) =>
     `${name} uses the Sharingan, receiving 15 damage reduction. If chidori is used it will deal 10 more damage`,

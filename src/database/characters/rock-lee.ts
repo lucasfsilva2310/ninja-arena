@@ -1,7 +1,7 @@
 import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
 
-const hiddenLotus = new Ability(
+export const hiddenLotus = new Ability(
   "Hidden Lotus",
   (name: string) => `${name} open its 5th chakra gate, dealing 40 damage.`,
   ["Taijutsu", "Random"],
@@ -9,12 +9,12 @@ const hiddenLotus = new Ability(
   [{ type: "Damage", value: 40 }],
   "Enemy"
 );
-const primaryLotus = new Ability(
+export const primaryLotus = new Ability(
   "Primary Lotus",
   (name: string, value?: number | undefined) =>
     `${name} extends its arm bandages around its opponent, dealing ${value} damage. This ability becomes Hidden Lotus for the next turn`,
   ["Taijutsu"],
-  0,
+  1,
   [
     {
       type: "Transform",
@@ -26,7 +26,7 @@ const primaryLotus = new Ability(
   "Enemy"
 );
 
-const powerOfYouth = new Ability(
+export const powerOfYouth = new Ability(
   "Power of Youth",
   (name: string, value?: number | undefined) =>
     `${name}  encourage itself, healing ${value} health.`,

@@ -1,7 +1,7 @@
 import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
 
-const narutoKick = new Ability(
+export const narutoKick = new Ability(
   "narutoKick",
   (name: string, value: number | undefined) =>
     `${name} throws a kick with his clones, dealing ${value} damage`,
@@ -11,7 +11,7 @@ const narutoKick = new Ability(
   "Enemy"
 );
 
-const rasengan = new Ability(
+export const rasengan = new Ability(
   "Rasengan",
   (name: string) => `${name} throws a rasengan`,
   ["Ninjutsu", "Random"],
@@ -25,7 +25,7 @@ const rasengan = new Ability(
   "Enemy"
 );
 
-const escapeClone = new Ability(
+export const escapeClone = new Ability(
   "escapeClone",
   (name: string) =>
     `${name} creates an clone to be targeted, becoming invunerable for the next turn.`,
