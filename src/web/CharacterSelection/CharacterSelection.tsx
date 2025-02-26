@@ -30,7 +30,6 @@ export default function CharacterSelection({
     setPreviewCharacter(character);
     setSelectedAbility(null);
   };
-  console.log(selectedCharacters);
 
   const handleDragStart = (
     e: DragEvent<HTMLDivElement>,
@@ -142,7 +141,7 @@ export default function CharacterSelection({
           >
             <div className="character-sprite">
               <img
-                src={`../../../public/characters/${char.name.toLowerCase()}/${char.name.toLowerCase()}.png`}
+                src={`/characters/${char.name.toLowerCase()}/${char.name.toLowerCase()}.png`}
                 alt={char.name}
                 draggable={false}
               />
@@ -179,7 +178,7 @@ export default function CharacterSelection({
                       onDragEnd={handleDragEnd}
                     >
                       <img
-                        src={`../../../public/characters/${selectedCharacters[
+                        src={`/characters/${selectedCharacters[
                           index
                         ].name.toLowerCase()}/${selectedCharacters[
                           index

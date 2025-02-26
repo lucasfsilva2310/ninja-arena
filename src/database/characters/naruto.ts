@@ -43,9 +43,12 @@ export const kagebunshin = new Ability(
   "Kage Bunshin",
   "Naruto creates clones, gaining 15% damage reduction for three turns. Naruto Kick now deals 30 damage. Rasengan now can be used(add enable logic).",
   ["Random"],
-  4,
+  5,
   [
-    { type: "DamageReduction", value: 15, duration: 3 },
+    {
+      type: "DamageReduction",
+      damageReduction: { amount: 15, duration: 3, isPercent: true },
+    },
     {
       type: "Buff",
       value: 10,
@@ -56,8 +59,7 @@ export const kagebunshin = new Ability(
       },
     },
   ],
-  "Self",
-  true
+  "Self"
 );
 
 export const naruto = new Character("Naruto", [

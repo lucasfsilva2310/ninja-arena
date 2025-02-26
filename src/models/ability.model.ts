@@ -12,7 +12,7 @@ export type EffectType =
 
 export interface AbilityEffect {
   type: EffectType;
-  value: number;
+  value?: number;
 
   // Specific Effects
   duration?: number;
@@ -23,8 +23,17 @@ export interface AbilityEffect {
   // Transform
   transformation?: Ability;
 
+  // Damage Reduction
+  damageReduction?: DamageReductionEffect;
+
   // Buff
   buff?: BuffEffect;
+}
+
+export interface DamageReductionEffect {
+  amount: number;
+  duration: number;
+  isPercent?: boolean;
 }
 
 export interface BuffEffect {
@@ -43,7 +52,6 @@ export class Ability {
     public defaultCooldown: number,
     public effects: AbilityEffect[],
     public target: "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies",
-    public isPercent: boolean = false,
     public isPermanent: boolean = false,
     public isStacking: boolean = false
   ) {}
@@ -96,21 +104,24 @@ export class Ability {
               increasedDamage += effect.buff.value;
             }
           });
-          target.takeDamage(effect.value, increasedDamage);
+          target.takeDamage(effect.value!, increasedDamage);
           break;
         case "Heal":
-          target.heal(effect.value);
+          target.heal(effect.value!);
           break;
         case "DamageReduction":
-          target.addDamageReduction(
-            ability,
-            effect.value,
-            effect.duration || 1
-          );
+          if (effect.damageReduction) {
+            target.addDamageReduction(
+              ability,
+              effect.damageReduction.amount,
+              effect.damageReduction.duration || 1,
+              effect.damageReduction.isPercent || false
+            );
+          }
           break;
         case "Transform":
-          if (effect.value > 0) {
-            target.takeDamage(effect.value);
+          if (effect.value! > 0) {
+            target.takeDamage(effect.value!);
           }
           character.applyTransformation(
             ability,
@@ -122,10 +133,10 @@ export class Ability {
           target.applyPersistentEffect(this);
           break;
         case "Stacking":
-          target.applyStackingEffect(effect.value, effect.increment!);
+          target.applyStackingEffect(effect.value!, effect.increment!);
           break;
         case "Buff":
-          character.applyBuff(effect.buff!, effect.value);
+          character.applyBuff(effect.buff!, effect.value!);
           break;
       }
 

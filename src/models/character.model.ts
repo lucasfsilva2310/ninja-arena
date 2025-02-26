@@ -77,7 +77,7 @@ export class Character {
         console.log(
           `${this.name} tem ${effect.damageReduction.amount}${
             effect.damageReduction.isPercent ? "%" : ""
-          } de dano reduzido. Dano reduzido: ${reducedDamage}`
+          } de dano reduzido. Dano reduzido: ${damage - reducedDamage}`
         );
       }
     });
@@ -94,17 +94,24 @@ export class Character {
     this.hp = Math.min(100, this.hp + amount);
   }
 
-  addDamageReduction(ability: Ability, amount: number, remainingTurns: number) {
+  addDamageReduction(
+    ability: Ability,
+    amount: number,
+    remainingTurns: number,
+    isPercent: boolean
+  ) {
     console.log(
-      `recebeu ${amount} de redução de dano por ${remainingTurns} turnos. `
+      `recebeu ${amount}${
+        isPercent ? "%" : ""
+      } de redução de dano por ${remainingTurns} turnos. `
     );
     this.activeEffects.push({
       name: ability.name,
       description: ability.description,
       damageReduction: {
         amount,
-        isPercent: ability.isPercent,
         remainingTurns,
+        isPercent,
       },
     });
   }
