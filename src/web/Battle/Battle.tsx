@@ -1,12 +1,15 @@
+import "./Battle.css";
+
 import React, { useState, useEffect } from "react";
 import { GameEngine } from "../../models/game-engine";
 import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
-import "./Battle.css";
 import { ChakraType } from "../../models/chakra.model";
 import { Player } from "../../models/player.model";
-import ExchangeRandomChakraFinalModal from "./ExchangeRandomChakraFinalModal";
-import ChakraTransformModal from "./ChakraTransformModal";
+import ExchangeRandomChakraFinalModal from "./Modals/ExchangeRandomChakra/ExchangeRandomChakraFinalModal";
+import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";
+
+import AbilityFooter from "./AbilityFooter/AbilityFooter";
 
 interface BattleProps {
   game: GameEngine;
@@ -25,6 +28,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null
   );
+  const [selectedCharacterForAbilities, setSelectedCharacterForAbilities] =
+    useState<Character | null>(null);
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
   const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
   const [showExchangeRandomFinalModal, setShowExchangeRandomFinalModal] =
@@ -44,6 +49,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setChakrasToSwitchFromRandom([]);
     setSelectedChakras([]);
     setShowExchangeRandomFinalModal(false);
+    setSelectedCharacterForAbilities(null);
   };
 
   useEffect(() => {
@@ -64,10 +70,14 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     switch (ability.target) {
       case "Enemy":
-        targets = game.player2.characters.filter((char) => char.isAlive() && !char.isInvulnerable());
+        targets = game.player2.characters.filter(
+          (char) => char.isAlive() && !char.isInvulnerable()
+        );
         break;
       case "AllEnemies":
-        targets = game.player2.characters.filter((char) => char.isAlive() && !char.isInvulnerable());
+        targets = game.player2.characters.filter(
+          (char) => char.isAlive() && !char.isInvulnerable()
+        );
         break;
       case "Ally":
         targets = game.player1.characters.filter((char) => char.isAlive());
@@ -82,6 +92,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     setPossibleTargets([...targets]);
   };
+
   const handleTargetClick = (player: Player, target: Character) => {
     if (!possibleTargets.includes(target)) {
       return;
@@ -260,10 +271,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         />
       )}
       <div className="battle-container">
-        <h2 className="battle-header">Turno {game.turn}</h2>
-
         <div className="chakra-container">
-          <h3 className="chakra-title">Chakra Disponível</h3>
+          <h3 className="chakra-title">Available Chakras</h3>
           <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
           <button
             onClick={() => setChakraTransformModal(true)}
@@ -274,40 +283,46 @@ export default function Battle({ game, onGameOver }: BattleProps) {
           </button>
         </div>
 
+        <h2 className="battle-header">Turn {game.turn}</h2>
+
         <div className="teams-container">
           {/* Player 1 Team */}
           <div className="team-container">
-            <h3 className="team-title">Seu Time</h3>
+            <h3 className="team-title">Your team</h3>
             {game.player1.characters.map((char, charIndex) => (
               <div className="character-card" key={char.name + charIndex}>
                 <div className="character-info-container">
                   <div className="character-name-box">
-                    {/* <CharacterSprite character={char} isEnemy={false} /> */}
-                    <div className="character-actions" onClick={() => handleTargetClick(game.player1, char)}>
+                    <div
+                      className="character-actions"
+                      onClick={() => handleTargetClick(game.player1, char)}
+                    >
                       <PlayerCharacterName
                         character={char}
                         possibleTargets={possibleTargets}
                       />
                     </div>
                   </div>
-                  <div className="character-actions">
-                    <CurrentActions
-                      character={char}
-                      selectedActions={selectedActions}
-                      removeSelectedAction={removeSelectedAction}
-                    />
+                  <div className="character-info-abilities-container">
+                    <div className="character-actions">
+                      <CurrentActions
+                        character={char}
+                        selectedActions={selectedActions}
+                        removeSelectedAction={removeSelectedAction}
+                      />
+                    </div>
+                    <div className="character-effects">
+                      <ActiveEffects character={char} />
+                    </div>
+                    <div className="abilities-container">
+                      <Abilities
+                        character={char}
+                        activeChakras={player1ActiveChakras}
+                        selectedActions={selectedActions}
+                        handleAbilityClick={handleAbilityClick}
+                      />
+                    </div>
                   </div>
-                  <div className="character-effects">
-                    <ActiveEffects character={char} />
-                  </div>
-                </div>
-                <div className="abilities-container">
-                  <Abilities
-                    character={char}
-                    activeChakras={player1ActiveChakras}
-                    selectedActions={selectedActions}
-                    handleAbilityClick={handleAbilityClick}
-                  />
                 </div>
               </div>
             ))}
@@ -315,9 +330,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
           {/* Player 2 Team */}
           <div className="team-container">
-            <h3 className="team-title">Time Inimigo</h3>
+            <h3 className="team-title">Enemy Team</h3>
             {game.player2.characters.map((char, charIndex) => (
-              <div className="character-card" key={char.name + charIndex + "enemy"}>
+              <div
+                className="character-card"
+                key={char.name + charIndex + "enemy"}
+              >
                 <div className="character-info-container">
                   <div className="character-effects">
                     <ActiveEffects character={char} />
@@ -330,9 +348,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                     />
                   </div>
                   <div className="character-name-box">
-                    {/* <CharacterSprite character={char} isEnemy={true} /> */}
-                    <div 
-                      className={`enemy-hover ${possibleTargets.includes(char) ? "enemy-selected" : ""}`}
+                    <div
+                      className={`enemy-hover ${
+                        possibleTargets.includes(char) ? "enemy-selected" : ""
+                      }`}
                       onClick={() => handleTargetClick(game.player1, char)}
                     >
                       <EnemyCharacterName
@@ -345,6 +364,14 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               </div>
             ))}
           </div>
+          <AbilityFooter
+            selectedAbility={selectedAbility}
+            selectedCharacter={selectedCharacterForAbilities}
+            onAbilityClick={(ability) =>
+              handleAbilityClick(selectedCharacterForAbilities!, ability)
+            }
+            activeChakras={player1ActiveChakras}
+          />
         </div>
         <button onClick={executeTurn} className="turn-button">
           Finalizar Turno
@@ -444,7 +471,6 @@ const ActiveEffects = ({ character }: { character: Character }) => {
       {character.activeEffects.find((effect) => !effect.transformation) &&
         character.activeEffects.length > 0 && (
           <span className="effect-label" key="effects">
-            Efeitos:{" "}
             {character.activeEffects.map((effect, index) => {
               if (!effect.name) {
                 return null;
@@ -499,40 +525,3 @@ const EnemyCharacterName = ({
     </h4>
   );
 };
-
-// Character sprite component
-// const CharacterSprite = ({ 
-//   character, 
-//   isEnemy,
-//   animationState 
-// }: { 
-//   character: Character; 
-//   isEnemy: boolean;
-//   animationState?: "idle" | "attack" | "hurt" | "victory" | "defeat";
-// }) => {
-//   const getSpritePath = () => {
-//     const baseSpritePath = `/sprites/${character.name.toLowerCase()}`;
-//     switch (animationState) {
-//       case "attack":
-//         return `${baseSpritePath}_attack.gif`;
-//       case "hurt":
-//         return `${baseSpritePath}_hurt.gif`;
-//       case "victory":
-//         return `${baseSpritePath}_victory.gif`;
-//       case "defeat":
-//         return `${baseSpritePath}_defeat.gif`;
-//       default:
-//         return `${baseSpritePath}_idle.gif`;
-//     }
-//   };
-
-//   return (
-//     <div className={`character-sprite ${isEnemy ? 'enemy-sprite' : 'player-sprite'}`}>
-//       <img 
-//         src={getSpritePath()} 
-//         alt={character.name} 
-//         className={`sprite ${animationState || 'idle'}`}
-//       />
-//     </div>
-//   );
-// };
