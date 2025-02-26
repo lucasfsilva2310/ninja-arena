@@ -3,7 +3,7 @@ import {
   ChakraType,
   chakraTypesWithoutRandom,
   initialChakraObj,
-} from "../../models/chakra.model";
+} from "../../../../models/chakra.model";
 import "./ChakraTransformModal.css";
 
 interface ChakraTransformModalProps {
