@@ -55,6 +55,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setSelectedCharacterForAbilitiesPreview(null);
   };
 
+  const clearActionStates = () => {
+    setSelectedAbility(null);
+    setSelectedActions([]);
+    setPossibleTargets([]);
+  };
+
   useEffect(() => {
     if (game.checkGameOver()) {
       onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
@@ -63,7 +69,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
   const handleAbilityClick = (character: Character, ability: Ability) => {
     if (selectedAbility === ability && selectedCharacter === character) {
-      clearStates();
+      clearActionStates();
       return;
     }
     setSelectedCharacterForAbilitiesPreview(character);
@@ -95,9 +101,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     setPossibleTargets([...targets]);
   };
+
   const handleTargetClick = (player: Player, target: Character) => {
+    setSelectedCharacterForAbilitiesPreview(target);
+    setSelectedAbility(null);
+
     if (!possibleTargets.includes(target)) {
-      setSelectedCharacterForAbilitiesPreview(target);
       return;
     }
 
@@ -289,6 +298,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
           <h2 className="battle-header">Turn {game.turn}</h2>
 
+          <div className="end-turn-button-container">
+            <button onClick={executeTurn} className="end-turn-button">
+              Finalizar Turno
+            </button>
+          </div>
+
           <div className="teams-container">
             {/* Player 1 Team */}
             <div className="team-container">
@@ -369,12 +384,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               ))}
             </div>
           </div>
-          <button onClick={executeTurn} className="turn-button">
-            Finalizar Turno
-          </button>
         </div>
         <AbilityFooter
           selectedCharacter={selectedCharacterForAbilitiesPreview}
+          currentSelectedAbility={selectedAbility}
         />
       </div>
     </>
@@ -477,17 +490,19 @@ const Abilities = ({
   return (
     <div className="abilities-container">
       {character.abilities.map((ability) => {
-        const isAbilitiesDisabled =
+        const isAbilityDisabled =
           !ability.canUse(character, activeChakras) ||
-          selectedActions.some((action) => action.character === character);
+          selectedActions.some((action) => action.character === character) ||
+          ability.isOnCooldown();
+
         return (
           <div
             key={ability.name}
             className={`ability-icon-container ${
-              isAbilitiesDisabled ? "ability-inactive" : "ability-active"
+              isAbilityDisabled ? "ability-inactive" : "ability-active"
             }`}
             onClick={() =>
-              !isAbilitiesDisabled && handleAbilityClick(character, ability)
+              !isAbilityDisabled && handleAbilityClick(character, ability)
             }
           >
             <img
@@ -498,12 +513,17 @@ const Abilities = ({
                 .split(" ")
                 .join("")
                 .toLowerCase()}.png`}
+              alt={ability.name}
+              className="ability-icon"
               onError={(e) => {
                 e.currentTarget.src = "/abilities/default.png";
               }}
-              alt={ability.name}
-              className="ability-icon"
             />
+            {ability.currentCooldown > 0 && (
+              <div className="ability-cooldown-overlay">
+                {ability.currentCooldown}
+              </div>
+            )}
             <div className="ability-tooltip">
               <h4>{ability.name}</h4>
               <p>{ability.description}</p>
