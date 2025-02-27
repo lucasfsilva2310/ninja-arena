@@ -65,11 +65,13 @@ const AbilityPreview: React.FC<AbilityPreviewProps> = ({
                 </p>
               </div>
               <div className="ability-details">
-                <span className="ability-cooldown">
-                  Cooldown: {selectedAbility.defaultCooldown} turns
+                <span>
+                  <span className="ability-info-title">Cooldown:</span>{" "}
+                  {selectedAbility.defaultCooldown} turns
                 </span>
-                <span className="ability-type">
-                  Target: {selectedAbility.target}
+                <span>
+                  <span className="ability-info-title">Target:</span>{" "}
+                  {selectedAbility.target}
                 </span>
               </div>
             </div>

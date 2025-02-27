@@ -184,11 +184,13 @@ export default function CharacterSelection({
                       onDragEnd={handleDragEnd}
                     >
                       <img
-                        src={`/characters/${selectedCharacters[
-                          index
-                        ].name.toLowerCase()}/${selectedCharacters[
-                          index
-                        ].name.toLowerCase()}.png`}
+                        src={`/characters/${selectedCharacters[index].name
+                          .split(" ")
+                          .join("")
+                          .toLowerCase()}/${selectedCharacters[index].name
+                          .split(" ")
+                          .join("")
+                          .toLowerCase()}.png`}
                         alt={selectedCharacters[index].name}
                         className="selected-sprite"
                         draggable={false}

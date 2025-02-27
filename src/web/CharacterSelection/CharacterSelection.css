@@ -158,8 +158,8 @@
 }
 
 .selected-sprite {
-  width: 48px;
-  height: 48px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   pointer-events: none;
 }
@@ -198,14 +198,6 @@
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin: 1rem 0;
-}
-
-.abilities-list {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
 }
 
 .ability-preview-button {
@@ -293,6 +285,11 @@
   font-size: 0.875rem;
 }
 
+.ability-info-title {
+  font-weight: 600;
+  color: rgb(22, 23, 24);
+}
+
 .character-slot {
   width: 80px;
   height: 80px;
@@ -337,11 +334,6 @@
 
   .selected-list {
     flex-wrap: wrap;
-  }
-
-  .abilities-list {
-    flex-wrap: wrap;
-    justify-content: center;
   }
 
   .ability-description-content {

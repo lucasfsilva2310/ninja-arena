@@ -1,23 +1,35 @@
 /* Battle.css */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
 .battle-container {
-  height: 80%;
   width: 100%;
   max-width: 1440px;
+  height: 65vh;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem 2rem;
+  padding-bottom: 0; /* Remove bottom padding to avoid extra space */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: #ffffff;
 }
 
 .battle-header {
   font-size: 1.5rem;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 /* Chakra Section */
 .chakra-container {
-  margin-bottom: 2rem;
-  padding: 1rem;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
   background-color: #f8fafc;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -47,23 +59,23 @@
 .teams-container {
   display: flex;
   justify-content: space-between;
-  gap: 2rem;
-  margin-bottom: 2rem;
+  /* align-items: space-between; */
+  gap: 1.5rem;
+  height: calc(100% - 120px);
 }
 
 .team-container {
   flex: 1;
-  max-width: 600px;
-  padding: 1.5rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  gap: 0.75rem;
 }
 
 .team-title {
   font-size: 1.25rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
@@ -71,7 +83,8 @@
 .character-card {
   display: flex;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
+  max-width: 1000px;
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid #e2e8f0;
@@ -86,9 +99,8 @@
   gap: 1rem;
   width: 100%;
   padding: 0.5rem;
-  background-color: #f8fafc;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
 }
 
 .character-name-container.enemy {
@@ -130,11 +142,9 @@
 
 /* Character Name */
 .character-name {
-  font-size: 1rem;
-  font-weight: 600;
+  position: relative;
   margin: 0;
   padding: 0.25rem 0;
-  transition: color 0.2s ease;
 }
 
 /* Character States */
@@ -148,20 +158,42 @@
   opacity: 0.7;
 }
 
-.character-selected {
-  color: #3b82f6;
-  position: relative;
+/* Apply highlight to the container when character is selected */
+.character-name-container .character-selected {
+  color: #1e293b; /* Keep text color dark for readability */
 }
 
+/* When a character is a possible target, highlight the entire container */
+.character-name-container:has(.character-selected) {
+  background-color: rgba(
+    253,
+    224,
+    71,
+    0.4
+  ); /* Light yellow with transparency */
+  animation: targetPulse 2s infinite ease-in-out;
+  box-shadow: 0 0 8px rgba(253, 224, 71, 0.4);
+}
+
+/* Create the pulsing animation */
+@keyframes targetPulse {
+  0% {
+    background-color: rgba(253, 224, 71, 0.2); /* Start more transparent */
+    box-shadow: 0 0 4px rgba(253, 224, 71, 0.2);
+  }
+  50% {
+    background-color: rgba(253, 224, 71, 0.6); /* Peak opacity */
+    box-shadow: 0 0 12px rgba(253, 224, 71, 0.6);
+  }
+  100% {
+    background-color: rgba(253, 224, 71, 0.2); /* Return to transparent */
+    box-shadow: 0 0 4px rgba(253, 224, 71, 0.2);
+  }
+}
+
+/* Remove the previous underline effect */
 .character-selected::after {
-  content: "";
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #3b82f6;
-  animation: selectPulse 2s infinite;
+  display: none;
 }
 
 /* Hover Effects */
@@ -228,6 +260,8 @@
 .character-info-container {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
   gap: 0.5rem;
 }
 
@@ -272,7 +306,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1rem;
 }
 
 .ability-button {
@@ -331,6 +364,13 @@
   }
 }
 
+@media (max-width: 768px) {
+  .battle-container {
+    height: 60vh;
+    padding: 0.75rem;
+  }
+}
+
 @media (max-width: 640px) {
   .character-name-container {
     padding: 0.25rem;
@@ -352,11 +392,20 @@
 }
 
 /* Ability and Effect Icons */
-.ability-icon-container,
+.ability-icon-container {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
 .effect-icon-container {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
@@ -426,7 +475,6 @@
 .abilities-container,
 .active-effects {
   display: flex;
-  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -450,8 +498,8 @@
 @media (max-width: 640px) {
   .ability-icon-container,
   .effect-icon-container {
-    width: 32px;
-    height: 32px;
+    width: 25px;
+    height: 25px;
   }
 
   .ability-tooltip,

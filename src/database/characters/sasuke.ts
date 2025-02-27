@@ -3,7 +3,7 @@ import { Character } from "../../models/character.model";
 import { kawarimi } from "../abilities/kawarimi";
 
 export const fireball = new Ability(
-  "fireball",
+  "Fireball",
 
   "Sasuke throws a fireball jutsu, dealing 25 damage.",
   ["Ninjutsu"],

@@ -273,107 +273,109 @@ export default function Battle({ game, onGameOver }: BattleProps) {
           onTransform={handleTransformChakras}
         />
       )}
-      <div className="battle-container">
-        <div className="chakra-container">
-          <h3 className="chakra-title">Available Chakras</h3>
-          <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
-          <button
-            onClick={() => setChakraTransformModal(true)}
-            className="chakra-button"
-            disabled={player1ActiveChakras.length < 5}
-          >
-            Trocar Chakra
-          </button>
-        </div>
+      <div className="app-container">
+        <div className="battle-container">
+          <div className="chakra-container">
+            <h3 className="chakra-title">Available Chakras</h3>
+            <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
+            <button
+              onClick={() => setChakraTransformModal(true)}
+              className="chakra-button"
+              disabled={player1ActiveChakras.length < 5}
+            >
+              Trocar Chakra
+            </button>
+          </div>
 
-        <h2 className="battle-header">Turn {game.turn}</h2>
+          <h2 className="battle-header">Turn {game.turn}</h2>
 
-        <div className="teams-container">
-          {/* Player 1 Team */}
-          <div className="team-container">
-            <h3 className="team-title">Your team</h3>
-            {game.player1.characters.map((char, charIndex) => (
-              <div className="character-card" key={char.name + charIndex}>
-                <div className="character-info-container">
-                  <div className="character-name-box">
-                    <div
-                      className="character-actions"
-                      onClick={() => handleTargetClick(game.player1, char)}
-                    >
-                      <PlayerCharacterName
-                        character={char}
-                        possibleTargets={possibleTargets}
-                      />
+          <div className="teams-container">
+            {/* Player 1 Team */}
+            <div className="team-container">
+              <h3 className="team-title">Your team</h3>
+              {game.player1.characters.map((char, charIndex) => (
+                <div className="character-card" key={char.name + charIndex}>
+                  <div className="character-info-container">
+                    <div className="character-name-box">
+                      <div
+                        className="character-actions"
+                        onClick={() => handleTargetClick(game.player1, char)}
+                      >
+                        <PlayerCharacterName
+                          character={char}
+                          possibleTargets={possibleTargets}
+                        />
+                      </div>
+                    </div>
+                    <div className="character-info-abilities-container">
+                      <div className="character-actions">
+                        <CurrentActions
+                          character={char}
+                          selectedActions={selectedActions}
+                          removeSelectedAction={removeSelectedAction}
+                        />
+                      </div>
+                      <div className="character-effects">
+                        <ActiveEffects character={char} />
+                      </div>
+                      <div className="abilities-container">
+                        <Abilities
+                          character={char}
+                          activeChakras={player1ActiveChakras}
+                          selectedActions={selectedActions}
+                          handleAbilityClick={handleAbilityClick}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="character-info-abilities-container">
+                </div>
+              ))}
+            </div>
+
+            {/* Player 2 Team */}
+            <div className="team-container">
+              <h3 className="team-title">Enemy Team</h3>
+              {game.player2.characters.map((char, charIndex) => (
+                <div
+                  className="character-card"
+                  key={char.name + charIndex + "enemy"}
+                >
+                  <div className="character-info-container">
+                    <div className="character-effects">
+                      <ActiveEffects character={char} />
+                    </div>
                     <div className="character-actions">
-                      <CurrentActions
+                      <CurrentActionsOnEnemy
                         character={char}
                         selectedActions={selectedActions}
                         removeSelectedAction={removeSelectedAction}
                       />
                     </div>
-                    <div className="character-effects">
-                      <ActiveEffects character={char} />
-                    </div>
-                    <div className="abilities-container">
-                      <Abilities
-                        character={char}
-                        activeChakras={player1ActiveChakras}
-                        selectedActions={selectedActions}
-                        handleAbilityClick={handleAbilityClick}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Player 2 Team */}
-          <div className="team-container">
-            <h3 className="team-title">Enemy Team</h3>
-            {game.player2.characters.map((char, charIndex) => (
-              <div
-                className="character-card"
-                key={char.name + charIndex + "enemy"}
-              >
-                <div className="character-info-container">
-                  <div className="character-effects">
-                    <ActiveEffects character={char} />
-                  </div>
-                  <div className="character-actions">
-                    <CurrentActionsOnEnemy
-                      character={char}
-                      selectedActions={selectedActions}
-                      removeSelectedAction={removeSelectedAction}
-                    />
-                  </div>
-                  <div className="character-name-box">
-                    <div
-                      className={`enemy-hover ${
-                        possibleTargets.includes(char) ? "enemy-selected" : ""
-                      }`}
-                      onClick={() => handleTargetClick(game.player1, char)}
-                    >
-                      <EnemyCharacterName
-                        character={char}
-                        possibleTargets={possibleTargets}
-                      />
+                    <div className="character-name-box">
+                      <div
+                        className={`enemy-hover ${
+                          possibleTargets.includes(char) ? "enemy-selected" : ""
+                        }`}
+                        onClick={() => handleTargetClick(game.player1, char)}
+                      >
+                        <EnemyCharacterName
+                          character={char}
+                          possibleTargets={possibleTargets}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          <AbilityFooter
-            selectedCharacter={selectedCharacterForAbilitiesPreview}
-          />
+          <button onClick={executeTurn} className="turn-button">
+            Finalizar Turno
+          </button>
         </div>
-        <button onClick={executeTurn} className="turn-button">
-          Finalizar Turno
-        </button>
+        <AbilityFooter
+          selectedCharacter={selectedCharacterForAbilitiesPreview}
+        />
       </div>
     </>
   );
@@ -395,7 +397,7 @@ const CurrentActions = ({
           action.target === character && (
             <div
               key={action.ability.name + actionIndex}
-              className="ability-icon-container"
+              className="effect-icon-container"
               onClick={() => removeSelectedAction(actionIndex)}
             >
               <img
@@ -436,7 +438,7 @@ const CurrentActionsOnEnemy = ({
           action.target === character && (
             <div
               key={actionIndex}
-              className="ability-icon-container"
+              className="effect-icon-container"
               onClick={() => removeSelectedAction(actionIndex)}
             >
               <img
@@ -584,7 +586,13 @@ const PlayerCharacterName = ({
     <div className="character-name-container">
       <div className="character-portrait">
         <img
-          src={`/characters/${character.name.toLowerCase()}/${character.name.toLowerCase()}.png`}
+          src={`/characters/${character.name
+            .split(" ")
+            .join("")
+            .toLowerCase()}/${character.name
+            .split(" ")
+            .join("")
+            .toLowerCase()}.png`}
           alt={character.name}
           className="character-image"
           onError={(e) => {
