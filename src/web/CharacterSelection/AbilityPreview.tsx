@@ -27,7 +27,13 @@ const AbilityPreview: React.FC<AbilityPreviewProps> = ({
             }`}
           >
             <img
-              src={`../public/abilities/${character.name.toLowerCase()}/${ability.name.toLowerCase()}.png`}
+              src={`../abilities/${character.name
+                .split(" ")
+                .join("")
+                .toLowerCase()}/${ability.name
+                .split(" ")
+                .join("")
+                .toLowerCase()}.png`}
               alt={ability.name}
               className="ability-preview-icon"
             />
@@ -40,7 +46,13 @@ const AbilityPreview: React.FC<AbilityPreviewProps> = ({
           <div className="ability-description-content">
             <div className="ability-image-container">
               <img
-                src={`../public/abilities/${character.name.toLowerCase()}/${selectedAbility.name.toLowerCase()}.png`}
+                src={`../abilities/${character.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}/${selectedAbility.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}.png`}
                 alt={selectedAbility.name}
                 className="ability-image"
               />

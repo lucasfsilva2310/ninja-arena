@@ -141,7 +141,13 @@ export default function CharacterSelection({
           >
             <div className="character-sprite">
               <img
-                src={`/characters/${char.name.toLowerCase()}/${char.name.toLowerCase()}.png`}
+                src={`/characters/${char.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}/${char.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}.png`}
                 alt={char.name}
                 draggable={false}
               />

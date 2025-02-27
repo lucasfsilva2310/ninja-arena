@@ -93,9 +93,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     setPossibleTargets([...targets]);
   };
-
   const handleTargetClick = (player: Player, target: Character) => {
     if (!possibleTargets.includes(target)) {
+      setSelectedCharacterForAbilities(target);
       return;
     }
 
@@ -365,14 +365,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               </div>
             ))}
           </div>
-          <AbilityFooter
-            selectedAbility={selectedAbility}
-            selectedCharacter={selectedCharacterForAbilities}
-            onAbilityClick={(ability) =>
-              handleAbilityClick(selectedCharacterForAbilities!, ability)
-            }
-            activeChakras={player1ActiveChakras}
-          />
+          <AbilityFooter selectedCharacter={selectedCharacterForAbilities} />
         </div>
         <button onClick={executeTurn} className="turn-button">
           Finalizar Turno
@@ -391,17 +384,35 @@ const CurrentActions = ({
   selectedActions: SelectedAction[];
   removeSelectedAction: (index: number) => void;
 }) => {
-  return selectedActions.map(
-    (action, actionIndex) =>
-      action.target === character && (
-        <p
-          className="ability-selected"
-          key={action.ability.name + actionIndex}
-          onClick={() => removeSelectedAction(actionIndex)}
-        >
-          {action.ability.name}
-        </p>
-      )
+  return (
+    <div className="current-actions">
+      {selectedActions.map(
+        (action, actionIndex) =>
+          action.target === character && (
+            <div
+              key={action.ability.name + actionIndex}
+              className="ability-icon-container"
+              onClick={() => removeSelectedAction(actionIndex)}
+            >
+              <img
+                src={`/abilities/${action.character.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}/${action.ability.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}.png`}
+                alt={action.ability.name}
+                className="ability-icon"
+              />
+              <div className="ability-tooltip">
+                <h4>{action.ability.name}</h4>
+                <p>{action.ability.description}</p>
+              </div>
+            </div>
+          )
+      )}
+    </div>
   );
 };
 
@@ -414,17 +425,35 @@ const CurrentActionsOnEnemy = ({
   selectedActions: SelectedAction[];
   removeSelectedAction: (index: number) => void;
 }) => {
-  return selectedActions.map(
-    (action, actionIndex) =>
-      action.target === character && (
-        <p
-          key={actionIndex}
-          className="ability-selected"
-          onClick={() => removeSelectedAction(actionIndex)}
-        >
-          {action.ability.name}
-        </p>
-      )
+  return (
+    <div className="current-actions">
+      {selectedActions.map(
+        (action, actionIndex) =>
+          action.target === character && (
+            <div
+              key={actionIndex}
+              className="ability-icon-container"
+              onClick={() => removeSelectedAction(actionIndex)}
+            >
+              <img
+                src={`/abilities/${action.character.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}/${action.ability.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}.png`}
+                alt={action.ability.name}
+                className="ability-icon"
+              />
+              <div className="ability-tooltip">
+                <h4>{action.ability.name}</h4>
+                <p>{action.ability.description}</p>
+              </div>
+            </div>
+          )
+      )}
+    </div>
   );
 };
 
@@ -440,25 +469,48 @@ const Abilities = ({
   handleAbilityClick: (character: Character, ability: Ability) => void;
 }) => {
   return (
-    <div className="flex gap-2">
+    <div className="abilities-container">
       {character.abilities.map((ability) => {
         const isAbilitiesDisabled =
           !ability.canUse(character, activeChakras) ||
           selectedActions.some((action) => action.character === character);
         return (
-          <button
+          <div
             key={ability.name}
-            onClick={() => handleAbilityClick(character, ability)}
-            disabled={isAbilitiesDisabled}
-            className={`ability-button ${
+            className={`ability-icon-container ${
               isAbilitiesDisabled ? "ability-inactive" : "ability-active"
             }`}
+            onClick={() =>
+              !isAbilitiesDisabled && handleAbilityClick(character, ability)
+            }
           >
-            {ability.name} ({ability.requiredChakra.join(", ")}){" "}
-            {ability.currentCooldown > 0
-              ? `Cooldown: ${ability.currentCooldown}`
-              : ""}
-          </button>
+            <img
+              src={`/abilities/${character.name
+                .split(" ")
+                .join("")
+                .toLowerCase()}/${ability.name
+                .split(" ")
+                .join("")
+                .toLowerCase()}.png`}
+              onError={(e) => {
+                e.currentTarget.src = "/abilities/default.png";
+              }}
+              alt={ability.name}
+              className="ability-icon"
+            />
+            <div className="ability-tooltip">
+              <h4>{ability.name}</h4>
+              <p>{ability.description}</p>
+              <div className="ability-details">
+                <span>Chakra: {ability.requiredChakra.join(", ")}</span>
+                {ability.currentCooldown > 0 && (
+                  <span className="cooldown">
+                    Cooldown: {ability.currentCooldown}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
         );
       })}
     </div>
@@ -467,27 +519,53 @@ const Abilities = ({
 
 const ActiveEffects = ({ character }: { character: Character }) => {
   return (
-    <p className="active-effects">
-      {/* Validate if the effect is not a transformation to not render empty span */}
-      {character.activeEffects.find((effect) => !effect.transformation) &&
-        character.activeEffects.length > 0 && (
-          <span className="effect-label" key="effects">
-            {character.activeEffects.map((effect, index) => {
-              if (!effect.name) {
-                return null;
-              }
+    <div className="active-effects">
+      {character.activeEffects.map((effect, index) => {
+        let hasDuration: boolean = false;
+        let duration: number = 0;
 
-              return (
-                <span key={effect.name + index} className="effect-item">
-                  {effect.name}
-                  <span className="tooltip">{effect.description}</span>
-                  {index < character.activeEffects.length - 1 && ", "}
-                </span>
-              );
-            })}
-          </span>
-        )}
-    </p>
+        if (effect.damageReduction || effect.buff || effect.transformation) {
+          hasDuration = true;
+          duration =
+            effect.damageReduction?.remainingTurns ||
+            effect.buff?.remainingTurns ||
+            effect.transformation?.remainingTurns ||
+            0;
+        }
+
+        return (
+          <div key={effect.name + index} className="effect-icon-container">
+            <img
+              src={`/abilities/${character.name
+                .split(" ")
+                .join("")
+                .toLowerCase()}/${effect.name
+                .split(" ")
+                .join("")
+                .toLowerCase()}.png`}
+              alt={effect.name}
+              className="effect-icon"
+              onError={(e) => {
+                e.currentTarget.src = "/abilities/default.png";
+              }}
+            />
+            <div className="effect-tooltip">
+              <h4>{effect.name}</h4>
+              <p>{effect.description}</p>
+              {hasDuration && (
+                <div className="effect-duration">
+                  <span className="duration-text">
+                    {duration === 1
+                      ? "1 turn remaining"
+                      : `${duration} turns remaining`}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 };
 

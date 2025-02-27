@@ -1,8 +1,7 @@
 import { Ability, AbilityEffect, BuffEffect } from "./ability.model";
-
-type EffectType = {
-  name?: string;
-  description?: string;
+export type EffectType = {
+  name: string;
+  description: string;
   damageReduction?: {
     amount: number;
     remainingTurns: number;
@@ -15,8 +14,6 @@ type EffectType = {
     remainingTurns: number;
     applied?: boolean;
   };
-  persistentEffects?: Ability[];
-  stackingEffect?: { baseDamage: number; increment: number };
   buff?: {
     buffedAbilites: string[];
     buffType: "Damage" | "Heal" | "CooldownReduction";
@@ -128,6 +125,8 @@ export class Character {
     this.replaceAbility(originalAbility, newAbility);
 
     this.activeEffects.push({
+      name: originalAbility.name,
+      description: originalAbility.description,
       transformation: { originalAbility, newAbility, remainingTurns: duration },
     });
   }
@@ -164,34 +163,18 @@ export class Character {
     }
   }
 
-  applyPersistentEffect(ability: Ability) {
-    console.log(`${this.name} aplicou ${ability.name} persistentemente. `);
-    this.activeEffects.push({ persistentEffects: [ability] });
-  }
-
-  applyStackingEffect(baseDamage: number, increment: number) {
-    const existingEffect = this.activeEffects.find(
-      (effect) => effect.stackingEffect !== undefined
-    );
-    console.log(`${this.name} aplicou efeito stack somando ${increment}. `);
-
-    if (existingEffect && existingEffect.stackingEffect) {
-      console.log(`${this.name} incrementou efeito stack ${increment}. `);
-      existingEffect.stackingEffect.baseDamage += increment;
-    } else {
-      console.log(`${this.name} aplicou baseDamage ${baseDamage}. `);
-      this.activeEffects.push({ stackingEffect: { baseDamage, increment } });
-    }
-  }
-
-  applyBuff(buff: BuffEffect, value: number) {
+  applyBuff(ability: Ability, buff: BuffEffect, value: number) {
     console.log(`${this.name} aplicou buff de ${buff.buffType}. `);
-    this.activeEffects.push({ buff: { ...buff, value } });
+    this.activeEffects.push({
+      name: ability.name,
+      description: ability.description,
+      buff: { ...buff, value },
+    });
   }
 
   removeActiveEffect(currentEffect: AbilityEffect) {
     this.activeEffects = this.activeEffects.filter(
-      (effect) => effect !== currentEffect
+      (effect) => effect.name !== currentEffect.name
     );
   }
 }

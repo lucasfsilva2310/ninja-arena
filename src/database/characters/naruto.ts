@@ -3,7 +3,7 @@ import { Character } from "../../models/character.model";
 
 export const narutoKick = new Ability(
   "Naruto Kick",
-  "Naruto throws a kick with his clones, dealing 20 damage. If Kagebunshin is active, it deals 30 damage.",
+  "Naruto throws a kick with his clones, dealing 20 damage. If Kage Bunshin is active, it deals 30 damage.",
   ["Taijutsu", "Random"],
   0,
   [{ type: "Damage", value: 20 }],
@@ -12,13 +12,13 @@ export const narutoKick = new Ability(
 
 export const rasengan = new Ability(
   "Rasengan",
-  "Naruto throws a rasengan",
+  "Naruto throws a rasengan, dealing 35 damage. It can only be used if Kage Bunshin is active.",
   ["Ninjutsu", "Random"],
   1,
   [
     {
       type: "Damage",
-      value: 30,
+      value: 35,
     },
   ],
   "Enemy"

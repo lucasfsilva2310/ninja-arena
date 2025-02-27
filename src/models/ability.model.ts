@@ -11,6 +11,8 @@ export type EffectType =
   | "Buff";
 
 export interface AbilityEffect {
+  name?: string;
+  description?: string;
   type: EffectType;
   value?: number;
 
@@ -54,7 +56,13 @@ export class Ability {
     public target: "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies",
     public isPermanent: boolean = false,
     public isStacking: boolean = false
-  ) {}
+  ) {
+    this.effects.map((effect) => ({
+      ...effect,
+      name: effect.name || this.name,
+      description: effect.description || this.description,
+    }));
+  }
 
   canUse(char: Character, chakras: ChakraType[]): boolean {
     if (this.isOnCooldown()) return false;
@@ -129,14 +137,8 @@ export class Ability {
             effect.duration || 1
           );
           break;
-        case "Persistent":
-          target.applyPersistentEffect(this);
-          break;
-        case "Stacking":
-          target.applyStackingEffect(effect.value!, effect.increment!);
-          break;
         case "Buff":
-          character.applyBuff(effect.buff!, effect.value!);
+          character.applyBuff(ability, effect.buff!, effect.value!);
           break;
       }
 
