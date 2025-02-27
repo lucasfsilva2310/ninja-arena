@@ -29,8 +29,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null
   );
-  const [selectedCharacterForAbilities, setSelectedCharacterForAbilities] =
-    useState<Character | null>(null);
+  const [
+    selectedCharacterForAbilitiesPreview,
+    setSelectedCharacterForAbilitiesPreview,
+  ] = useState<Character | null>(null);
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
   const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
   const [showExchangeRandomFinalModal, setShowExchangeRandomFinalModal] =
@@ -50,7 +52,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setChakrasToSwitchFromRandom([]);
     setSelectedChakras([]);
     setShowExchangeRandomFinalModal(false);
-    setSelectedCharacterForAbilities(null);
+    setSelectedCharacterForAbilitiesPreview(null);
   };
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       clearStates();
       return;
     }
-
+    setSelectedCharacterForAbilitiesPreview(character);
     setSelectedCharacter(character);
     setSelectedAbility(ability);
     let targets: Character[] = [];
@@ -95,7 +97,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
   const handleTargetClick = (player: Player, target: Character) => {
     if (!possibleTargets.includes(target)) {
-      setSelectedCharacterForAbilities(target);
+      setSelectedCharacterForAbilitiesPreview(target);
       return;
     }
 
@@ -365,7 +367,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               </div>
             ))}
           </div>
-          <AbilityFooter selectedCharacter={selectedCharacterForAbilities} />
+          <AbilityFooter
+            selectedCharacter={selectedCharacterForAbilitiesPreview}
+          />
         </div>
         <button onClick={executeTurn} className="turn-button">
           Finalizar Turno
