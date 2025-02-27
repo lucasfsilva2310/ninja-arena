@@ -6,16 +6,26 @@ import { Character } from "../../../models/character.model";
 
 interface AbilityFooterProps {
   selectedCharacter: Character | null;
+  currentSelectedAbility: Ability | null;
 }
 
-const AbilityFooter: React.FC<AbilityFooterProps> = ({ selectedCharacter }) => {
+const AbilityFooter: React.FC<AbilityFooterProps> = ({
+  selectedCharacter,
+  currentSelectedAbility,
+}) => {
   useEffect(() => {
     if (selectedCharacter) {
-      setSelectedAbility(null);
+      if (currentSelectedAbility) {
+        setSelectedAbility(currentSelectedAbility);
+      } else {
+        setSelectedAbility(null);
+      }
     }
-  }, [selectedCharacter?.name]);
+  }, [selectedCharacter?.name, currentSelectedAbility?.name]);
 
-  const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
+  const [selectedAbility, setSelectedAbility] = useState<Ability | null>(
+    currentSelectedAbility || null
+  );
 
   const handleAbilityDescriptionClick = (ability: Ability) => {
     setSelectedAbility(ability);
@@ -83,13 +93,18 @@ const AbilityFooter: React.FC<AbilityFooterProps> = ({ selectedCharacter }) => {
                   </div>
                   <div className="ability-details">
                     <span className="ability-cooldown">
-                      Cooldown: {selectedAbility.defaultCooldown} turns
+                      <span className="ability-info-title">Cooldown:</span>{" "}
+                      {selectedAbility.defaultCooldown} turns
                     </span>
                     <span className="ability-type">
-                      Target: {selectedAbility.target}
+                      <span className="ability-info-title">Target: </span>{" "}
+                      {selectedAbility.target}
                     </span>
                     <span className="ability-chakra">
-                      Required Chakra:{" "}
+                      <span className="ability-info-title">
+                        {" "}
+                        Required Chakra:
+                      </span>{" "}
                       {selectedAbility.requiredChakra.join(", ")}
                     </span>
                   </div>
