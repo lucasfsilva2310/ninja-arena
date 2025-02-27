@@ -43,6 +43,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     ChakraType[]
   >([]);
   const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
+  const [background, setBackground] = useState<string>(
+    "/backgrounds/default.png"
+  );
 
   const clearStates = () => {
     setSelectedCharacter(null);
@@ -66,6 +69,22 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
     }
   }, [onGameOver, game, selectedActions]);
+
+  useEffect(() => {
+    // List of available backgrounds
+    const backgrounds = [
+      "forest.png",
+      "training.png",
+      "akatsuki.png",
+      "waterfall.png",
+      // Add more background filenames as needed
+    ];
+
+    // Select random background
+    const randomBackground =
+      backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    setBackground(`/backgrounds/${randomBackground}`);
+  }, []); // Empty dependency array means this runs once when component mounts
 
   const handleAbilityClick = (character: Character, ability: Ability) => {
     if (selectedAbility === ability && selectedCharacter === character) {
@@ -282,8 +301,16 @@ export default function Battle({ game, onGameOver }: BattleProps) {
           onTransform={handleTransformChakras}
         />
       )}
-      <div className="app-container">
-        <div className="battle-container">
+      <div
+        className="battle-container"
+        style={{
+          backgroundImage: `url(${background})`,
+          backgroundSize: "100% 100%",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div className="app-container">
           <div className="chakra-container">
             <h3 className="chakra-title">Available Chakras</h3>
             <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
@@ -356,15 +383,17 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                   key={char.name + charIndex + "enemy"}
                 >
                   <div className="character-info-container">
-                    <div className="character-effects">
-                      <ActiveEffects character={char} />
-                    </div>
-                    <div className="character-actions">
-                      <CurrentActionsOnEnemy
-                        character={char}
-                        selectedActions={selectedActions}
-                        removeSelectedAction={removeSelectedAction}
-                      />
+                    <div className="character-info-abilities-container">
+                      <div className="character-effects">
+                        <ActiveEffects character={char} />
+                      </div>
+                      <div className="character-actions">
+                        <CurrentActionsOnEnemy
+                          character={char}
+                          selectedActions={selectedActions}
+                          removeSelectedAction={removeSelectedAction}
+                        />
+                      </div>
                     </div>
                     <div className="character-name-box">
                       <div
@@ -408,29 +437,33 @@ const CurrentActions = ({
       {selectedActions.map(
         (action, actionIndex) =>
           action.target === character && (
-            <>
-              <div
-                key={action.ability.name + actionIndex}
-                className="effect-icon-container"
-                onClick={() => removeSelectedAction(actionIndex)}
-              >
-                <img
-                  src={`/abilities/${action.character.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}/${action.ability.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}.png`}
-                  alt={action.ability.name}
-                  className="ability-icon"
-                />
-              </div>
-              <div className="ability-tooltip">
+            <div
+              key={action.ability.name + actionIndex}
+              className="effect-icon-container"
+              onClick={() => removeSelectedAction(actionIndex)}
+            >
+              <img
+                src={`/abilities/${action.character.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}/${action.ability.name
+                  .split(" ")
+                  .join("")
+                  .toLowerCase()}.png`}
+                alt={action.ability.name}
+                className="effect-icon"
+                onError={(e) => {
+                  e.currentTarget.src = "/abilities/default.png";
+                }}
+              />
+              <div className="effect-tooltip">
                 <h4>{action.ability.name}</h4>
                 <p>{action.ability.description}</p>
+                <div className="effect-duration">
+                  <span>Will be applied this turn</span>
+                </div>
               </div>
-            </>
+            </div>
           )
       )}
     </div>
@@ -465,11 +498,17 @@ const CurrentActionsOnEnemy = ({
                   .join("")
                   .toLowerCase()}.png`}
                 alt={action.ability.name}
-                className="ability-icon"
+                className="effect-icon"
+                onError={(e) => {
+                  e.currentTarget.src = "/abilities/default.png";
+                }}
               />
-              <div className="ability-tooltip">
+              <div className="effect-tooltip">
                 <h4>{action.ability.name}</h4>
                 <p>{action.ability.description}</p>
+                <div className="effect-duration">
+                  <span>Will be applied this turn</span>
+                </div>
               </div>
             </div>
           )
@@ -549,17 +588,10 @@ const ActiveEffects = ({ character }: { character: Character }) => {
   return (
     <div className="active-effects">
       {character.activeEffects.map((effect, index) => {
-        let hasDuration: boolean = false;
-        let duration: number = 0;
-
-        if (effect.damageReduction || effect.buff || effect.transformation) {
-          hasDuration = true;
-          duration =
-            effect.damageReduction?.remainingTurns ||
-            effect.buff?.remainingTurns ||
-            effect.transformation?.remainingTurns ||
-            0;
-        }
+        const duration =
+          effect.damageReduction?.remainingTurns ||
+          effect.buff?.remainingTurns ||
+          effect.transformation?.remainingTurns;
 
         return (
           <div key={effect.name + index} className="effect-icon-container">
@@ -580,9 +612,9 @@ const ActiveEffects = ({ character }: { character: Character }) => {
             <div className="effect-tooltip">
               <h4>{effect.name}</h4>
               <p>{effect.description}</p>
-              {hasDuration && (
+              {duration && (
                 <div className="effect-duration">
-                  <span className="duration-text">
+                  <span>
                     {duration === 1
                       ? "1 turn remaining"
                       : `${duration} turns remaining`}
@@ -647,6 +679,7 @@ const EnemyCharacterName = ({
   return (
     <div className="character-name-container enemy">
       <div className="character-details">
+        <HealthBar currentHP={character.hp} />
         <h4
           className={`character-name ${
             character.hp > 0 ? "character-alive" : "character-dead"
@@ -654,7 +687,6 @@ const EnemyCharacterName = ({
         >
           {character.name}
         </h4>
-        <HealthBar currentHP={character.hp} />
       </div>
       <div className="character-portrait">
         <img

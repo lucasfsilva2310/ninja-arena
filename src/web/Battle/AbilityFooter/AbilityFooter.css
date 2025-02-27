@@ -4,8 +4,7 @@
   left: 0;
   right: 0;
   height: 22vh;
-  background-color: #f8fafc;
-  border-top: 1px solid rgba(59, 130, 246, 0.2);
+  background-color: rgba(248, 250, 252, 0);
 }
 
 .ability-preview-container {
