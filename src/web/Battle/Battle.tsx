@@ -498,9 +498,7 @@ const Abilities = ({
         return (
           <div
             key={ability.name}
-            className={`ability-icon-container ${
-              isAbilityDisabled ? "ability-inactive" : "ability-active"
-            }`}
+            className={`ability-icon-container`}
             onClick={() =>
               !isAbilityDisabled && handleAbilityClick(character, ability)
             }
@@ -514,7 +512,9 @@ const Abilities = ({
                 .join("")
                 .toLowerCase()}.png`}
               alt={ability.name}
-              className="ability-icon"
+              className={`ability-icon ${
+                isAbilityDisabled ? "ability-inactive" : "ability-active"
+              }`}
               onError={(e) => {
                 e.currentTarget.src = "/abilities/default.png";
               }}
