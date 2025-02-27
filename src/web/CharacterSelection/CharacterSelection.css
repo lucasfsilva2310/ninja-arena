@@ -20,11 +20,11 @@
 .characters-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 1rem;
 }
 
-.character-card {
+.character-card-selection {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -38,19 +38,22 @@
   gap: 1rem;
   user-select: none;
   cursor: grab;
+
+  max-width: 110px;
+  max-height: 120px;
 }
 
-.character-card:hover {
+.character-card-selection-selection:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.character-card.selected {
+.character-card-selection.selected {
   border-color: #3b82f6;
   background-color: #f0f9ff;
 }
 
-.character-card.dragging {
+.character-card-selection.dragging {
   opacity: 0.5;
   cursor: grabbing;
 }
@@ -58,6 +61,8 @@
 .character-sprite {
   width: 96px;
   height: 96px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -78,7 +83,7 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: #1e293b;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 .abilities-preview {
@@ -170,8 +175,16 @@
   font-weight: bold;
 }
 
-.start-game-btn {
+.start-game-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
+  margin-bottom: 1rem;
+}
+
+.start-game-btn {
+  width: 20%;
   padding: 1rem;
   background-color: #10b981;
   color: white;

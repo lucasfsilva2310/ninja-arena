@@ -116,50 +116,7 @@ export default function CharacterSelection({
 
   return (
     <div className="character-selection-container">
-      <h2 className="selection-header">Choose 3 characters</h2>
-
-      <div
-        className="remove-zone"
-        onDragOver={handleDragOverRemoveZone}
-        onDragLeave={handleDragLeaveRemoveZone}
-        onDrop={handleDropOnRemoveZone}
-      >
-        Arraste aqui para remover
-      </div>
-
-      <div className="characters-grid">
-        {availableCharacters.map((char) => (
-          <div
-            key={char.name}
-            className={`character-card ${
-              selectedCharacters.includes(char) ? "selected" : ""
-            }`}
-            onClick={() => handleCharacterClick(char)}
-            draggable
-            onDragStart={(e) => handleDragStart(e, char)}
-            onDragEnd={handleDragEnd}
-          >
-            <div className="character-sprite">
-              <img
-                src={`/characters/${char.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}/${char.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}.png`}
-                alt={char.name}
-                draggable={false}
-              />
-            </div>
-            <div className="character-info">
-              <h3 className="character-name">{char.name}</h3>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="selection-footer">
+      <div className="selection-header">
         <div className="selected-characters">
           <h3>Selected Characters:</h3>
           <div className="selected-list">
@@ -202,13 +159,60 @@ export default function CharacterSelection({
               ))}
           </div>
         </div>
-        <button
-          className="start-game-btn"
-          onClick={startGame}
-          disabled={selectedCharacters.length !== 3}
+        <div className="start-game-btn-container">
+          <button
+            className="start-game-btn"
+            onClick={startGame}
+            disabled={selectedCharacters.length !== 3}
+          >
+            Iniciar Jogo
+          </button>
+        </div>
+      </div>
+
+      <div className="selection-footer">
+        <h4>Choose 3 characters</h4>
+
+        <div
+          className="remove-zone"
+          onDragOver={handleDragOverRemoveZone}
+          onDragLeave={handleDragLeaveRemoveZone}
+          onDrop={handleDropOnRemoveZone}
         >
-          Iniciar Jogo
-        </button>
+          Arraste aqui para remover
+        </div>
+
+        <div className="characters-grid">
+          {availableCharacters.map((char) => (
+            <div
+              key={char.name}
+              className={`character-card-selection ${
+                selectedCharacters.includes(char) ? "selected" : ""
+              }`}
+              onClick={() => handleCharacterClick(char)}
+              draggable
+              onDragStart={(e) => handleDragStart(e, char)}
+              onDragEnd={handleDragEnd}
+            >
+              <div className="character-sprite">
+                <img
+                  src={`/characters/${char.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}/${char.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}.png`}
+                  alt={char.name}
+                  draggable={false}
+                />
+              </div>
+              <div className="character-info">
+                <h3 className="character-name">{char.name}</h3>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <AbilityPreview

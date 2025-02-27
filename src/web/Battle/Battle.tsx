@@ -408,27 +408,29 @@ const CurrentActions = ({
       {selectedActions.map(
         (action, actionIndex) =>
           action.target === character && (
-            <div
-              key={action.ability.name + actionIndex}
-              className="effect-icon-container"
-              onClick={() => removeSelectedAction(actionIndex)}
-            >
-              <img
-                src={`/abilities/${action.character.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}/${action.ability.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}.png`}
-                alt={action.ability.name}
-                className="ability-icon"
-              />
+            <>
+              <div
+                key={action.ability.name + actionIndex}
+                className="effect-icon-container"
+                onClick={() => removeSelectedAction(actionIndex)}
+              >
+                <img
+                  src={`/abilities/${action.character.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}/${action.ability.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}.png`}
+                  alt={action.ability.name}
+                  className="ability-icon"
+                />
+              </div>
               <div className="ability-tooltip">
                 <h4>{action.ability.name}</h4>
                 <p>{action.ability.description}</p>
               </div>
-            </div>
+            </>
           )
       )}
     </div>
