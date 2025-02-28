@@ -56,8 +56,8 @@ export default function ChakraTransformModal({
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h3>Trocar Chakra</h3>
-        <p>Selecione exatamente 5 chakras para transformar:</p>
+        <h3>Eschange Chakra</h3>
+        <p>Select exactly 5 chakras to transform:</p>
         <div className="chakra-selection">
           {chakraTypesWithoutRandom.map((chakra) => (
             <div key={chakra} className="chakra-item">
@@ -84,7 +84,7 @@ export default function ChakraTransformModal({
             </div>
           ))}
         </div>
-        <p>Selecione o Chakra em que os 5 serão transformados:</p>
+        <p>Select the chakra to be formed:</p>
         <div className="chakra-target">
           {chakraTypesWithoutRandom.map((chakra) => (
             <button
@@ -97,7 +97,7 @@ export default function ChakraTransformModal({
           ))}
         </div>
         <div className="modal-actions">
-          <div>Total Selecionado: {chakrasToRemove.length}</div>
+          <div>Total selected: {chakrasToRemove.length}</div>
           <button className="cancel-button" onClick={onClose}>
             Cancelar
           </button>
@@ -106,7 +106,7 @@ export default function ChakraTransformModal({
             onClick={handleTransform}
             disabled={chakrasToRemove.length !== 5 || !targetChakra}
           >
-            Transformar
+            Transform
           </button>
         </div>
       </div>

@@ -23,8 +23,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   color: black;
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.6rem;
   text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff,
     1px 1px 0 #fff;
   transition: color 0.3s ease;

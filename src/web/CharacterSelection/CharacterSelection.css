@@ -1,11 +1,11 @@
 .character-selection-container {
   width: 100%;
-  max-width: 1440px;
   margin: 0 auto;
   padding: 2rem;
-  min-height: 90vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2rem;
 }
 
@@ -13,34 +13,64 @@
   font-size: 1.5rem;
   font-weight: bold;
   text-align: center;
-  color: #1e293b;
+  color: rgb(255, 255, 255);
   margin-bottom: 1rem;
+  max-width: 500px;
+  width: 100%;
 }
 
-.characters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+.selection-header-wrapper {
+  background-color: rgba(215, 198, 180, 0.5);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.characters-selection-container {
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   padding: 1rem;
+
+  background-color: rgba(215, 198, 180, 0.5);
+  border-radius: 8px;
+
+  max-height: calc(100% - 100px);
+}
+
+.characters-grid-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.characters-header-container h4 {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 1.3rem;
 }
 
 .character-card-selection {
-  background-color: #fff;
+  background-color: rgba(244, 235, 220, 0.8);
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.23);
+  padding: 0.1rem;
+  border: 1px solid rgba(199, 183, 158, 0.8);
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 2px solid transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
   user-select: none;
   cursor: grab;
-
   max-width: 110px;
-  max-height: 120px;
+  height: 120px;
 }
 
 .character-card-selection-selection:hover {
@@ -50,7 +80,7 @@
 
 .character-card-selection.selected {
   border-color: #3b82f6;
-  background-color: #f0f9ff;
+  background-color: rgba(244, 235, 220, 0.2);
 }
 
 .character-card-selection.dragging {
@@ -59,13 +89,13 @@
 }
 
 .character-sprite {
-  width: 96px;
-  height: 96px;
-  border: 1px solid #e2e8f0;
+  width: 100%;
+  height: 80%;
   border-radius: 8px;
   display: flex;
   justify-content: center;
   align-items: center;
+  background-color: rgba(244, 235, 220, 0);
 }
 
 .character-sprite img {
@@ -77,13 +107,18 @@
 
 .character-info {
   text-align: center;
+  height: 10%;
+  margin-bottom: 10%;
+  width: 100%;
 }
 
 .character-name {
-  font-size: 1.25rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #1e293b;
-  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .abilities-preview {
@@ -128,6 +163,11 @@
 .selection-footer {
   padding-top: 2rem;
   border-top: 1px solid #e2e8f0;
+  width: 90%;
+  height: 50vh;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .selected-characters {
@@ -135,9 +175,8 @@
 }
 
 .selected-characters h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #1e293b;
+  font-size: 1rem;
+  color: rgb(9, 9, 9);
   margin-bottom: 1rem;
 }
 
@@ -184,7 +223,7 @@
 }
 
 .start-game-btn {
-  width: 20%;
+  width: 200px;
   padding: 1rem;
   background-color: #10b981;
   color: white;

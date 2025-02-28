@@ -1,5 +1,6 @@
+import "./AbilityDescriptionFooter.css";
+
 import React, { useEffect, useState } from "react";
-import "./AbilityFooter.css";
 
 import { Ability } from "../../../models/ability.model";
 import { Character } from "../../../models/character.model";
@@ -8,6 +9,29 @@ interface AbilityFooterProps {
   selectedCharacter: Character | null;
   currentSelectedAbility: Ability | null;
 }
+
+const getChakraColor = (chakraType: string): string => {
+  switch (chakraType) {
+    case "Taijutsu":
+      return "#22c55e"; // Green
+    case "Ninjutsu":
+      return "#3b82f6"; // Blue
+    case "Genjutsu":
+      return "#ffffff"; // White
+    case "Bloodline":
+      return "#ef4444"; // Red
+    case "Random":
+      return "#000000"; // Black
+    default:
+      return "#94a3b8"; // Default gray
+  }
+};
+
+const ChakraText = ({ chakra }: { chakra: string }) => (
+  <span style={{ color: getChakraColor(chakra), fontWeight: "bold" }}>
+    {chakra}
+  </span>
+);
 
 const AbilityFooter: React.FC<AbilityFooterProps> = ({
   selectedCharacter,
@@ -44,7 +68,7 @@ const AbilityFooter: React.FC<AbilityFooterProps> = ({
                 <button
                   key={ability.name}
                   onClick={() => handleAbilityDescriptionClick(ability)}
-                  className={`ability-preview-button`}
+                  className="ability-preview-button"
                 >
                   <img
                     src={`/abilities/${selectedCharacter.name
@@ -101,11 +125,15 @@ const AbilityFooter: React.FC<AbilityFooterProps> = ({
                       {selectedAbility.target}
                     </span>
                     <span className="ability-chakra">
-                      <span className="ability-info-title">
-                        {" "}
-                        Required Chakra:
-                      </span>{" "}
-                      {selectedAbility.requiredChakra.join(", ")}
+                      <span className="ability-info-title">Cost:</span>{" "}
+                      {selectedAbility.requiredChakra.length} (
+                      {selectedAbility.requiredChakra.map((chakra, index) => (
+                        <React.Fragment key={index}>
+                          {index > 0 && ", "}
+                          <ChakraText chakra={chakra} />
+                        </React.Fragment>
+                      ))}
+                      )
                     </span>
                   </div>
                 </div>

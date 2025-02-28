@@ -9,8 +9,8 @@ import { Player } from "../../models/player.model";
 import ExchangeRandomChakraFinalModal from "./Modals/ExchangeRandomChakra/ExchangeRandomChakraFinalModal";
 import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";
 
-import AbilityFooter from "./AbilityFooter/AbilityFooter";
-import HealthBar from "../components/HealthBar/HealthBar";
+import AbilityFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
+import HealthBar from "./HealthBar/HealthBar";
 
 interface BattleProps {
   game: GameEngine;
@@ -23,6 +23,23 @@ interface SelectedAction {
   ability: Ability;
   target: Character;
 }
+
+const getChakraColor = (chakraType: string): string => {
+  switch (chakraType) {
+    case "Taijutsu":
+      return "#22c55e"; // Green
+    case "Ninjutsu":
+      return "#3b82f6"; // Blue
+    case "Genjutsu":
+      return "#ffffff"; // White
+    case "Bloodline":
+      return "#ef4444"; // Red
+    case "Random":
+      return "#000000"; // Black
+    default:
+      return "#94a3b8"; // Default gray
+  }
+};
 
 export default function Battle({ game, onGameOver }: BattleProps) {
   const [selectedActions, setSelectedActions] = useState<SelectedAction[]>([]);
@@ -44,7 +61,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   >([]);
   const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
   const [background, setBackground] = useState<string>(
-    "/backgrounds/default.png"
+    "/backgrounds/battle/default.png"
   );
 
   const clearStates = () => {
@@ -72,19 +89,18 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
   useEffect(() => {
     // List of available backgrounds
+    // Add Logic to get random background from backgrounds folder directory
     const backgrounds = [
       "forest.png",
       "training.png",
       "akatsuki.png",
       "waterfall.png",
-      // Add more background filenames as needed
     ];
 
-    // Select random background
     const randomBackground =
       backgrounds[Math.floor(Math.random() * backgrounds.length)];
-    setBackground(`/backgrounds/${randomBackground}`);
-  }, []); // Empty dependency array means this runs once when component mounts
+    setBackground(`/backgrounds/battle/${randomBackground}`);
+  }, []);
 
   const handleAbilityClick = (character: Character, ability: Ability) => {
     if (selectedAbility === ability && selectedCharacter === character) {
@@ -213,7 +229,15 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const player1ActiveChakrasComponent = Object.entries(
     game.player1.getChakraCount()
   ).map(([chakra, count]) => (
-    <span key={chakra} className="chakra-item">
+    <span
+      key={chakra}
+      className="chakra-item"
+      style={{
+        color: getChakraColor(chakra),
+        fontWeight: "bold",
+        borderColor: getChakraColor(chakra),
+      }}
+    >
       {chakra}: {count - selectedChakras.filter((c) => c === chakra).length}
     </span>
   ));
@@ -319,7 +343,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               className="chakra-button"
               disabled={player1ActiveChakras.length < 5}
             >
-              Trocar Chakra
+              Exchange Chakra
             </button>
           </div>
 
@@ -327,7 +351,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
           <div className="end-turn-button-container">
             <button onClick={executeTurn} className="end-turn-button">
-              Finalizar Turno
+              End Turn
             </button>
           </div>
 
@@ -360,14 +384,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                       <div className="character-effects">
                         <ActiveEffects character={char} />
                       </div>
-                      <div className="abilities-container">
-                        <Abilities
-                          character={char}
-                          activeChakras={player1ActiveChakras}
-                          selectedActions={selectedActions}
-                          handleAbilityClick={handleAbilityClick}
-                        />
-                      </div>
+                      <Abilities
+                        character={char}
+                        activeChakras={player1ActiveChakras}
+                        selectedActions={selectedActions}
+                        handleAbilityClick={handleAbilityClick}
+                      />
                     </div>
                   </div>
                 </div>
@@ -569,7 +591,22 @@ const Abilities = ({
               <h4>{ability.name}</h4>
               <p>{ability.description}</p>
               <div className="ability-details">
-                <span>Chakra: {ability.requiredChakra.join(", ")}</span>
+                <span>
+                  Chakra:{" "}
+                  {ability.requiredChakra.map((chakra, index) => (
+                    <React.Fragment key={index}>
+                      {index > 0 && ", "}
+                      <span
+                        style={{
+                          color: getChakraColor(chakra),
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {chakra}
+                      </span>
+                    </React.Fragment>
+                  ))}
+                </span>
                 {ability.currentCooldown > 0 && (
                   <span className="cooldown">
                     Cooldown: {ability.currentCooldown}
@@ -679,7 +716,6 @@ const EnemyCharacterName = ({
   return (
     <div className="character-name-container enemy">
       <div className="character-details">
-        <HealthBar currentHP={character.hp} />
         <h4
           className={`character-name ${
             character.hp > 0 ? "character-alive" : "character-dead"
@@ -687,6 +723,7 @@ const EnemyCharacterName = ({
         >
           {character.name}
         </h4>
+        <HealthBar currentHP={character.hp} />
       </div>
       <div className="character-portrait">
         <img

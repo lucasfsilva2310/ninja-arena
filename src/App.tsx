@@ -1,4 +1,5 @@
 import "./reset.css";
+import "./App.css";
 
 import { useState } from "react";
 import CharacterSelection from "./web/CharacterSelection/CharacterSelection";

@@ -1,9 +1,11 @@
-import { useState, DragEvent } from "react";
+import "./CharacterSelection.css";
+
+import { useState, DragEvent, useEffect } from "react";
+
 import { Character } from "../../models/character.model";
 import { Ability } from "../../models/ability.model";
 import { availableCharacters } from "../../database/available-characters";
-import AbilityPreview from "./AbilityPreview";
-import "./CharacterSelection.css";
+import AbilityDescriptionFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
 
 interface CharacterSelectionProps {
   startGame: () => void;
@@ -25,6 +27,19 @@ export default function CharacterSelection({
   );
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [isDraggingFromSlot, setIsDraggingFromSlot] = useState(false);
+  const [background, setBackground] = useState<string>(
+    "/backgrounds/character-selection/default.png"
+  );
+
+  useEffect(() => {
+    // List of available backgrounds
+    // Add Logic to get random background from backgrounds folder directory
+    const backgrounds = ["itachi.png"];
+
+    const randomBackground =
+      backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    setBackground(`/backgrounds/character-selection/${randomBackground}`);
+  }, []);
 
   const handleCharacterClick = (character: Character) => {
     setPreviewCharacter(character);
@@ -115,64 +130,72 @@ export default function CharacterSelection({
   };
 
   return (
-    <div className="character-selection-container">
+    <div
+      className="character-selection-container"
+      style={{
+        backgroundImage: `url(${background})`,
+        backgroundSize: "100% 100%",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
       <div className="selection-header">
-        <div className="selected-characters">
-          <h3>Selected Characters:</h3>
-          <div className="selected-list">
-            {Array(3)
-              .fill(null)
-              .map((_, index) => (
-                <div
-                  key={`slot-${index}`}
-                  className={`character-slot ${
-                    dragOverIndex === index ? "drag-over" : ""
-                  } ${selectedCharacters[index] ? "filled" : "empty-slot"}`}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDrop={(e) => handleDrop(e, index)}
-                >
-                  {selectedCharacters[index] && (
-                    <div
-                      className="selected-character-container"
-                      draggable
-                      onDragStart={(e) =>
-                        handleDragStart(e, selectedCharacters[index], true)
-                      }
-                      onDragEnd={handleDragEnd}
-                    >
-                      <img
-                        src={`/characters/${selectedCharacters[index].name
-                          .split(" ")
-                          .join("")
-                          .toLowerCase()}/${selectedCharacters[index].name
-                          .split(" ")
-                          .join("")
-                          .toLowerCase()}.png`}
-                        alt={selectedCharacters[index].name}
-                        className="selected-sprite"
-                        draggable={false}
-                      />
-                    </div>
-                  )}
-                  {!selectedCharacters[index] && <span>?</span>}
-                </div>
-              ))}
+        <div className="selection-header-wrapper">
+          <div className="selected-characters">
+            <h3>Selected Characters:</h3>
+            <div className="selected-list">
+              {Array(3)
+                .fill(null)
+                .map((_, index) => (
+                  <div
+                    key={`slot-${index}`}
+                    className={`character-slot ${
+                      dragOverIndex === index ? "drag-over" : ""
+                    } ${selectedCharacters[index] ? "filled" : "empty-slot"}`}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                  >
+                    {selectedCharacters[index] && (
+                      <div
+                        className="selected-character-container"
+                        draggable
+                        onDragStart={(e) =>
+                          handleDragStart(e, selectedCharacters[index], true)
+                        }
+                        onDragEnd={handleDragEnd}
+                      >
+                        <img
+                          src={`/characters/${selectedCharacters[index].name
+                            .split(" ")
+                            .join("")
+                            .toLowerCase()}/${selectedCharacters[index].name
+                            .split(" ")
+                            .join("")
+                            .toLowerCase()}.png`}
+                          alt={selectedCharacters[index].name}
+                          className="selected-sprite"
+                          draggable={false}
+                        />
+                      </div>
+                    )}
+                    {!selectedCharacters[index] && <span>?</span>}
+                  </div>
+                ))}
+            </div>
           </div>
-        </div>
-        <div className="start-game-btn-container">
-          <button
-            className="start-game-btn"
-            onClick={startGame}
-            disabled={selectedCharacters.length !== 3}
-          >
-            Iniciar Jogo
-          </button>
+          <div className="start-game-btn-container">
+            <button
+              className="start-game-btn"
+              onClick={startGame}
+              disabled={selectedCharacters.length !== 3}
+            >
+              Start Game
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="selection-footer">
-        <h4>Choose 3 characters</h4>
-
         <div
           className="remove-zone"
           onDragOver={handleDragOverRemoveZone}
@@ -182,43 +205,47 @@ export default function CharacterSelection({
           Arraste aqui para remover
         </div>
 
-        <div className="characters-grid">
-          {availableCharacters.map((char) => (
-            <div
-              key={char.name}
-              className={`character-card-selection ${
-                selectedCharacters.includes(char) ? "selected" : ""
-              }`}
-              onClick={() => handleCharacterClick(char)}
-              draggable
-              onDragStart={(e) => handleDragStart(e, char)}
-              onDragEnd={handleDragEnd}
-            >
-              <div className="character-sprite">
-                <img
-                  src={`/characters/${char.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}/${char.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}.png`}
-                  alt={char.name}
-                  draggable={false}
-                />
+        <div className="characters-selection-container">
+          <div className="characters-header-container">
+            <h4>Select 3 characters</h4>
+          </div>
+          <div className="characters-grid-body">
+            {availableCharacters.map((char) => (
+              <div
+                key={char.name}
+                className={`character-card-selection ${
+                  selectedCharacters.includes(char) ? "selected" : ""
+                }`}
+                onClick={() => handleCharacterClick(char)}
+                draggable
+                onDragStart={(e) => handleDragStart(e, char)}
+                onDragEnd={handleDragEnd}
+              >
+                <div className="character-sprite">
+                  <img
+                    src={`/characters/${char.name
+                      .split(" ")
+                      .join("")
+                      .toLowerCase()}/${char.name
+                      .split(" ")
+                      .join("")
+                      .toLowerCase()}.png`}
+                    alt={char.name}
+                    draggable={false}
+                  />
+                </div>
+                <div className="character-info">
+                  <h3 className="character-name">{char.name}</h3>
+                </div>
               </div>
-              <div className="character-info">
-                <h3 className="character-name">{char.name}</h3>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      <AbilityPreview
-        character={previewCharacter}
-        selectedAbility={selectedAbility}
-        onAbilityClick={setSelectedAbility}
+      <AbilityDescriptionFooter
+        selectedCharacter={previewCharacter}
+        currentSelectedAbility={selectedAbility}
       />
     </div>
   );
