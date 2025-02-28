@@ -741,3 +741,13 @@
   left: auto;
   right: 16px;
 }
+
+.effect-separator {
+  margin: 0.5rem 0;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.effect-tooltip p {
+  margin: 0.5rem 0;
+}

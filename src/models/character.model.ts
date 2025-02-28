@@ -93,6 +93,7 @@ export class Character {
 
   addDamageReduction(
     ability: Ability,
+    description: string,
     amount: number,
     remainingTurns: number,
     isPercent: boolean
@@ -104,7 +105,7 @@ export class Character {
     );
     this.activeEffects.push({
       name: ability.name,
-      description: ability.description,
+      description,
       damageReduction: {
         amount,
         remainingTurns,
@@ -167,7 +168,7 @@ export class Character {
     console.log(`${this.name} aplicou buff de ${buff.buffType}. `);
     this.activeEffects.push({
       name: ability.name,
-      description: ability.description,
+      description: buff.description,
       buff: { ...buff, value },
     });
   }

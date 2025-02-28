@@ -33,12 +33,14 @@ export interface AbilityEffect {
 }
 
 export interface DamageReductionEffect {
+  description: string;
   amount: number;
   duration: number;
   isPercent?: boolean;
 }
 
 export interface BuffEffect {
+  description: string;
   buffedAbilites: string[];
   remainingTurns: number;
   buffType: "Damage" | "Heal";
@@ -121,6 +123,7 @@ export class Ability {
           if (effect.damageReduction) {
             target.addDamageReduction(
               ability,
+              effect.damageReduction.description,
               effect.damageReduction.amount,
               effect.damageReduction.duration || 1,
               effect.damageReduction.isPercent || false

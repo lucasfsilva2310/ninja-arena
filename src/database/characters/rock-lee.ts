@@ -58,6 +58,7 @@ export const backflip = new Ability(
       type: "DamageReduction",
       value: Infinity,
       duration: 1,
+      description: "This character is invunerable.",
     },
   ],
   "Self"

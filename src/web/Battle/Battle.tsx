@@ -622,39 +622,59 @@ const Abilities = ({
 };
 
 const ActiveEffects = ({ character }: { character: Character }) => {
+  // Group effects by ability name
+  const groupedEffects = character.activeEffects.reduce((acc, effect) => {
+    if (!acc[effect.name]) {
+      acc[effect.name] = [];
+    }
+    acc[effect.name].push(effect);
+    return acc;
+  }, {} as Record<string, typeof character.activeEffects>);
+
   return (
     <div className="active-effects">
-      {character.activeEffects.map((effect, index) => {
-        const duration =
-          effect.damageReduction?.remainingTurns ||
-          effect.buff?.remainingTurns ||
-          effect.transformation?.remainingTurns;
+      {Object.entries(groupedEffects).map(([abilityName, effects]) => {
+        // Get the longest duration among all effects for this ability
+        const maxDuration = Math.max(
+          ...effects.map(
+            (effect) =>
+              effect.damageReduction?.remainingTurns ||
+              effect.buff?.remainingTurns ||
+              effect.transformation?.remainingTurns ||
+              0
+          )
+        );
 
         return (
-          <div key={effect.name + index} className="effect-icon-container">
+          <div key={abilityName} className="effect-icon-container">
             <img
               src={`/abilities/${character.name
                 .split(" ")
                 .join("")
-                .toLowerCase()}/${effect.name
+                .toLowerCase()}/${abilityName
                 .split(" ")
                 .join("")
                 .toLowerCase()}.png`}
-              alt={effect.name}
+              alt={abilityName}
               className="effect-icon"
               onError={(e) => {
                 e.currentTarget.src = "/abilities/default.png";
               }}
             />
             <div className="effect-tooltip">
-              <h4>{effect.name}</h4>
-              <p>{effect.description}</p>
-              {duration && (
+              <h4>{abilityName}</h4>
+              {effects.map((effect, index) => (
+                <React.Fragment key={index}>
+                  {index > 0 && <hr className="effect-separator" />}
+                  <p>{effect.description}</p>
+                </React.Fragment>
+              ))}
+              {maxDuration > 0 && (
                 <div className="effect-duration">
                   <span>
-                    {duration === 1
+                    {maxDuration === 1
                       ? "1 turn remaining"
-                      : `${duration} turns remaining`}
+                      : `${maxDuration} turns remaining`}
                   </span>
                 </div>
               )}

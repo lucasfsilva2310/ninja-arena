@@ -47,7 +47,12 @@ export const kagebunshin = new Ability(
   [
     {
       type: "DamageReduction",
-      damageReduction: { amount: 15, duration: 3, isPercent: true },
+      damageReduction: {
+        amount: 15,
+        duration: 3,
+        isPercent: true,
+        description: "This character has 15% damage reduction.",
+      },
     },
     {
       type: "Buff",
@@ -56,6 +61,7 @@ export const kagebunshin = new Ability(
         buffedAbilites: ["Naruto Kick"],
         buffType: "Damage",
         remainingTurns: 3,
+        description: 'This character has 10 damage increase on "Naruto Kick".',
       },
     },
   ],

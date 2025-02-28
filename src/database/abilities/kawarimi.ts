@@ -9,6 +9,7 @@ export const kawarimi = new Ability(
     {
       type: "DamageReduction",
       damageReduction: {
+        description: "This character is invunerable.",
         amount: Infinity,
         duration: 1,
       },

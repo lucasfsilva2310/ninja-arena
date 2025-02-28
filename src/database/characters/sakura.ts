@@ -31,6 +31,7 @@ export const innerStrength = new Ability(
       type: "Buff",
       value: 5,
       buff: {
+        description: 'Increases attack power for "Anger Punch" by 5.',
         buffedAbilites: ["Anger Punch"],
         remainingTurns: 3,
         buffType: "Damage",

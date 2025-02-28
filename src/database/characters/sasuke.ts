@@ -49,6 +49,7 @@ export const sharingan = new Ability(
         buffedAbilites: ["Chidori"],
         buffType: "Damage",
         remainingTurns: 2,
+        description: 'This character has 10 damage increase on "Chidori".',
       },
     },
   ],
