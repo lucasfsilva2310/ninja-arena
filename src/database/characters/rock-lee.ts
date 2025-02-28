@@ -39,6 +39,15 @@ export const powerOfYouth = new Ability(
   "Self"
 );
 
+export const konohaLeafPunch = new Ability(
+  "Konoha Leaf Punch",
+  "Rock Lee do one of his most famous punches, dealing 20 damage to the selected enemy.",
+  ["Taijutsu"],
+  1,
+  [{ type: "Damage", value: 20 }],
+  "Enemy"
+);
+
 export const backflip = new Ability(
   "Backflip",
   "Rock Lee do a big backflip avoiding all danger, becoming invunerable for the next turn.",
@@ -55,6 +64,7 @@ export const backflip = new Ability(
 );
 
 export const rockLee = new Character("Rock Lee", [
+  konohaLeafPunch,
   primaryLotus,
   powerOfYouth,
   backflip,
