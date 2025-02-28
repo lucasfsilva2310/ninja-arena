@@ -1,19 +1,28 @@
+@import "../../../styles/variables.css";
+
 .ability-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 22vh;
-  background-color: rgba(248, 250, 252, 0);
+  height: var(--footer-height);
+  background-size: contain;
+  background-position: bottom center;
+  background-repeat: no-repeat;
+  /* padding: 2rem 1rem; */
 }
 
 .ability-preview-container {
-  max-width: 1200px;
+  max-width: var(--container-width);
   height: 100%;
   margin: 0 auto;
-  padding: 0.75rem;
+  padding: var(--spacing-md) var(--spacing-xl);
   display: flex;
   flex-direction: column;
+  background-image: url("/assets/scroll-open-only-medium.jpg");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .ability-preview-container h4 {
@@ -117,8 +126,8 @@
   display: flex;
   flex-direction: row;
   gap: 1rem;
-  color: #94a3b8;
-  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
   flex-wrap: wrap;
 }
 
@@ -129,10 +138,13 @@
 @media (max-width: 640px) {
   .ability-footer {
     height: 40vh;
+    padding: 1.5rem 0.75rem; /* Adjust padding for mobile */
+    background-size: 100% 100%; /* Ensure full coverage on mobile */
   }
 
   .ability-preview-container {
-    padding: 0.5rem;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-size: 100% 100%; /* Maintain full coverage on mobile */
   }
 
   .ability-description-content {
@@ -143,5 +155,13 @@
 
   .ability-details {
     align-items: center;
+  }
+}
+
+/* Add a minimum width to ensure the scroll doesn't get too compressed */
+@media (min-width: 1024px) {
+  .ability-footer {
+    min-width: 768px;
+    background-size: contain;
   }
 }

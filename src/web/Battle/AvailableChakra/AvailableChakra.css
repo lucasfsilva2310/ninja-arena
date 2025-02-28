@@ -1,0 +1,68 @@
+@import "../../../styles/variables.css";
+
+.chakra-container {
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.chakra-inside-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 50%;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-lg);
+  background-image: url("/assets/scroll-open-only-medium.jpg");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.chakra-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: var(--text-dark);
+}
+
+.chakra-inside-container button {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dark);
+  background-color: var(--bg-button);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.chakra-inside-container button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.chakra-inside-container button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .chakra-inside-container {
+    width: 80%;
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .chakra-inside-container {
+    width: 90%;
+    padding: 0.5rem 1rem;
+  }
+}

@@ -1,12 +1,14 @@
+@import "../../styles/variables.css";
+
 .character-selection-container {
   width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--spacing-xl);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: var(--spacing-xl);
 }
 
 .selection-header {
@@ -20,10 +22,10 @@
 }
 
 .selection-header-wrapper {
-  background-color: rgba(215, 198, 180, 0.5);
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
+  background-color: var(--bg-primary);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
   width: 100%;
 }
 
@@ -33,8 +35,8 @@
   gap: 1rem;
   padding: 1rem;
 
-  background-color: rgba(215, 198, 180, 0.5);
-  border-radius: 8px;
+  background-color: var(--bg-primary);
+  border-radius: var(--radius-lg);
 
   max-height: calc(100% - 100px);
 }
@@ -57,18 +59,16 @@
 }
 
 .character-card-selection {
-  background-color: rgba(244, 235, 220, 0.8);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.23);
-  padding: 0.1rem;
-  border: 1px solid rgba(199, 183, 158, 0.8);
-  cursor: pointer;
-  transition: all 0.2s ease;
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-xs);
+  cursor: grab;
+  transition: var(--transition-fast);
   display: flex;
   flex-direction: column;
   align-items: center;
   user-select: none;
-  cursor: grab;
   max-width: 110px;
   height: 120px;
 }

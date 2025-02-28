@@ -1,0 +1,107 @@
+@import "../../../styles/variables.css";
+
+.character-card {
+  position: relative;
+  width: 100%;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  background-image: url("/assets/scroll-medium-open-full.png");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.character-info-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  gap: 2rem;
+
+  width: 100%;
+  padding: 1rem 2rem;
+}
+
+@media (max-width: 640px) {
+  .character-name-container {
+    padding: 0.25rem;
+    gap: 0.5rem;
+  }
+
+  .character-portrait {
+    width: 48px;
+    height: 48px;
+  }
+
+  .character-name {
+    font-size: 0.875rem;
+  }
+
+  .character-info-container {
+    flex-direction: column;
+  }
+}
+
+.character-name-box {
+  width: 40%;
+}
+
+.character-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.3rem;
+
+  height: 30px;
+  width: 100%;
+}
+
+.character-info-abilities-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+/* Effects Styling */
+.character-effects {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.3rem;
+
+  margin: 0.1rem;
+
+  height: 30px;
+  width: 100%;
+}
+
+/* Player team (left side) effects and actions */
+.team-container:first-child .character-effects,
+.team-container:first-child .current-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-start; /* Align to the left */
+}
+
+/* Enemy team (right side) effects and actions */
+.team-container:last-child .character-effects,
+.team-container:last-child .current-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end; /* Align to the right */
+}
+
+/* Adjust enemy card to mirror the scroll if needed */
+.character-card[class*="enemy"] {
+  transform: scaleX(-1);
+}
+
+/* Prevent content from being mirrored */
+.character-card[class*="enemy"] .character-info-container {
+  transform: scaleX(-1);
+}

@@ -1,0 +1,128 @@
+@import "../../../styles/variables.css";
+
+.current-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.effect-icon-container {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  overflow: visible;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.effect-icon-container:hover {
+  transform: scale(1.1);
+}
+
+.effect-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+.effect-tooltip {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 300px;
+  background-color: var(--bg-tooltip);
+  color: var(--text-white);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-sm);
+  z-index: 50;
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-fast);
+  pointer-events: none;
+}
+
+.effect-tooltip h4 {
+  margin: 0 0 var(--spacing-sm);
+  font-size: var(--font-base);
+  color: var(--color-primary-light);
+}
+
+.effect-tooltip p {
+  margin: 0 0 var(--spacing-sm);
+  line-height: 1.4;
+  font-size: var(--font-xs);
+  letter-spacing: 0.075rem;
+  color: var(--text-light);
+}
+
+.effect-duration {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.effect-icon-container:hover .effect-tooltip {
+  visibility: visible;
+  opacity: 1;
+  bottom: 110%;
+}
+
+.effect-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: var(--bg-tooltip) transparent transparent transparent;
+}
+
+/* Ensure tooltips don't get cut off at screen edges */
+.effect-icon-container:first-child .effect-tooltip {
+  left: 0;
+  transform: none;
+}
+
+.effect-icon-container:first-child .effect-tooltip::after {
+  left: 16px;
+}
+
+.effect-icon-container:last-child .effect-tooltip {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.effect-icon-container:last-child .effect-tooltip::after {
+  left: auto;
+  right: 16px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .effect-tooltip {
+    min-width: 160px;
+    max-width: 260px;
+    font-size: var(--font-xs);
+  }
+}
+
+.active-effects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  height: 102px;
+}
+
+.effect-separator {
+  margin: var(--spacing-sm) 0;
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}

@@ -6,7 +6,10 @@ interface HealthBarProps {
   maxHP?: number;
 }
 
-const HealthBar: React.FC<HealthBarProps> = ({ currentHP, maxHP = 100 }) => {
+export const HealthBar: React.FC<HealthBarProps> = ({
+  currentHP,
+  maxHP = 100,
+}) => {
   const [displayHP, setDisplayHP] = useState(currentHP);
   const [isAnimating, setIsAnimating] = useState(false);
   const previousHP = useRef(currentHP);
@@ -75,5 +78,3 @@ const HealthBar: React.FC<HealthBarProps> = ({ currentHP, maxHP = 100 }) => {
     </div>
   );
 };
-
-export default HealthBar;

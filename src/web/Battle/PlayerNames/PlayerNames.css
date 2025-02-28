@@ -1,0 +1,106 @@
+@import "../../../styles/variables.css";
+
+.character-name-container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.character-portrait {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid var(--border-dark);
+  flex-shrink: 0;
+  background-color: var(--bg-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-fast);
+}
+
+.character-image:hover {
+  transform: scale(1.1);
+}
+
+.character-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.character-name {
+  position: relative;
+  margin: 0;
+  padding: var(--spacing-xs) 0;
+}
+
+.character-alive {
+  color: var(--text-dark);
+}
+
+.character-dead {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* When a character is a possible target, highlight the entire container */
+.character-name-container:has(.character-selected) {
+  background-color: var(--bg-highlight);
+  animation: targetPulse 2s infinite ease-in-out;
+  box-shadow: var(--shadow-highlight);
+  padding: var(--spacing-sm);
+}
+
+@keyframes targetPulse {
+  0% {
+    background-color: var(--bg-highlight-dim);
+    box-shadow: var(--shadow-highlight-dim);
+  }
+  50% {
+    background-color: var(--bg-highlight);
+    box-shadow: var(--shadow-highlight);
+  }
+  100% {
+    background-color: var(--bg-highlight-dim);
+    box-shadow: var(--shadow-highlight-dim);
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 640px) {
+  .character-name-container {
+    padding: var(--spacing-xs);
+    gap: var(--spacing-sm);
+  }
+
+  .character-portrait {
+    width: 48px;
+    height: 48px;
+  }
+
+  .character-name {
+    font-size: var(--font-sm);
+  }
+}
+
+/* Enemy-specific styles */
+.character-name-container.enemy {
+  flex-direction: row-reverse;
+}
+
+.enemy .character-details {
+  text-align: right;
+}

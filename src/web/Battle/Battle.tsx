@@ -10,36 +10,21 @@ import ExchangeRandomChakraFinalModal from "./Modals/ExchangeRandomChakra/Exchan
 import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";
 
 import AbilityFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
-import HealthBar from "./HealthBar/HealthBar";
+import { AvailableChakra } from "./AvailableChakra/AvailableChakra";
+import { MainPlayer } from "./PlayerBoards/MainPlayer";
+import { EnemyPlayer } from "./PlayerBoards/EnemyPlayer";
 
 interface BattleProps {
   game: GameEngine;
   onGameOver: (winner: string) => void;
 }
 
-interface SelectedAction {
+export interface SelectedAction {
   player: Player;
   character: Character;
   ability: Ability;
   target: Character;
 }
-
-const getChakraColor = (chakraType: string): string => {
-  switch (chakraType) {
-    case "Taijutsu":
-      return "#22c55e"; // Green
-    case "Ninjutsu":
-      return "#3b82f6"; // Blue
-    case "Genjutsu":
-      return "#ffffff"; // White
-    case "Bloodline":
-      return "#ef4444"; // Red
-    case "Random":
-      return "#000000"; // Black
-    default:
-      return "#94a3b8"; // Default gray
-  }
-};
 
 export default function Battle({ game, onGameOver }: BattleProps) {
   const [selectedActions, setSelectedActions] = useState<SelectedAction[]>([]);
@@ -64,6 +49,52 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     "/backgrounds/battle/default.png"
   );
 
+  const [player1ActiveChakras, setPlayer1ActiveChakras] = useState<
+    ChakraType[]
+  >([]);
+
+  // Recalc active chakras based on selected chakras
+  useEffect(() => {
+    const chakras: ChakraType[] = [];
+    Object.entries(game.player1.getChakraCount()).forEach(([chakra, count]) => {
+      const chakraCount =
+        count - selectedChakras.filter((c) => c === chakra).length;
+
+      for (let i = 0; i < chakraCount; i++) {
+        chakras.push(chakra as ChakraType);
+      }
+    });
+    setPlayer1ActiveChakras(chakras);
+  }, [game.player1, selectedChakras]);
+
+  const handleTransformChakras = (
+    chakrasToTransform: ChakraType[],
+    targetChakra: ChakraType
+  ) => {
+    game.player1.transformChakras(chakrasToTransform, targetChakra);
+  };
+
+  // Check if game is over
+  useEffect(() => {
+    if (game.checkGameOver()) {
+      onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
+    }
+  }, [onGameOver, game, selectedActions]);
+
+  // Get random background
+  useEffect(() => {
+    const backgrounds = [
+      "forest.png",
+      "training.png",
+      "akatsuki.png",
+      "waterfall.png",
+    ];
+
+    const randomBackground =
+      backgrounds[Math.floor(Math.random() * backgrounds.length)];
+    setBackground(`/backgrounds/battle/${randomBackground}`);
+  }, []);
+
   const clearStates = () => {
     setSelectedCharacter(null);
     setSelectedAbility(null);
@@ -80,27 +111,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setSelectedActions([]);
     setPossibleTargets([]);
   };
-
-  useEffect(() => {
-    if (game.checkGameOver()) {
-      onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
-    }
-  }, [onGameOver, game, selectedActions]);
-
-  useEffect(() => {
-    // List of available backgrounds
-    // Add Logic to get random background from backgrounds folder directory
-    const backgrounds = [
-      "forest.png",
-      "training.png",
-      "akatsuki.png",
-      "waterfall.png",
-    ];
-
-    const randomBackground =
-      backgrounds[Math.floor(Math.random() * backgrounds.length)];
-    setBackground(`/backgrounds/battle/${randomBackground}`);
-  }, []);
 
   const handleAbilityClick = (character: Character, ability: Ability) => {
     if (selectedAbility === ability && selectedCharacter === character) {
@@ -209,46 +219,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     executeAITurn();
   };
 
-  // Logic to get unused chakras
-  // TODO: isolate
-  const player1ActiveChakras: ChakraType[] = [];
-
-  const getNotUsedChakras = () => {
-    Object.entries(game.player1.getChakraCount()).forEach(([chakra, count]) => {
-      const chakraCount =
-        count - selectedChakras.filter((c) => c === chakra).length;
-
-      for (let i = 0; i < chakraCount; i++) {
-        player1ActiveChakras.push(chakra as ChakraType);
-      }
-    });
-  };
-
-  getNotUsedChakras();
-
-  const player1ActiveChakrasComponent = Object.entries(
-    game.player1.getChakraCount()
-  ).map(([chakra, count]) => (
-    <span
-      key={chakra}
-      className="chakra-item"
-      style={{
-        color: getChakraColor(chakra),
-        fontWeight: "bold",
-        borderColor: getChakraColor(chakra),
-      }}
-    >
-      {chakra}: {count - selectedChakras.filter((c) => c === chakra).length}
-    </span>
-  ));
-
-  const handleTransformChakras = (
-    chakrasToTransform: ChakraType[],
-    targetChakra: ChakraType
-  ) => {
-    game.player1.transformChakras(chakrasToTransform, targetChakra);
-  };
-
   // TODO: Randomized AI Turn
   const executeAITurn = () => {
     const aiActions: {
@@ -335,17 +305,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         }}
       >
         <div className="app-container">
-          <div className="chakra-container">
-            <h3 className="chakra-title">Available Chakras</h3>
-            <div className="flex gap-2">{player1ActiveChakrasComponent}</div>
-            <button
-              onClick={() => setChakraTransformModal(true)}
-              className="chakra-button"
-              disabled={player1ActiveChakras.length < 5}
-            >
-              Exchange Chakra
-            </button>
-          </div>
+          <AvailableChakra
+            game={game}
+            activeChakras={player1ActiveChakras}
+            selectedChakras={selectedChakras}
+            setChakraTransformModal={setChakraTransformModal}
+          />
 
           <h2 className="battle-header">Turn {game.turn}</h2>
 
@@ -359,80 +324,27 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             {/* Player 1 Team */}
             <div className="team-container">
               <h3 className="team-title">Your team</h3>
-              {game.player1.characters.map((char, charIndex) => (
-                <div className="character-card" key={char.name + charIndex}>
-                  <div className="character-info-container">
-                    <div className="character-name-box">
-                      <div
-                        className="character-actions"
-                        onClick={() => handleTargetClick(game.player1, char)}
-                      >
-                        <PlayerCharacterName
-                          character={char}
-                          possibleTargets={possibleTargets}
-                        />
-                      </div>
-                    </div>
-                    <div className="character-info-abilities-container">
-                      <div className="character-actions">
-                        <CurrentActions
-                          character={char}
-                          selectedActions={selectedActions}
-                          removeSelectedAction={removeSelectedAction}
-                        />
-                      </div>
-                      <div className="character-effects">
-                        <ActiveEffects character={char} />
-                      </div>
-                      <Abilities
-                        character={char}
-                        activeChakras={player1ActiveChakras}
-                        selectedActions={selectedActions}
-                        handleAbilityClick={handleAbilityClick}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <MainPlayer
+                game={game}
+                handleTargetClick={handleTargetClick}
+                possibleTargets={possibleTargets}
+                selectedActions={selectedActions}
+                removeSelectedAction={removeSelectedAction}
+                handleAbilityClick={handleAbilityClick}
+                playerActiveChakras={player1ActiveChakras}
+              />
             </div>
 
             {/* Player 2 Team */}
             <div className="team-container">
               <h3 className="team-title">Enemy Team</h3>
-              {game.player2.characters.map((char, charIndex) => (
-                <div
-                  className="character-card"
-                  key={char.name + charIndex + "enemy"}
-                >
-                  <div className="character-info-container">
-                    <div className="character-info-abilities-container">
-                      <div className="character-effects">
-                        <ActiveEffects character={char} />
-                      </div>
-                      <div className="character-actions">
-                        <CurrentActionsOnEnemy
-                          character={char}
-                          selectedActions={selectedActions}
-                          removeSelectedAction={removeSelectedAction}
-                        />
-                      </div>
-                    </div>
-                    <div className="character-name-box">
-                      <div
-                        className={`enemy-hover ${
-                          possibleTargets.includes(char) ? "enemy-selected" : ""
-                        }`}
-                        onClick={() => handleTargetClick(game.player1, char)}
-                      >
-                        <EnemyCharacterName
-                          character={char}
-                          possibleTargets={possibleTargets}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <EnemyPlayer
+                game={game}
+                handleTargetClick={handleTargetClick}
+                possibleTargets={possibleTargets}
+                selectedActions={selectedActions}
+                removeSelectedAction={removeSelectedAction}
+              />
             </div>
           </div>
         </div>
@@ -444,318 +356,3 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     </>
   );
 }
-
-const CurrentActions = ({
-  character,
-  selectedActions,
-  removeSelectedAction,
-}: {
-  character: Character;
-  selectedActions: SelectedAction[];
-  removeSelectedAction: (index: number) => void;
-}) => {
-  return (
-    <div className="current-actions">
-      {selectedActions.map(
-        (action, actionIndex) =>
-          action.target === character && (
-            <div
-              key={action.ability.name + actionIndex}
-              className="effect-icon-container"
-              onClick={() => removeSelectedAction(actionIndex)}
-            >
-              <img
-                src={`/abilities/${action.character.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}/${action.ability.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}.png`}
-                alt={action.ability.name}
-                className="effect-icon"
-                onError={(e) => {
-                  e.currentTarget.src = "/abilities/default.png";
-                }}
-              />
-              <div className="effect-tooltip">
-                <h4>{action.ability.name}</h4>
-                <p>{action.ability.description}</p>
-                <div className="effect-duration">
-                  <span>Will be applied this turn</span>
-                </div>
-              </div>
-            </div>
-          )
-      )}
-    </div>
-  );
-};
-
-const CurrentActionsOnEnemy = ({
-  character,
-  selectedActions,
-  removeSelectedAction,
-}: {
-  character: Character;
-  selectedActions: SelectedAction[];
-  removeSelectedAction: (index: number) => void;
-}) => {
-  return (
-    <div className="current-actions">
-      {selectedActions.map(
-        (action, actionIndex) =>
-          action.target === character && (
-            <div
-              key={actionIndex}
-              className="effect-icon-container"
-              onClick={() => removeSelectedAction(actionIndex)}
-            >
-              <img
-                src={`/abilities/${action.character.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}/${action.ability.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}.png`}
-                alt={action.ability.name}
-                className="effect-icon"
-                onError={(e) => {
-                  e.currentTarget.src = "/abilities/default.png";
-                }}
-              />
-              <div className="effect-tooltip">
-                <h4>{action.ability.name}</h4>
-                <p>{action.ability.description}</p>
-                <div className="effect-duration">
-                  <span>Will be applied this turn</span>
-                </div>
-              </div>
-            </div>
-          )
-      )}
-    </div>
-  );
-};
-
-const Abilities = ({
-  character,
-  activeChakras,
-  selectedActions,
-  handleAbilityClick,
-}: {
-  character: Character;
-  activeChakras: ChakraType[];
-  selectedActions: SelectedAction[];
-  handleAbilityClick: (character: Character, ability: Ability) => void;
-}) => {
-  return (
-    <div className="abilities-container">
-      {character.abilities.map((ability) => {
-        const isAbilityDisabled =
-          !ability.canUse(character, activeChakras) ||
-          selectedActions.some((action) => action.character === character) ||
-          ability.isOnCooldown();
-
-        return (
-          <div
-            key={ability.name}
-            className={`ability-icon-container`}
-            onClick={() =>
-              !isAbilityDisabled && handleAbilityClick(character, ability)
-            }
-          >
-            <img
-              src={`/abilities/${character.name
-                .split(" ")
-                .join("")
-                .toLowerCase()}/${ability.name
-                .split(" ")
-                .join("")
-                .toLowerCase()}.png`}
-              alt={ability.name}
-              className={`ability-icon ${
-                isAbilityDisabled ? "ability-inactive" : "ability-active"
-              }`}
-              onError={(e) => {
-                e.currentTarget.src = "/abilities/default.png";
-              }}
-            />
-            {ability.currentCooldown > 0 && (
-              <div className="ability-cooldown-overlay">
-                {ability.currentCooldown}
-              </div>
-            )}
-            <div className="ability-tooltip">
-              <h4>{ability.name}</h4>
-              <p>{ability.description}</p>
-              <div className="ability-details">
-                <span>
-                  Chakra:{" "}
-                  {ability.requiredChakra.map((chakra, index) => (
-                    <React.Fragment key={index}>
-                      {index > 0 && ", "}
-                      <span
-                        style={{
-                          color: getChakraColor(chakra),
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {chakra}
-                      </span>
-                    </React.Fragment>
-                  ))}
-                </span>
-                {ability.currentCooldown > 0 && (
-                  <span className="cooldown">
-                    Cooldown: {ability.currentCooldown}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-const ActiveEffects = ({ character }: { character: Character }) => {
-  // Group effects by ability name
-  const groupedEffects = character.activeEffects.reduce((acc, effect) => {
-    if (!acc[effect.name]) {
-      acc[effect.name] = [];
-    }
-    acc[effect.name].push(effect);
-    return acc;
-  }, {} as Record<string, typeof character.activeEffects>);
-
-  return (
-    <div className="active-effects">
-      {Object.entries(groupedEffects).map(([abilityName, effects]) => {
-        // Get the longest duration among all effects for this ability
-        const maxDuration = Math.max(
-          ...effects.map(
-            (effect) =>
-              effect.damageReduction?.remainingTurns ||
-              effect.buff?.remainingTurns ||
-              effect.transformation?.remainingTurns ||
-              0
-          )
-        );
-
-        return (
-          <div key={abilityName} className="effect-icon-container">
-            <img
-              src={`/abilities/${character.name
-                .split(" ")
-                .join("")
-                .toLowerCase()}/${abilityName
-                .split(" ")
-                .join("")
-                .toLowerCase()}.png`}
-              alt={abilityName}
-              className="effect-icon"
-              onError={(e) => {
-                e.currentTarget.src = "/abilities/default.png";
-              }}
-            />
-            <div className="effect-tooltip">
-              <h4>{abilityName}</h4>
-              {effects.map((effect, index) => (
-                <React.Fragment key={index}>
-                  {index > 0 && <hr className="effect-separator" />}
-                  <p>{effect.description}</p>
-                </React.Fragment>
-              ))}
-              {maxDuration > 0 && (
-                <div className="effect-duration">
-                  <span>
-                    {maxDuration === 1
-                      ? "1 turn remaining"
-                      : `${maxDuration} turns remaining`}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-const PlayerCharacterName = ({
-  character,
-  possibleTargets,
-}: {
-  character: Character;
-  possibleTargets: Character[];
-}) => {
-  return (
-    <div className="character-name-container">
-      <div className="character-portrait">
-        <img
-          src={`/characters/${character.name
-            .split(" ")
-            .join("")
-            .toLowerCase()}/${character.name
-            .split(" ")
-            .join("")
-            .toLowerCase()}.png`}
-          alt={character.name}
-          className="character-image"
-          onError={(e) => {
-            // Fallback to default image if character image doesn't exist
-            e.currentTarget.src = "/characters/default.png";
-          }}
-        />
-      </div>
-      <div className="character-details">
-        <h4
-          className={`character-name ${
-            character.hp > 0 ? "character-alive" : "character-dead"
-          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
-        >
-          {character.name}
-        </h4>
-        <HealthBar currentHP={character.hp} />
-      </div>
-    </div>
-  );
-};
-
-const EnemyCharacterName = ({
-  character,
-  possibleTargets,
-}: {
-  character: Character;
-  possibleTargets: Character[];
-}) => {
-  return (
-    <div className="character-name-container enemy">
-      <div className="character-details">
-        <h4
-          className={`character-name ${
-            character.hp > 0 ? "character-alive" : "character-dead"
-          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
-        >
-          {character.name}
-        </h4>
-        <HealthBar currentHP={character.hp} />
-      </div>
-      <div className="character-portrait">
-        <img
-          src={`/characters/${character.name.toLowerCase()}/${character.name.toLowerCase()}.png`}
-          alt={character.name}
-          className="character-image"
-          onError={(e) => {
-            // Fallback to default image if character image doesn't exist
-            e.currentTarget.src = "/characters/default.png";
-          }}
-        />
-      </div>
-    </div>
-  );
-};

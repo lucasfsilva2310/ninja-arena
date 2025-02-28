@@ -1,0 +1,87 @@
+:root {
+  /* Color System */
+  --color-primary: #d7c6b4;
+  --color-primary-light: #f4ebdc;
+  --color-primary-dark: #c7b79e;
+
+  --color-secondary: #8b7355;
+  --color-secondary-light: #a08967;
+  --color-secondary-dark: #695640;
+
+  /* Background Colors */
+  --bg-primary: rgba(215, 198, 180, 0.9); /* Light brown with transparency */
+  --bg-secondary: rgba(
+    244,
+    235,
+    220,
+    0.9
+  ); /* Lighter brown with transparency */
+  --bg-overlay: rgba(255, 255, 255, 0.9);
+  --bg-tooltip: rgba(15, 23, 42, 0.95);
+
+  /* Chakra Colors */
+  --chakra-taijutsu: #22c55e;
+  --chakra-ninjutsu: #3b82f6;
+  --chakra-genjutsu: #ffffff;
+  --chakra-bloodline: #ef4444;
+  --chakra-random: #000000;
+
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-success-hover: #059669;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-disabled: #94a3b8;
+
+  /* Text Colors */
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-light: #e2e8f0;
+  --text-white: #ffffff;
+
+  /* Border Colors */
+  --border-primary: #e2e8f0;
+  --border-secondary: rgba(199, 183, 158, 0.8);
+  --border-active: #3b82f6;
+
+  /* Font Sizes */
+  --font-xs: 0.75rem; /* 12px */
+  --font-sm: 0.875rem; /* 14px */
+  --font-base: 1rem; /* 16px */
+  --font-lg: 1.125rem; /* 18px */
+  --font-xl: 1.25rem; /* 20px */
+  --font-2xl: 1.5rem; /* 24px */
+
+  /* Font Weights */
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem; /* 4px */
+  --spacing-sm: 0.5rem; /* 8px */
+  --spacing-md: 1rem; /* 16px */
+  --spacing-lg: 1.5rem; /* 24px */
+  --spacing-xl: 2rem; /* 32px */
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 8px 12px rgba(0, 0, 0, 0.5);
+
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+
+  /* Layout */
+  --header-height: 60px;
+  --footer-height: 22vh;
+  --container-width: 1200px;
+}
