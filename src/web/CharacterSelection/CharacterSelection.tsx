@@ -246,6 +246,7 @@ export default function CharacterSelection({
       <AbilityDescriptionFooter
         selectedCharacter={previewCharacter}
         currentSelectedAbility={selectedAbility}
+        context="character-selection"
       />
     </div>
   );

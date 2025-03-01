@@ -25,7 +25,8 @@
   background-size: 100% 100%;
   padding: var(--spacing-lg);
   border-radius: var(--radius-lg);
-  margin-bottom: var(--spacing-xl);
+  margin-top: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
   width: 100%;
 }
 

@@ -8,6 +8,7 @@ import { Character } from "../../../models/character.model";
 interface AbilityFooterProps {
   selectedCharacter: Character | null;
   currentSelectedAbility: Ability | null;
+  context?: "battle" | "character-selection";
 }
 
 const getChakraColor = (chakraType: string): string => {
@@ -36,6 +37,7 @@ const ChakraText = ({ chakra }: { chakra: string }) => (
 const AbilityFooter: React.FC<AbilityFooterProps> = ({
   selectedCharacter,
   currentSelectedAbility,
+  context = "battle",
 }) => {
   useEffect(() => {
     if (selectedCharacter) {
@@ -57,15 +59,17 @@ const AbilityFooter: React.FC<AbilityFooterProps> = ({
 
   if (!selectedCharacter)
     return (
-      <div className="ability-footer">
+      <div className={`ability-footer ${context}`}>
         <div className="ability-preview-container empty">
-          <p>Select a character or ability to see details</p>
+          <p>{`Select a character ${
+            context === "character-selection" ? "" : "or ability"
+          } to see details`}</p>
         </div>
       </div>
     );
 
   return (
-    <div className="ability-footer">
+    <div className={`ability-footer ${context}`}>
       <div className="ability-preview-container">
         <div className="abilities-list">
           {selectedCharacter.abilities.map((ability) => {

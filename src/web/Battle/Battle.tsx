@@ -376,6 +376,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
           <AbilityFooter
             selectedCharacter={selectedCharacterForAbilitiesPreview}
             currentSelectedAbility={selectedAbility}
+            context="battle"
           />
         </div>
       </div>
