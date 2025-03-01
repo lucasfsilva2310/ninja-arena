@@ -84,4 +84,7 @@
   --header-height: 60px;
   --footer-height: 22vh;
   --container-width: 1200px;
+
+  --empty-clean-scroll-background: url("/assets/scroll-open-only-medium.jpg");
+  --scroll-with-base-background: url("/assets/scroll-medium-open-full.png");
 }

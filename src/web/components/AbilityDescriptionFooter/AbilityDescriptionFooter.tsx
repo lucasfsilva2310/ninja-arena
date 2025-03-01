@@ -55,93 +55,99 @@ const AbilityFooter: React.FC<AbilityFooterProps> = ({
     setSelectedAbility(ability);
   };
 
-  if (!selectedCharacter) return null;
+  if (!selectedCharacter)
+    return (
+      <div className="ability-footer">
+        <div className="ability-preview-container empty">
+          <p>Select a character or ability to see details</p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="ability-footer">
-      {selectedCharacter && (
-        <div className="ability-preview-container">
-          <h4>{selectedCharacter.name}</h4>
-          <div className="abilities-list">
-            {selectedCharacter.abilities.map((ability) => {
-              return (
-                <button
-                  key={ability.name}
-                  onClick={() => handleAbilityDescriptionClick(ability)}
-                  className="ability-preview-button"
-                >
-                  <img
-                    src={`/abilities/${selectedCharacter.name
-                      .split(" ")
-                      .join("")
-                      .toLowerCase()}/${ability.name
-                      .split(" ")
-                      .join("")
-                      .toLowerCase()}.png`}
-                    alt={ability.name}
-                    className="ability-preview-icon"
-                    onError={(e) => {
-                      e.currentTarget.src = "/abilities/default.png";
-                    }}
-                  />
-                </button>
-              );
-            })}
-          </div>
+      <div className="ability-preview-container">
+        <div className="abilities-list">
+          {selectedCharacter.abilities.map((ability) => {
+            return (
+              <button
+                key={ability.name}
+                onClick={() => handleAbilityDescriptionClick(ability)}
+                className={`ability-preview-button ${
+                  selectedAbility?.name === ability.name ? "selected" : ""
+                }`}
+              >
+                <img
+                  src={`/abilities/${selectedCharacter.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}/${ability.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}.png`}
+                  alt={ability.name}
+                  className="ability-preview-icon"
+                  onError={(e) => {
+                    e.currentTarget.src = "/abilities/default.png";
+                  }}
+                />
+              </button>
+            );
+          })}
+        </div>
 
-          {selectedAbility && (
-            <div className="ability-description-container">
-              <div className="ability-description-content">
-                <div className="ability-image-container">
-                  <img
-                    src={`/abilities/${selectedCharacter.name
-                      .split(" ")
-                      .join("")
-                      .toLowerCase()}/${selectedAbility.name
-                      .split(" ")
-                      .join("")
-                      .toLowerCase()}.png`}
-                    alt={selectedAbility.name}
-                    className="ability-image"
-                    onError={(e) => {
-                      e.currentTarget.src = "/abilities/default.png";
-                    }}
-                  />
+        {selectedAbility && (
+          <div className="ability-description-container">
+            <div className="ability-description-content">
+              <div className="ability-image-container">
+                <img
+                  src={`/abilities/${selectedCharacter.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}/${selectedAbility.name
+                    .split(" ")
+                    .join("")
+                    .toLowerCase()}.png`}
+                  alt={selectedAbility.name}
+                  className="ability-image"
+                  onError={(e) => {
+                    e.currentTarget.src = "/abilities/default.png";
+                  }}
+                />
+              </div>
+              <div className="ability-info">
+                <div className="ability-header">
+                  <h3 className="ability-name">{selectedAbility.name}</h3>
+                  <p className="ability-description">
+                    {selectedAbility.description}
+                  </p>
                 </div>
-                <div className="ability-info">
-                  <div className="ability-header">
-                    <h3 className="ability-name">{selectedAbility.name}</h3>
-                    <p className="ability-description">
-                      {selectedAbility.description}
-                    </p>
-                  </div>
-                  <div className="ability-details">
-                    <span className="ability-cooldown">
-                      <span className="ability-info-title">Cooldown:</span>{" "}
-                      {selectedAbility.defaultCooldown} turns
-                    </span>
-                    <span className="ability-type">
-                      <span className="ability-info-title">Target: </span>{" "}
-                      {selectedAbility.target}
-                    </span>
-                    <span className="ability-chakra">
-                      <span className="ability-info-title">Cost:</span>{" "}
-                      {selectedAbility.requiredChakra.length} (
-                      {selectedAbility.requiredChakra.map((chakra, index) => (
-                        <React.Fragment key={index}>
-                          {index > 0 && ", "}
-                          <ChakraText chakra={chakra} />
-                        </React.Fragment>
-                      ))}
-                      )
-                    </span>
-                  </div>
+                <div className="ability-details">
+                  <span className="ability-cooldown">
+                    <span className="ability-info-title">Cooldown:</span>{" "}
+                    {selectedAbility.defaultCooldown} turns
+                  </span>
+                  <span className="ability-type">
+                    <span className="ability-info-title">Target: </span>{" "}
+                    {selectedAbility.target}
+                  </span>
+                  <span className="ability-chakra">
+                    <span className="ability-info-title">Cost:</span>{" "}
+                    {selectedAbility.requiredChakra.length} (
+                    {selectedAbility.requiredChakra.map((chakra, index) => (
+                      <React.Fragment key={index}>
+                        {index > 0 && ", "}
+                        <ChakraText chakra={chakra} />
+                      </React.Fragment>
+                    ))}
+                    )
+                  </span>
                 </div>
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

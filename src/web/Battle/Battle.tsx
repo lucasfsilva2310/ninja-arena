@@ -11,8 +11,10 @@ import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal"
 
 import AbilityFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
 import { AvailableChakra } from "./AvailableChakra/AvailableChakra";
-import { MainPlayer } from "./PlayerBoards/MainPlayer";
-import { EnemyPlayer } from "./PlayerBoards/EnemyPlayer";
+import { PlayerBoard } from "./PlayerBoards/PlayerBoard";
+import { PlayerInfo } from "./PlayerInfo/PlayerInfo";
+import BattleOptions from "./BattleOptions/BattleOptions";
+import "./BattleFooter/BattleFooter.css";
 
 interface BattleProps {
   game: GameEngine;
@@ -305,53 +307,77 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         }}
       >
         <div className="app-container">
-          <AvailableChakra
-            game={game}
-            activeChakras={player1ActiveChakras}
-            selectedChakras={selectedChakras}
-            setChakraTransformModal={setChakraTransformModal}
-          />
-
-          <h2 className="battle-header">Turn {game.turn}</h2>
-
-          <div className="end-turn-button-container">
-            <button onClick={executeTurn} className="end-turn-button">
-              End Turn
-            </button>
+          <div className="header-section">
+            <PlayerInfo
+              name="Player 1"
+              rank="Chunin"
+              avatar="/characters/default.png" //TODO: Change to player avatar later
+            />
+            <AvailableChakra
+              game={game}
+              activeChakras={player1ActiveChakras}
+              selectedChakras={selectedChakras}
+              setChakraTransformModal={setChakraTransformModal}
+            />
+            <PlayerInfo
+              name="Player 2"
+              rank="Jonin"
+              avatar="/characters/default.png" //TODO: Change to player avatar later
+              isEnemy
+            />
           </div>
 
-          <div className="teams-container">
-            {/* Player 1 Team */}
-            <div className="team-container">
-              <h3 className="team-title">Your team</h3>
-              <MainPlayer
-                game={game}
-                handleTargetClick={handleTargetClick}
-                possibleTargets={possibleTargets}
-                selectedActions={selectedActions}
-                removeSelectedAction={removeSelectedAction}
-                handleAbilityClick={handleAbilityClick}
-                playerActiveChakras={player1ActiveChakras}
-              />
+          <div className="battle-content">
+            <div className="end-turn-button-container">
+              <button onClick={executeTurn} className="end-turn-button">
+                End Turn
+              </button>
             </div>
 
-            {/* Player 2 Team */}
-            <div className="team-container">
-              <h3 className="team-title">Enemy Team</h3>
-              <EnemyPlayer
-                game={game}
-                handleTargetClick={handleTargetClick}
-                possibleTargets={possibleTargets}
-                selectedActions={selectedActions}
-                removeSelectedAction={removeSelectedAction}
-              />
+            <div className="teams-container">
+              <div className="team-container">
+                <PlayerBoard
+                  game={game}
+                  handleTargetClick={handleTargetClick}
+                  possibleTargets={possibleTargets}
+                  selectedActions={selectedActions}
+                  removeSelectedAction={removeSelectedAction}
+                  handleAbilityClick={handleAbilityClick}
+                  playerActiveChakras={player1ActiveChakras}
+                  isEnemy={false}
+                />
+              </div>
+
+              <div className="team-container">
+                <PlayerBoard
+                  game={game}
+                  handleTargetClick={handleTargetClick}
+                  possibleTargets={possibleTargets}
+                  selectedActions={selectedActions}
+                  removeSelectedAction={removeSelectedAction}
+                  isEnemy={true}
+                />
+              </div>
             </div>
           </div>
         </div>
-        <AbilityFooter
-          selectedCharacter={selectedCharacterForAbilitiesPreview}
-          currentSelectedAbility={selectedAbility}
-        />
+        <div className="battle-footer">
+          <BattleOptions
+            onSurrender={() => {
+              /* implement later */
+            }}
+            onHistory={() => {
+              /* implement later */
+            }}
+            onExample={() => {
+              /* implement later */
+            }}
+          />
+          <AbilityFooter
+            selectedCharacter={selectedCharacterForAbilitiesPreview}
+            currentSelectedAbility={selectedAbility}
+          />
+        </div>
       </div>
     </>
   );

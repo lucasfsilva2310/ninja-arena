@@ -14,16 +14,6 @@ export const EnemyCharacterName: React.FC<EnemyCharacterNameProps> = ({
 }) => {
   return (
     <div className="character-name-container enemy">
-      <div className="character-details">
-        <h4
-          className={`character-name ${
-            character.hp > 0 ? "character-alive" : "character-dead"
-          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
-        >
-          {character.name}
-        </h4>
-        <HealthBar currentHP={character.hp} />
-      </div>
       <div className="character-portrait">
         <img
           src={`/characters/${character.name
@@ -36,10 +26,19 @@ export const EnemyCharacterName: React.FC<EnemyCharacterNameProps> = ({
           alt={character.name}
           className="character-image"
           onError={(e) => {
-            // Fallback to default image if character image doesn't exist
             e.currentTarget.src = "/characters/default.png";
           }}
         />
+      </div>
+      <div className="character-details">
+        <h4
+          className={`character-name ${
+            character.hp > 0 ? "character-alive" : "character-dead"
+          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
+        >
+          {character.name}
+        </h4>
+        <HealthBar currentHP={character.hp} />
       </div>
     </div>
   );

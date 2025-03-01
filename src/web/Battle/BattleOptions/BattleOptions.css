@@ -1,0 +1,59 @@
+@import "../../../styles/variables.css";
+
+.battle-options-container {
+  width: 200px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.battle-options-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-image: url("/assets/scroll-open-only-medium.jpg");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+}
+
+.option-button-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.option-action-button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dark);
+  background-color: var(--bg-button);
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  font-weight: var(--font-semibold);
+}
+
+.option-action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.option-action-button.surrender:hover {
+  background-color: var(--color-error);
+  color: var(--text-white);
+}
+
+@media (max-width: 1024px) {
+  .battle-options-container {
+    width: 100%;
+    height: auto;
+  }
+
+  .battle-options-content {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+}

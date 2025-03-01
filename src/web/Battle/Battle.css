@@ -71,15 +71,15 @@
 .teams-container {
   display: flex;
   justify-content: space-between;
+  gap: var(--spacing-xl);
   height: calc(100% - 120px);
-  width: 97%;
 }
 
 .team-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  max-width: 490px;
+  max-width: 460px;
   gap: 0.75rem;
 }
 
@@ -306,8 +306,6 @@
 .end-turn-button-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 42px;
 }
 
 .end-turn-button {
@@ -334,12 +332,13 @@
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  .teams-container {
+  .header-section {
     flex-direction: column;
+    gap: var(--spacing-md);
   }
 
-  .team-container {
-    max-width: 100%;
+  .teams-container {
+    flex-direction: column;
   }
 }
 
@@ -645,4 +644,19 @@
 
 .effect-tooltip p {
   margin: 0.5rem 0;
+}
+
+/* Add new styles */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.battle-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  height: calc(100% - var(--footer-height));
 }

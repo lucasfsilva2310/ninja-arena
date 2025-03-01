@@ -1,21 +1,16 @@
 @import "../../../styles/variables.css";
 
 .ability-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: var(--footer-height);
-  background-size: contain;
-  background-position: bottom center;
-  background-repeat: no-repeat;
-  /* padding: 2rem 1rem; */
+  width: 800px; /* Fixed width */
+  height: 170px; /* Fixed height */
+  position: fixed; /* Fixed position */
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
+  margin: 0; /* Remove margin */
 }
 
 .ability-preview-container {
-  max-width: var(--container-width);
   height: 100%;
-  margin: 0 auto;
   padding: var(--spacing-md) var(--spacing-xl);
   display: flex;
   flex-direction: column;
@@ -23,33 +18,38 @@
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
+  position: relative; /* Add this for absolute positioning of children */
 }
 
 .ability-preview-container h4 {
-  margin: 0;
-  font-size: 1rem;
+  display: none;
 }
 
 .abilities-list {
+  position: absolute;
+  top: -20px; /* Move up to create overflow effect */
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  border-bottom: 1px solid rgb(133, 130, 130);
-  padding: 0.5rem;
   gap: 0.5rem;
-  margin-bottom: 0.2rem;
+  padding: 0;
+  margin: 0;
+  border-bottom: none; /* Remove border */
 }
 
 .ability-preview-button {
   width: 40px;
   height: 40px;
   padding: 0;
-  border: 1px solid black;
+  border: 2px solid black; /* Make border more visible */
   border-radius: 8px;
-  background: none;
+  background: white; /* Add white background */
   cursor: pointer;
   transition: all 0.2s ease;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
 }
 
 .ability-preview-button:hover:not(:disabled) {
@@ -74,6 +74,7 @@
 }
 
 .ability-description-container {
+  margin-top: 40px; /* Add space for the overflowing abilities */
   border-radius: 8px;
   padding: 0.25rem;
 }
@@ -135,33 +136,40 @@
   color: #ef4444; /* Red color for damage value */
 }
 
-@media (max-width: 640px) {
+.ability-preview-container.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+@media (max-width: 1024px) {
   .ability-footer {
-    height: 40vh;
-    padding: 1.5rem 0.75rem; /* Adjust padding for mobile */
-    background-size: 100% 100%; /* Ensure full coverage on mobile */
-  }
-
-  .ability-preview-container {
-    padding: var(--spacing-sm) var(--spacing-md);
-    background-size: 100% 100%; /* Maintain full coverage on mobile */
-  }
-
-  .ability-description-content {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-
-  .ability-details {
-    align-items: center;
+    width: calc(100% - var(--spacing-md) * 2);
+    right: 50%;
+    transform: translateX(50%);
+    height: 200px;
   }
 }
 
-/* Add a minimum width to ensure the scroll doesn't get too compressed */
-@media (min-width: 1024px) {
+@media (max-width: 640px) {
   .ability-footer {
-    min-width: 768px;
-    background-size: contain;
+    height: 180px;
+    bottom: 0;
+    padding: 0; /* Remove padding */
+  }
+
+  .ability-preview-container {
+    padding: var(--spacing-sm);
+  }
+
+  .ability-image-container {
+    width: 60px;
+    height: 60px;
+  }
+
+  .ability-name {
+    font-size: 1.2rem;
   }
 }
