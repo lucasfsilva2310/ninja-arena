@@ -54,12 +54,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  font-family: var(--font-family-default);
 }
 
 .character-name {
   position: relative;
   margin: 0;
   padding: var(--spacing-xs) 0;
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
 }
 
 .character-alive {
@@ -76,7 +79,6 @@
   0% {
     background: var(--highlight-bg-dim);
     box-shadow: 0 0 15px var(--highlight-shadow-dim);
-    border-color: var(--highlight-border-dim);
   }
   50% {
     background: var(--highlight-bg-bright);
@@ -86,7 +88,6 @@
   100% {
     background: var(--highlight-bg-dim);
     box-shadow: 0 0 15px var(--highlight-shadow-dim);
-    border-color: var(--highlight-border-dim);
   }
 }
 
@@ -114,4 +115,20 @@
 
 .enemy .character-details {
   text-align: right;
+}
+
+/* Add death animation styles */
+.character-dying {
+  animation: deathFade 1s ease-in-out;
+}
+
+@keyframes deathFade {
+  0% {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+  100% {
+    filter: grayscale(1);
+    opacity: 0.7;
+  }
 }

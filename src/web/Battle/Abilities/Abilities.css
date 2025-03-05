@@ -87,6 +87,7 @@
 .ability-details {
   font-size: var(--font-sm);
   color: var(--text-secondary);
+  margin-top: 1rem;
 }
 
 .cooldown {

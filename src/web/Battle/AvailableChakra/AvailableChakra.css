@@ -27,8 +27,9 @@
 }
 
 .chakra-title {
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-base);
   margin-bottom: 0.4rem;
   color: var(--text-dark);
 }
@@ -51,6 +52,10 @@
 .chakra-inside-container button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.chakra-count {
+  font-family: var(--font-family-default);
 }
 
 @media (max-width: 768px) {

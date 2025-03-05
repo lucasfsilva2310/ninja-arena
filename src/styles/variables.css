@@ -1,3 +1,17 @@
+@font-face {
+  font-family: "Manga";
+  src: url("/fonts/manga.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Manga Bold";
+  src: url("/fonts/manga-bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
 :root {
   /* Color System */
   --color-primary: #d7c6b4;
@@ -43,6 +57,11 @@
   --border-primary: #e2e8f0;
   --border-secondary: rgba(199, 183, 158, 0.8);
   --border-active: #3b82f6;
+
+  /* Font Families */
+  --font-family-default: "Manga", sans-serif;
+  --font-family-title: "MangaBold", sans-serif;
+  --font-family-default-italic: "MangaItalic", sans-serif;
 
   /* Font Sizes */
   --font-xs: 0.75rem; /* 12px */
@@ -107,4 +126,8 @@
   /* Shadow highlights with opacity */
   --highlight-shadow-dim: rgba(79, 70, 229, 0.2);
   --highlight-shadow-bright: rgba(79, 70, 229, 0.4);
+
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-bold: 700;
 }

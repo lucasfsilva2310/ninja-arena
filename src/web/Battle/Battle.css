@@ -59,6 +59,7 @@
   margin-bottom: var(--spacing-sm);
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
   font-weight: var(--font-semibold);
+  font-family: var(--font-family-default);
 }
 
 /* Special case for Genjutsu to ensure white is visible */
@@ -95,7 +96,6 @@
   align-items: center;
   gap: 1rem;
   width: 100%;
-  /* padding: 0.5rem; */
   border-radius: 8px;
   transition: all 0.3s ease;
 }
@@ -142,6 +142,8 @@
   position: relative;
   margin: 0;
   padding: 0.25rem 0;
+  font-family: var(----font-family-title);
+  font-size: var(--font-sm);
 }
 
 /* Character States */
@@ -229,11 +231,13 @@
   border-radius: 4px;
   background-color: #f0fdf4;
   cursor: pointer;
+  font-family: var(--font-family-default);
 }
 
 .effect-label {
   color: #3b82f6; /* Blue color for active effects */
   font-weight: 500;
+  font-family: var(----font-family-title);
 }
 
 .effect-item {
@@ -285,6 +289,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: var(----font-family-title);
 }
 
 .end-turn-button:hover {
@@ -378,7 +383,8 @@
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: white;
-  font-size: 0.875rem;
+  font-size: var(--font-sm);
+  font-family: var(--font-family-default);
   z-index: 50;
   opacity: 0;
   visibility: hidden;

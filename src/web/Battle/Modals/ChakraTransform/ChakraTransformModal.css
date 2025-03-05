@@ -84,3 +84,17 @@
 .transform-button:hover:not(:disabled) {
   background: #45a049;
 }
+
+.modal-title {
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
+}
+
+.modal-description {
+  font-family: var(--font-family-default);
+}
+
+.chakra-type {
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
+}

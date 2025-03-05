@@ -35,3 +35,17 @@
 .modal-close-btn:hover {
   background: #d43f3f;
 }
+
+.modal-title {
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
+}
+
+.modal-description {
+  font-family: var(--font-family-default);
+}
+
+.modal-button {
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
+}

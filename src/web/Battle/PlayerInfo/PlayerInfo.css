@@ -10,6 +10,7 @@
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
+  font-family: var(--font-family-title);
 }
 
 .player-text-info {
@@ -46,4 +47,13 @@
 /* Enemy-specific styles */
 .player-info-container.enemy {
   flex-direction: row-reverse;
+}
+
+.player-info-name {
+  font-family: var(--font-family-title);
+  font-weight: var(--font-weight-bold);
+}
+
+.player-info-rank {
+  font-family: var(--font-family-default);
 }

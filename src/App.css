@@ -1,10 +1,31 @@
 @font-face {
-  font-family: "ninja";
+  font-family: "Naruto";
   src: url("/fonts/njnaruto.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
+@font-face {
+  font-family: "Manga";
+  src: url("/fonts/mangat.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MangaBold";
+  src: url("/fonts/mangatb.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "MangaItalic";
+  src: url("/fonts/mangait.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
 body {
-  font-family: "ninja", sans-serif;
+  font-family: "Naruto", sans-serif;
 }
