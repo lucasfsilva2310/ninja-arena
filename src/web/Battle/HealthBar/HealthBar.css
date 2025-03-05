@@ -1,5 +1,5 @@
 .health-bar-container {
-  width: 100%;
+  max-width: 90%;
   height: 20px;
   background-color: #e2e8f0;
   border-radius: 4px;

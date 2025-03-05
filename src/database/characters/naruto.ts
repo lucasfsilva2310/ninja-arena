@@ -32,8 +32,11 @@ export const escapeClone = new Ability(
   [
     {
       type: "DamageReduction",
-      value: Infinity,
-      duration: 1,
+      damageReduction: {
+        description: "This character is invunerable.",
+        amount: Infinity,
+        duration: 1,
+      },
     },
   ],
   "Self"
