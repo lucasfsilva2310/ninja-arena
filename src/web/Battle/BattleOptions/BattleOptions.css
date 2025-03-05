@@ -8,6 +8,8 @@
 }
 
 .battle-options-content {
+  font-family: var(--font-family-title);
+
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);

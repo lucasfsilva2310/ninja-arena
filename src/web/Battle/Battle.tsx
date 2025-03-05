@@ -15,6 +15,7 @@ import { AvailableChakra } from "./AvailableChakra/AvailableChakra";
 import { PlayerBoard } from "./PlayerBoards/PlayerBoard";
 import { PlayerInfo } from "./PlayerInfo/PlayerInfo";
 import BattleOptions from "./BattleOptions/BattleOptions";
+import { TurnTimer } from "./TurnTimer/TurnTimer";
 
 interface BattleProps {
   game: GameEngine;
@@ -54,6 +55,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [player1ActiveChakras, setPlayer1ActiveChakras] = useState<
     ChakraType[]
   >([]);
+  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
+  const [turnCount, setTurnCount] = useState(0);
 
   // Recalc active chakras based on selected chakras
   useEffect(() => {
@@ -209,20 +212,21 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     finalizeTurn();
   };
-  const finalizeTurn = () => {
+  const finalizeTurn = async () => {
     chakrasToSwitchFromRandom.forEach((chakra) =>
       game.player1.consumeChakra(chakra)
     );
     game.executeTurn(selectedActions);
     clearStates();
     game.nextTurn(game.player2);
-
+    setIsPlayerTurn(false);
+    setTurnCount((prev) => prev + 1);
     // AI Action
-    executeAITurn();
+    await executeAITurn();
   };
 
   // TODO: Randomized AI Turn
-  const executeAITurn = () => {
+  const executeAITurn = async () => {
     const aiActions: {
       player: Player;
       character: Character;
@@ -274,8 +278,16 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       }
     });
 
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
     game.executeTurn(aiActions);
     game.nextTurn(game.player1);
+    setIsPlayerTurn(true);
+    setTurnCount((prev) => prev + 1);
+  };
+
+  const handleTimeEnd = () => {
+    executeTurn();
   };
 
   return (
@@ -311,18 +323,28 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             <PlayerInfo
               name="Player 1"
               rank="Chunin"
-              avatar="/characters/default.png" //TODO: Change to player avatar later
+              avatar="/characters/default.png"
             />
-            <AvailableChakra
-              game={game}
-              activeChakras={player1ActiveChakras}
-              selectedChakras={selectedChakras}
-              setChakraTransformModal={setChakraTransformModal}
-            />
+
+            <div className="header-center">
+              <TurnTimer
+                isPlayerTurn={isPlayerTurn}
+                onTimeEnd={handleTimeEnd}
+                turnCount={turnCount}
+              />
+
+              <AvailableChakra
+                game={game}
+                activeChakras={player1ActiveChakras}
+                selectedChakras={selectedChakras}
+                setChakraTransformModal={setChakraTransformModal}
+              />
+            </div>
+
             <PlayerInfo
               name="Player 2"
               rank="Jonin"
-              avatar="/characters/default.png" //TODO: Change to player avatar later
+              avatar="/characters/default.png"
               isEnemy
             />
           </div>

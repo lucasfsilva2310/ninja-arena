@@ -57,7 +57,7 @@
   --border-primary: #e2e8f0;
   --border-secondary: rgba(199, 183, 158, 0.8);
   --border-active: #3b82f6;
-
+  --border-dark: #1e293b;
   /* Font Families */
   --font-family-default: "Manga", sans-serif;
   --font-family-title: "MangaBold", sans-serif;

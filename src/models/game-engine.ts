@@ -4,8 +4,11 @@ import { Player } from "./player.model";
 
 export class GameEngine {
   turn: number = 0;
+  currentPlayer: Player;
 
-  constructor(public player1: Player, public player2: Player) {}
+  constructor(public player1: Player, public player2: Player) {
+    this.currentPlayer = player1;
+  }
 
   startGame() {
     console.log(`🎮 Jogo iniciado! Turno de ${this.player1.name}`);
@@ -14,7 +17,8 @@ export class GameEngine {
 
   nextTurn(player: Player) {
     this.turn++;
-    console.log(`🎮 Turno ${this.turn}!`);
+    this.currentPlayer = player;
+    console.log(`🎮 Turn ${this.turn}! It's ${this.currentPlayer.name} turn.`);
     player.receiveChakra(this.turn);
     player.processCooldowns();
     player.processActiveEffects();
