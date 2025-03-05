@@ -10,6 +10,7 @@ import { Player } from "../../models/player.model";
 import ExchangeRandomChakraFinalModal from "./Modals/ExchangeRandomChakra/ExchangeRandomChakraFinalModal";
 import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";
 import SurrenderConfirmationModal from "./Modals/SurrenderConfirmation/SurrenderConfirmationModal";
+import BattleHistoryModal from "./Modals/BattleHistory/BattleHistoryModal";
 
 import AbilityFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
 import { AvailableChakra } from "./AvailableChakra/AvailableChakra";
@@ -61,6 +62,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
   // Add a new state for the surrender confirmation modal
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
+
+  // Add a new state for the battle history modal
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   // Check if game is over
   useEffect(() => {
@@ -356,6 +360,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setShowSurrenderModal(false);
   };
 
+  const handleShowHistory = () => {
+    setShowHistoryModal(true);
+  };
+
   return (
     <>
       {showExchangeRandomFinalModal && (
@@ -379,6 +387,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         <SurrenderConfirmationModal
           onConfirm={confirmSurrender}
           onCancel={cancelSurrender}
+        />
+      )}
+      {showHistoryModal && (
+        <BattleHistoryModal
+          history={game.getActionHistory()}
+          onClose={() => setShowHistoryModal(false)}
         />
       )}
       <div
@@ -466,9 +480,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         <div className="battle-footer">
           <BattleOptions
             onSurrender={handleSurrender}
-            onHistory={() => {
-              /* implement later */
-            }}
+            onHistory={handleShowHistory}
             onExample={() => {
               /* implement later */
             }}

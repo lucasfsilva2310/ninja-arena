@@ -5,23 +5,32 @@ import { Player } from "./player.model";
 export class GameEngine {
   turn: number = 0;
   currentPlayer: Player;
+  actionHistory: string[] = [];
 
   constructor(public player1: Player, public player2: Player) {
     this.currentPlayer = player1;
   }
 
+  addToHistory(message: string) {
+    const formattedMessage = `Turn ${this.turn}: ${message}`;
+    console.log(formattedMessage);
+    this.actionHistory.push(formattedMessage);
+  }
+
   startGame() {
-    console.log(`🎮 Jogo iniciado! Turno de ${this.player1.name}`);
+    this.addToHistory(`🎮 Game started! ${this.player1.name}'s turn`);
     this.nextTurn(this.player1);
   }
 
   nextTurn(player: Player) {
     this.turn++;
     this.currentPlayer = player;
-    console.log(`🎮 Turn ${this.turn}! It's ${this.currentPlayer.name} turn.`);
-    player.receiveChakra(this.turn);
-    player.processCooldowns();
-    player.processActiveEffects();
+    this.addToHistory(
+      `🎮 Turn ${this.turn}! It's ${this.currentPlayer.name}'s turn`
+    );
+    player.receiveChakra(this.turn, this);
+    player.processCooldowns(this);
+    player.processActiveEffects(this);
   }
 
   executeTurn(
@@ -34,13 +43,14 @@ export class GameEngine {
   ) {
     actions.forEach((action) => {
       if (action.character.isAlive()) {
-        console.log(
-          `${action.character.name} usou ${action.ability.name} em ${action.target.name}!`
+        this.addToHistory(
+          `${action.character.name} used ${action.ability.name} on ${action.target.name}!`
         );
         action.ability.applyEffect(
           action.character,
           action.ability,
-          action.target
+          action.target,
+          this
         );
         action.ability.requiredChakra.forEach((chakra) => {
           action.player.consumeChakra(chakra);
@@ -65,5 +75,9 @@ export class GameEngine {
 
   checkGameOver(): boolean {
     return this.player1.isDefeated() || this.player2.isDefeated();
+  }
+
+  getActionHistory(): string[] {
+    return this.actionHistory;
   }
 }

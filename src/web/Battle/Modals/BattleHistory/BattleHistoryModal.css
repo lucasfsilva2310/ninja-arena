@@ -1,5 +1,3 @@
-@import "../../../../styles/variables.css";
-
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -15,18 +13,21 @@
 }
 
 .modal-content {
-  background-image: url(var(--empty-clean-scroll-background));
+  background-image: url("/assets/scroll-open-only-medium.jpg");
   background-size: 100% 100%;
   background-position: center;
   background-repeat: no-repeat;
   padding: 30px;
   border-radius: var(--radius-lg);
-  width: 400px;
+  width: 600px;
   max-width: 90%;
+  max-height: 40vh;
   box-shadow: var(--shadow-lg);
   text-align: center;
   position: relative;
   color: var(--text-dark);
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-content h2 {
@@ -35,15 +36,38 @@
   margin-bottom: 1rem;
 }
 
-.modal-content p {
-  margin-bottom: 2rem;
-  font-size: var(--font-md);
+.history-container {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh;
+  text-align: left;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+
+.history-entry {
+  padding: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: var(--font-sm);
+}
+
+.history-entry:last-child {
+  border-bottom: none;
+}
+
+.no-history {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .modal-actions {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  margin-top: 1rem;
 }
 
 button {
@@ -53,7 +77,6 @@ button {
   border: 1px solid var(--border-dark);
   cursor: pointer;
   transition: all var(--transition-fast);
-  margin: 0.25rem;
   background-color: var(--color-error);
   color: white;
   min-width: 100px;
@@ -62,12 +85,20 @@ button {
 button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
-}
-
-.confirm-button:hover:not(:disabled) {
-  background-color: var(--color-success);
-}
-
-.cancel-button:hover {
   background-color: #d43f3f;
+}
+
+/* For a cleaner scrollbar */
+.history-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.history-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }

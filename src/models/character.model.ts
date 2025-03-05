@@ -1,4 +1,6 @@
 import { Ability, AbilityEffect, BuffEffect } from "./ability.model";
+import { GameEngine } from "./game-engine";
+
 export type EffectType = {
   name: string;
   description: string;
@@ -55,11 +57,18 @@ export class Character {
     );
   }
 
-  takeDamage(damage: number, increasedDamage: number = 0) {
+  takeDamage(
+    damage: number,
+    increasedDamage: number = 0,
+    gameEngine?: GameEngine
+  ) {
     let reducedDamage = damage;
-    console.log(
-      `${this.name} recebeu ${damage} de dano com mais ${increasedDamage} de dano aumentado`
-    );
+    if (gameEngine) {
+      gameEngine.addToHistory(
+        `${this.name} received ${damage} damage with ${increasedDamage} increased damage`
+      );
+    }
+
     this.activeEffects.forEach((effect) => {
       if (effect.damageReduction) {
         if (effect.damageReduction.isPercent) {
@@ -71,24 +80,26 @@ export class Character {
             damage - (reducedDamage + effect.damageReduction.amount)
           );
         }
-        console.log(
-          `${this.name} tem ${effect.damageReduction.amount}${
-            effect.damageReduction.isPercent ? "%" : ""
-          } de dano reduzido. Dano reduzido: ${damage - reducedDamage}`
-        );
+        if (gameEngine) {
+          gameEngine.addToHistory(
+            `${this.name} has ${effect.damageReduction.amount}${
+              effect.damageReduction.isPercent ? "%" : ""
+            } damage reduction. Reduced damage: ${damage - reducedDamage}`
+          );
+        }
       }
     });
     this.hp = Math.max(0, this.hp - (reducedDamage + increasedDamage));
   }
 
-  heal(amount: number) {
-    console.log(
-      `${this.name} recebeu ${amount} de cura. Vida atual: ${Math.min(
-        100,
-        this.hp + amount
-      )}`
-    );
-    this.hp = Math.min(100, this.hp + amount);
+  heal(amount: number, gameEngine?: GameEngine) {
+    const newHp = Math.min(100, this.hp + amount);
+    if (gameEngine) {
+      gameEngine.addToHistory(
+        `${this.name} was healed for ${amount}. Current HP: ${newHp}`
+      );
+    }
+    this.hp = newHp;
   }
 
   addDamageReduction(
@@ -96,13 +107,17 @@ export class Character {
     description: string,
     amount: number,
     remainingTurns: number,
-    isPercent: boolean
+    isPercent: boolean,
+    gameEngine?: GameEngine
   ) {
-    console.log(
-      `recebeu ${amount}${
-        isPercent ? "%" : ""
-      } de redução de dano por ${remainingTurns} turnos. `
-    );
+    if (gameEngine) {
+      gameEngine.addToHistory(
+        `${this.name} received ${amount}${
+          isPercent ? "%" : ""
+        } damage reduction for ${remainingTurns} turns`
+      );
+    }
+
     this.activeEffects.push({
       name: ability.name,
       description,
@@ -117,11 +132,14 @@ export class Character {
   applyTransformation(
     originalAbility: Ability,
     newAbility: Ability,
-    duration: number
+    duration: number,
+    gameEngine?: GameEngine
   ) {
-    console.log(
-      `${this.name} trocou habilidade de ${originalAbility.name} para ${newAbility.name} por ${duration} turnos. `
-    );
+    if (gameEngine) {
+      gameEngine.addToHistory(
+        `${this.name} transformed ability from ${originalAbility.name} to ${newAbility.name} for ${duration} turns`
+      );
+    }
 
     this.replaceAbility(originalAbility, newAbility);
 
@@ -132,7 +150,7 @@ export class Character {
     });
   }
 
-  revertTransformation(newAbility: Ability) {
+  revertTransformation(newAbility: Ability, gameEngine?: GameEngine) {
     const transformationEffect = this.activeEffects.find(
       (effect) =>
         effect.transformation && effect.transformation.newAbility === newAbility
@@ -143,29 +161,47 @@ export class Character {
         transformationEffect.transformation.newAbility,
         transformationEffect.transformation.originalAbility
       );
-      console.log(
-        `${this.name} reverteu a transformação de ${transformationEffect.transformation.newAbility.name} para ${transformationEffect.transformation.originalAbility.name}.`
-      );
+
+      if (gameEngine) {
+        gameEngine.addToHistory(
+          `${this.name} reverted transformation from ${transformationEffect.transformation.newAbility.name} to ${transformationEffect.transformation.originalAbility.name}`
+        );
+      }
+
       this.activeEffects = this.activeEffects.filter(
         (effect) => effect !== transformationEffect
       );
     }
   }
 
-  replaceAbility(oldAbility: Ability, newAbility: Ability) {
+  replaceAbility(
+    oldAbility: Ability,
+    newAbility: Ability,
+    gameEngine?: GameEngine
+  ) {
     const abilityIndex = this.abilities.findIndex(
       (ability) => ability === oldAbility
     );
     if (abilityIndex !== -1) {
       this.abilities[abilityIndex] = newAbility;
-      console.log(
-        `${this.name} substituiu ${oldAbility.name} por ${newAbility.name}.`
-      );
+      if (gameEngine) {
+        gameEngine.addToHistory(
+          `${this.name} replaced ${oldAbility.name} with ${newAbility.name}`
+        );
+      }
     }
   }
 
-  applyBuff(ability: Ability, buff: BuffEffect, value: number) {
-    console.log(`${this.name} aplicou buff de ${buff.buffType}. `);
+  applyBuff(
+    ability: Ability,
+    buff: BuffEffect,
+    value: number,
+    gameEngine?: GameEngine
+  ) {
+    if (gameEngine) {
+      gameEngine.addToHistory(`${this.name} applied ${buff.buffType} buff`);
+    }
+
     this.activeEffects.push({
       name: ability.name,
       description: buff.description,

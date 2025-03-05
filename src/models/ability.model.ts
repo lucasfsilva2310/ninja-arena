@@ -1,5 +1,6 @@
 import { Character } from "./character.model";
 import { ChakraType } from "./chakra.model";
+import { GameEngine } from "./game-engine";
 
 export type EffectType =
   | "Damage"
@@ -101,7 +102,12 @@ export class Ability {
     return totalAvailableChakras >= totalRequiredChakras;
   }
 
-  applyEffect(character: Character, ability: Ability, target: Character) {
+  applyEffect(
+    character: Character,
+    ability: Ability,
+    target: Character,
+    gameEngine?: GameEngine
+  ) {
     this.effects.forEach((effect) => {
       let increasedDamage: number = 0;
       switch (effect.type) {
@@ -114,10 +120,10 @@ export class Ability {
               increasedDamage += effect.buff.value;
             }
           });
-          target.takeDamage(effect.value!, increasedDamage);
+          target.takeDamage(effect.value!, increasedDamage, gameEngine);
           break;
         case "Heal":
-          target.heal(effect.value!);
+          target.heal(effect.value!, gameEngine);
           break;
         case "DamageReduction":
           if (effect.damageReduction) {
@@ -126,22 +132,24 @@ export class Ability {
               effect.damageReduction.description,
               effect.damageReduction.amount,
               effect.damageReduction.duration || 1,
-              effect.damageReduction.isPercent || false
+              effect.damageReduction.isPercent || false,
+              gameEngine
             );
           }
           break;
         case "Transform":
           if (effect.value! > 0) {
-            target.takeDamage(effect.value!);
+            target.takeDamage(effect.value!, 0, gameEngine);
           }
           character.applyTransformation(
             ability,
             effect.transformation!,
-            effect.duration || 1
+            effect.duration || 1,
+            gameEngine
           );
           break;
         case "Buff":
-          character.applyBuff(ability, effect.buff!, effect.value!);
+          character.applyBuff(ability, effect.buff!, effect.value!, gameEngine);
           break;
       }
 

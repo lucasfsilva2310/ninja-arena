@@ -6,13 +6,14 @@ import {
   InitialChakraObjType,
 } from "./chakra.model";
 import { Character } from "./character.model";
+import { GameEngine } from "./game-engine";
 
 export class Player {
   chakras: ChakraType[] = [];
 
   constructor(public name: string, public characters: Character[] = []) {}
 
-  receiveChakra(turn: number) {
+  receiveChakra(turn: number, gameEngine?: GameEngine) {
     const aliveCharacters = this.characters.filter((character) =>
       character.isAlive()
     );
@@ -21,13 +22,18 @@ export class Player {
 
     if (isStartOfGame) {
       this.chakras = [new Chakra().type];
+      if (gameEngine)
+        gameEngine.addToHistory(`${this.name} received initial chakra`);
       return;
     }
 
-    this.chakras = [
-      ...this.chakras,
-      ...aliveCharacters.map(() => new Chakra().type),
-    ];
+    const newChakras = aliveCharacters.map(() => new Chakra().type);
+    if (gameEngine)
+      gameEngine.addToHistory(
+        `${this.name} received ${newChakras.length} new chakra`
+      );
+
+    this.chakras = [...this.chakras, ...newChakras];
   }
 
   consumeChakra(chakra: ChakraType) {
@@ -37,9 +43,18 @@ export class Player {
     }
   }
 
-  transformChakras(chakrasToTransform: ChakraType[], targetChakra: ChakraType) {
+  transformChakras(
+    chakrasToTransform: ChakraType[],
+    targetChakra: ChakraType,
+    gameEngine?: GameEngine
+  ) {
     chakrasToTransform.forEach((chakra) => this.consumeChakra(chakra));
     this.chakras.push(targetChakra);
+
+    if (gameEngine)
+      gameEngine.addToHistory(
+        `${this.name} transformed ${chakrasToTransform.length} chakras into ${targetChakra}`
+      );
   }
 
   getChakraCount() {
@@ -59,7 +74,7 @@ export class Player {
     );
   }
 
-  processActiveEffects() {
+  processActiveEffects(gameEngine?: GameEngine) {
     this.characters.forEach((character) => {
       character.activeEffects = character.activeEffects.filter((effect) => {
         if (effect.damageReduction) {
@@ -68,6 +83,11 @@ export class Player {
             return true;
           }
           effect.damageReduction.remainingTurns--;
+          if (gameEngine) {
+            gameEngine.addToHistory(
+              `${character.name}'s damage reduction from ${effect.name} has ${effect.damageReduction.remainingTurns} turns remaining`
+            );
+          }
           return effect.damageReduction.remainingTurns > 0;
         }
         if (effect.transformation) {
@@ -75,31 +95,25 @@ export class Player {
             character.applyTransformation(
               effect.transformation.originalAbility,
               effect.transformation.newAbility,
-              effect.transformation.remainingTurns
+              effect.transformation.remainingTurns,
+              gameEngine
             );
             effect.transformation.applied = true;
           } else {
             effect.transformation.remainingTurns--;
             if (effect.transformation.remainingTurns === 0) {
-              character.revertTransformation(effect.transformation.newAbility);
-              console.log(
-                `${character.name} voltou à sua habilidade original.`
+              character.revertTransformation(
+                effect.transformation.newAbility,
+                gameEngine
               );
               return false;
             }
+            if (gameEngine) {
+              gameEngine.addToHistory(
+                `${character.name}'s transformation has ${effect.transformation.remainingTurns} turns remaining`
+              );
+            }
           }
-          return true;
-        }
-
-        if (effect.stackingEffect) {
-          effect.stackingEffect.baseDamage = Math.max(
-            0,
-            effect.stackingEffect.baseDamage
-          );
-          effect.stackingEffect.baseDamage += effect.stackingEffect.increment;
-          console.log(
-            `${character.name} teve seu efeito stack aumentado para ${effect.stackingEffect.baseDamage}.`
-          );
           return true;
         }
 
@@ -109,6 +123,11 @@ export class Player {
             return true;
           }
           effect.buff.remainingTurns--;
+          if (gameEngine) {
+            gameEngine.addToHistory(
+              `${character.name}'s buff from ${effect.name} has ${effect.buff.remainingTurns} turns remaining`
+            );
+          }
           return effect.buff.remainingTurns > 0;
         }
 
@@ -117,11 +136,16 @@ export class Player {
     });
   }
 
-  processCooldowns() {
+  processCooldowns(gameEngine?: GameEngine) {
     this.characters.forEach((character) => {
       character.abilities.forEach((ability) => {
         if (ability.isOnCooldown()) {
           ability.currentCooldown--;
+          if (ability.currentCooldown === 0 && gameEngine) {
+            gameEngine.addToHistory(
+              `${character.name}'s ability ${ability.name} is now ready`
+            );
+          }
         }
       });
     });
@@ -129,7 +153,7 @@ export class Player {
 
   chooseAbility(character: Character): Ability | null {
     const availableAbilities = character.abilities.filter((ability) =>
-      ability.canUse(this.chakras)
+      ability.canUse(character, this.chakras)
     );
 
     return availableAbilities.length > 0 ? availableAbilities[0] : null;
