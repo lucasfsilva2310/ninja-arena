@@ -5,6 +5,7 @@ import {
   initialChakraObj,
 } from "../../../../models/chakra.model";
 import "./ExchangeRandomChakraFinalModal.css";
+import { getChakraColor } from "../../../../utils/getChakraColor";
 
 interface ModalProps {
   availableChakras: ChakraType[];
@@ -31,6 +32,10 @@ export default function ExchangeRandomChakraFinalModal({
       return acc;
     }, initialChakraObj as Record<ChakraType, number>)
   );
+
+  const getChakraImage = (chakraType: string) => {
+    return `/chakras/chakra-${chakraType.toLowerCase()}.png`;
+  };
 
   const handleAddChakra = (chakra: ChakraType) => {
     if (
@@ -62,20 +67,39 @@ export default function ExchangeRandomChakraFinalModal({
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>{`Selecione ${requiredRandomCount} Chakra(s) para substituir "Random"`}</h2>
+        <h2>{`Select ${requiredRandomCount} Chakra(s) to exchange with "Random"`}</h2>
         <div className="chakra-options">
           {chakraTypesWithoutRandom.map((chakra) => (
-            <div key={chakra} className="chakra-item">
-              <span>
-                {chakra}: {chakraCounts[chakra]}
+            <div
+              key={chakra}
+              className="chakra-item"
+              style={{ borderColor: getChakraColor(chakra) }}
+            >
+              <div className="chakra-image-container">
+                <img
+                  src={getChakraImage(chakra)}
+                  alt={`${chakra} chakra`}
+                  className="chakra-image"
+                  onError={(e) => {
+                    e.currentTarget.src = "/chakras/chakra-default.png";
+                  }}
+                />
+              </div>
+              <span
+                className="chakra-count"
+                style={{ color: getChakraColor(chakra) }}
+              >
+                {chakraCounts[chakra]}
               </span>
               <button
+                className="chakra-action-btn"
                 onClick={() => handleAddChakra(chakra)}
                 disabled={chakraCounts[chakra] === 0}
               >
                 +
               </button>
               <button
+                className="chakra-action-btn"
                 onClick={() => handleRemoveChakra(chakra)}
                 disabled={!chakrasToSwitchFromRandom.includes(chakra)}
               >
@@ -85,17 +109,44 @@ export default function ExchangeRandomChakraFinalModal({
           ))}
         </div>
         <div className="selected-chakras">
-          <h3>Total Selecionado: {chakrasToSwitchFromRandom.length}</h3>
+          <h3>Selected Chakras</h3>
+          <div className="chakra-list">
+            {chakrasToSwitchFromRandom.map((chakra, index) => (
+              <div
+                key={index}
+                className="chakra-item"
+                style={{ borderColor: getChakraColor(chakra) }}
+              >
+                <div className="chakra-image-container">
+                  <img
+                    src={getChakraImage(chakra)}
+                    alt={`${chakra} chakra`}
+                    className="chakra-image"
+                    onError={(e) => {
+                      e.currentTarget.src = "/chakras/chakra-default.png";
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <h3>
+            Total Selected: {chakrasToSwitchFromRandom.length}/
+            {requiredRandomCount}
+          </h3>
         </div>
-        <button
-          onClick={handleConfirm}
-          disabled={chakrasToSwitchFromRandom.length < requiredRandomCount}
-        >
-          Confirmar
-        </button>
-        <button className="modal-close-btn" onClick={onClose}>
-          Cancelar
-        </button>
+        <div className="modal-actions">
+          <button
+            className="confirm-button"
+            onClick={handleConfirm}
+            disabled={chakrasToSwitchFromRandom.length < requiredRandomCount}
+          >
+            Confirm
+          </button>
+          <button className="cancel-button" onClick={onClose}>
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

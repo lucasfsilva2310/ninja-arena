@@ -11,6 +11,7 @@ interface AbilitiesProps {
   activeChakras: ChakraType[];
   selectedActions: SelectedAction[];
   handleAbilityClick: (character: Character, ability: Ability) => void;
+  isPlayerTurn?: boolean;
 }
 
 export const Abilities: React.FC<AbilitiesProps> = ({
@@ -18,11 +19,13 @@ export const Abilities: React.FC<AbilitiesProps> = ({
   activeChakras,
   selectedActions,
   handleAbilityClick,
+  isPlayerTurn = true,
 }) => {
   return (
     <div className="abilities-container">
       {character.abilities.map((ability) => {
         const isAbilityDisabled =
+          !isPlayerTurn ||
           !ability.canUse(character, activeChakras) ||
           selectedActions.some((action) => action.character === character) ||
           ability.isOnCooldown();

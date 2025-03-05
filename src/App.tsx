@@ -1,7 +1,7 @@
 import "./styles/reset.css";
 import "./App.css";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import CharacterSelection from "./web/CharacterSelection/CharacterSelection";
 import { GameEngine } from "./models/game-engine";
 import { Character } from "./models/character.model";
@@ -12,6 +12,15 @@ import Battle from "./web/Battle/Battle";
 function App() {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
   const [game, setGame] = useState<GameEngine | null>(null);
+  const [gameResult, setGameResult] = useState<string | null>(null);
+
+  // Handle game over with useEffect to control when alerts appear
+  useEffect(() => {
+    if (gameResult) {
+      alert(gameResult);
+      setGameResult(null);
+    }
+  }, [gameResult]);
 
   const toggleCharacterSelection = (character: Character) => {
     setSelectedCharacters((prev) => {
@@ -25,26 +34,49 @@ function App() {
     });
   };
 
-  const startGame = () => {
+  // Use useCallback to memoize this function
+  const startGame = useCallback(() => {
     if (selectedCharacters.length !== 3) {
       alert("Escolha exatamente 3 personagens para iniciar o jogo!");
       return;
     }
-    const player = new Player("Você", selectedCharacters);
-    const aiPlayer = new Player(
-      "Inteligência Artificial",
-      AICharacters.slice(0, 3)
+
+    const player = new Player(
+      "You",
+      selectedCharacters.map((char) => {
+        return new Character(
+          char.name,
+          char.abilities.map((a) => a.clone())
+        );
+      })
     );
+
+    // Create fresh AI player
+    const aiPlayer = new Player(
+      "AI",
+      AICharacters.slice(0, 3).map((char) => {
+        return new Character(
+          char.name,
+          char.abilities.map((a) => a.clone())
+        );
+      })
+    );
+
+    // Create new game engine
     const newGame = new GameEngine(player, aiPlayer);
     newGame.startGame();
     setGame(newGame);
-  };
+  }, [selectedCharacters]);
 
   const handleGameOver = (text: string) => {
-    alert(text);
+    // Set game result without immediate alert
+    setGameResult(text);
+
+    // Clear game state completely
     setGame(null);
     setSelectedCharacters([]);
   };
+
   return (
     <div className="root">
       {!game ? (

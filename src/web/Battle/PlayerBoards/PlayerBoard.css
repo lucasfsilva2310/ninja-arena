@@ -23,26 +23,6 @@
   padding: 1rem;
 }
 
-@media (max-width: 640px) {
-  .character-name-container {
-    padding: 0.25rem;
-    gap: 0.5rem;
-  }
-
-  .character-portrait {
-    width: 48px;
-    height: 48px;
-  }
-
-  .character-name {
-    font-size: 0.875rem;
-  }
-
-  .character-info-container {
-    flex-direction: column;
-  }
-}
-
 .character-name-box {
   width: 40%;
 }

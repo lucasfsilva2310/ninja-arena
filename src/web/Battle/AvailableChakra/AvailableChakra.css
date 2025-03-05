@@ -88,30 +88,6 @@
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
-@media (max-width: 768px) {
-  .chakra-inside-container {
-    width: 80%;
-    padding: 0.75rem 1.5rem;
-  }
-  .chakra-image-container {
-    width: 12px;
-    height: 12px;
-  }
-  .chakra-item {
-    padding: calc(var(--spacing-xs) / 2) var(--spacing-xs);
-  }
-}
-
-@media (max-width: 480px) {
-  .chakra-inside-container {
-    width: 90%;
-    padding: 0.5rem 1rem;
-  }
-  .chakra-item {
-    padding: var(--spacing-xs);
-  }
-  .chakra-image-container {
-    width: 18px;
-    height: 18px;
-  }
+.chakra-transform-button {
+  color: var(--text-dark);
 }

@@ -4,48 +4,132 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
-  max-width: 90%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  position: relative;
-}
-
-.modal-close-btn {
-  background: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.modal-close-btn:hover {
-  background: #d43f3f;
-}
-
-.modal-title {
-  font-family: var(--font-family-title);
-  font-weight: var(--font-weight-bold);
-}
-
-.modal-description {
   font-family: var(--font-family-default);
 }
 
-.modal-button {
+.modal-content {
+  background-image: url("/assets/scroll-open-only-medium.jpg");
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  width: 500px;
+  max-width: 90%;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  position: relative;
+  color: var(--text-dark);
+}
+
+.modal-content h2,
+.modal-content h3 {
   font-family: var(--font-family-title);
   font-weight: var(--font-weight-bold);
+  margin-bottom: 1rem;
+}
+
+.chakra-options,
+.selected-chakras {
+  margin: 1rem 0;
+}
+
+.selected-chakras {
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.selected-chakras .chakra-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+  min-height: 60px;
+  height: 60px;
+  width: 100%;
+  margin: 10px 0;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.selected-chakras .chakra-item {
+  height: 40px;
+  margin: 0;
+}
+
+.chakra-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: 0.5rem 0;
+  justify-content: center;
+}
+
+.chakra-image-container {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chakra-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.chakra-count {
+  font-family: var(--font-family-manga-bold);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-base);
+  margin: 0 5px;
+}
+
+button {
+  font-family: var(--font-family-manga-bold);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dark);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin: 0.25rem;
+  background-color: var(--color-error);
+  color: white;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.confirm-button:hover:not(:disabled) {
+  background-color: var(--color-success);
+}
+
+.cancel-button:hover {
+  background-color: #d43f3f;
+}
+
+.chakra-action-btn {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }

@@ -55,6 +55,7 @@ export const AvailableChakra = ({
         <button
           onClick={() => setChakraTransformModal(true)}
           disabled={activeChakras.length < 5}
+          className="chakra-transform-button"
         >
           Exchange Chakra
         </button>

@@ -20,7 +20,8 @@ interface PlayerBoardProps {
   removeSelectedAction: (index: number) => void;
   handleAbilityClick?: (character: Character, ability: Ability) => void;
   playerActiveChakras?: ChakraType[];
-  isEnemy?: boolean;
+  isPlayerTurn: boolean;
+  isEnemy: boolean;
 }
 
 export const PlayerBoard: React.FC<PlayerBoardProps> = ({
@@ -31,7 +32,8 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   removeSelectedAction,
   handleAbilityClick,
   playerActiveChakras,
-  isEnemy = false,
+  isPlayerTurn,
+  isEnemy,
 }) => {
   const player = isEnemy ? game.player2 : game.player1;
   const CharacterNameComponent = isEnemy
@@ -75,6 +77,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                   activeChakras={playerActiveChakras}
                   selectedActions={selectedActions}
                   handleAbilityClick={handleAbilityClick}
+                  isPlayerTurn={!isEnemy && isPlayerTurn}
                 />
               )}
             </div>

@@ -8,6 +8,8 @@
   border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
   padding: var(--spacing-sm);
+  font-family: var(--font-family-default);
+  font-size: var(--font-sm);
 }
 
 .character-portrait {

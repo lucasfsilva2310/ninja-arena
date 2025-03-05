@@ -58,7 +58,14 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [turnCount, setTurnCount] = useState(1);
 
-  // Recalc active chakras based on selected chakras
+  // Check if game is over
+  useEffect(() => {
+    if (game.checkGameOver()) {
+      onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
+    }
+  }, [onGameOver, game, selectedActions]);
+
+  // Check active chakras everytime player1 instance changes, selectedChakras changes or turn changes
   useEffect(() => {
     const chakras: ChakraType[] = [];
     Object.entries(game.player1.getChakraCount()).forEach(([chakra, count]) => {
@@ -70,7 +77,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       }
     });
     setPlayer1ActiveChakras(chakras);
-  }, [game.player1, selectedChakras]);
+  }, [game.player1, selectedChakras, turnCount]);
 
   const handleTransformChakras = (
     chakrasToTransform: ChakraType[],
@@ -79,19 +86,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     game.player1.transformChakras(chakrasToTransform, targetChakra);
   };
 
-  // Check if game is over
-  useEffect(() => {
-    if (game.checkGameOver()) {
-      onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
-    }
-  }, [onGameOver, game, selectedActions]);
-
   // Get random background
   useEffect(() => {
     const backgrounds = [
-      "forest.png",
-      "training.png",
-      "akatsuki.png",
+      // "forest.png",
+      // "training.png",
+      // "akatsuki.png",
       "waterfall.png",
     ];
 
@@ -109,6 +109,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setSelectedChakras([]);
     setShowExchangeRandomFinalModal(false);
     setSelectedCharacterForAbilitiesPreview(null);
+    setRandomChakraCount(0);
   };
 
   const clearActionStates = () => {
@@ -186,10 +187,27 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       const updatedActions = [...prevActions];
       const removedAction = updatedActions.splice(index, 1)[0];
 
+      // Find the chakras that need to be removed from selectedChakras
+      // This is the problem area - it's using position rather than actual chakra types
       setSelectedChakras((prevChakras) => {
-        return prevChakras.filter(
-          (_, i) => i >= removedAction.ability.requiredChakra.length
-        );
+        // Create a copy of the previous chakras
+        const updatedChakras = [...prevChakras];
+
+        // Calculate the starting index of the chakras to remove
+        // Find all chakras consumed by actions before the one being removed
+        let startIndex = 0;
+        for (let i = 0; i < index; i++) {
+          startIndex += prevActions[i].ability.requiredChakra.length;
+        }
+
+        // Calculate the end index
+        const endIndex =
+          startIndex + removedAction.ability.requiredChakra.length;
+
+        // Remove the chakras corresponding to the removed action
+        updatedChakras.splice(startIndex, endIndex - startIndex);
+
+        return updatedChakras;
       });
 
       return updatedActions;
@@ -313,7 +331,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       }
     });
 
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     game.executeTurn(aiActions);
     game.nextTurn(game.player1);
@@ -382,7 +400,11 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
           <div className="battle-content">
             <div className="end-turn-button-container">
-              <button onClick={executeTurn} className="end-turn-button">
+              <button
+                onClick={executeTurn}
+                className="end-turn-button"
+                disabled={!isPlayerTurn}
+              >
                 End Turn
               </button>
             </div>
@@ -399,6 +421,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                   handleAbilityClick={handleAbilityClick}
                   playerActiveChakras={player1ActiveChakras}
                   isEnemy={false}
+                  isPlayerTurn={isPlayerTurn}
                 />
               </div>
 
@@ -411,6 +434,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                   selectedActions={selectedActions}
                   removeSelectedAction={removeSelectedAction}
                   isEnemy={true}
+                  isPlayerTurn={isPlayerTurn}
                 />
               </div>
             </div>

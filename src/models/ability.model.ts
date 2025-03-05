@@ -159,4 +159,17 @@ export class Ability {
   isOnCooldown(): boolean {
     return this.currentCooldown > 0;
   }
+
+  public clone(): Ability {
+    return new Ability(
+      this.name,
+      this.description,
+      [...this.requiredChakra],
+      this.defaultCooldown,
+      this.effects,
+      this.target,
+      this.isPermanent,
+      this.isStacking
+    );
+  }
 }
