@@ -9,6 +9,7 @@ import { ChakraType } from "../../models/chakra.model";
 import { Player } from "../../models/player.model";
 import ExchangeRandomChakraFinalModal from "./Modals/ExchangeRandomChakra/ExchangeRandomChakraFinalModal";
 import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";
+import SurrenderConfirmationModal from "./Modals/SurrenderConfirmation/SurrenderConfirmationModal";
 
 import AbilityFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
 import { AvailableChakra } from "./AvailableChakra/AvailableChakra";
@@ -57,6 +58,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   >([]);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [turnCount, setTurnCount] = useState(1);
+
+  // Add a new state for the surrender confirmation modal
+  const [showSurrenderModal, setShowSurrenderModal] = useState(false);
 
   // Check if game is over
   useEffect(() => {
@@ -339,6 +343,19 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setTurnCount((prev) => prev + 1);
   };
 
+  const handleSurrender = () => {
+    setShowSurrenderModal(true);
+  };
+
+  const confirmSurrender = () => {
+    setShowSurrenderModal(false);
+    onGameOver("Você desistiu! IA venceu!");
+  };
+
+  const cancelSurrender = () => {
+    setShowSurrenderModal(false);
+  };
+
   return (
     <>
       {showExchangeRandomFinalModal && (
@@ -356,6 +373,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
           availableChakras={player1ActiveChakras}
           onClose={() => setChakraTransformModal(false)}
           onTransform={handleTransformChakras}
+        />
+      )}
+      {showSurrenderModal && (
+        <SurrenderConfirmationModal
+          onConfirm={confirmSurrender}
+          onCancel={cancelSurrender}
         />
       )}
       <div
@@ -442,9 +465,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         </div>
         <div className="battle-footer">
           <BattleOptions
-            onSurrender={() => {
-              /* implement later */
-            }}
+            onSurrender={handleSurrender}
             onHistory={() => {
               /* implement later */
             }}
