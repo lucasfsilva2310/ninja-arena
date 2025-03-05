@@ -56,7 +56,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     ChakraType[]
   >([]);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
-  const [turnCount, setTurnCount] = useState(0);
+  const [turnCount, setTurnCount] = useState(1);
 
   // Recalc active chakras based on selected chakras
   useEffect(() => {
@@ -196,6 +196,40 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     });
   };
 
+  const handleTimeEnd = () => {
+    // Filter out actions that require Random chakra
+    const actionsWithoutRandom = selectedActions.filter(
+      (action) => !action.ability.requiredChakra.includes("Random")
+    );
+
+    // If we removed any actions, update the selected chakras accordingly
+    if (actionsWithoutRandom.length !== selectedActions.length) {
+      // Keep only chakras from abilities without Random requirements
+      setSelectedChakras(
+        actionsWithoutRandom.flatMap((action) => action.ability.requiredChakra)
+      );
+
+      // Update the actions list to remove abilities with Random
+      setSelectedActions(actionsWithoutRandom);
+    }
+
+    // Execute the remaining valid actions (or empty list if all had Random)
+    executeRemainingActions(actionsWithoutRandom);
+  };
+
+  // New function to execute the remaining valid actions
+  const executeRemainingActions = (actionsToExecute: SelectedAction[]) => {
+    // Skip the random chakra modal entirely
+    game.executeTurn(actionsToExecute);
+    clearStates();
+    game.nextTurn(game.player2);
+    setIsPlayerTurn(false);
+    setTurnCount((prev) => prev + 1);
+
+    // Continue with AI turn
+    executeAITurn();
+  };
+
   const executeTurn = () => {
     const totalRandoms = selectedActions.reduce(
       (count, action) =>
@@ -212,6 +246,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     finalizeTurn();
   };
+
   const finalizeTurn = async () => {
     chakrasToSwitchFromRandom.forEach((chakra) =>
       game.player1.consumeChakra(chakra)
@@ -284,10 +319,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     game.nextTurn(game.player1);
     setIsPlayerTurn(true);
     setTurnCount((prev) => prev + 1);
-  };
-
-  const handleTimeEnd = () => {
-    executeTurn();
   };
 
   return (
