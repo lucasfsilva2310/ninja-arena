@@ -7,6 +7,7 @@
   width: 100%;
   border-radius: var(--radius-lg);
   transition: all var(--transition-fast);
+  padding: var(--spacing-sm);
 }
 
 .character-portrait {
@@ -26,9 +27,24 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
+.character-name-container:has(.character-selected) {
+  background: var(--highlight-bg-dim);
+  box-shadow: 0 0 15px var(--highlight-shadow-dim);
+  animation: containerPulse 2s infinite ease-in-out;
+}
+
+.character-name-container:has(.character-selected) .character-image {
+  transform: scale(1);
+}
+
+.character-name-container:has(.character-selected) .character-image:hover {
+  transform: scale(1.1);
+}
+
+/* Regular hover effect when not selected */
 .character-image:hover {
   transform: scale(1.1);
 }
@@ -56,26 +72,21 @@
   opacity: 0.7;
 }
 
-/* When a character is a possible target, highlight the entire container */
-.character-name-container:has(.character-selected) {
-  background-color: var(--bg-highlight);
-  animation: targetPulse 2s infinite ease-in-out;
-  box-shadow: var(--shadow-highlight);
-  padding: var(--spacing-sm);
-}
-
-@keyframes targetPulse {
+@keyframes containerPulse {
   0% {
-    background-color: var(--bg-highlight-dim);
-    box-shadow: var(--shadow-highlight-dim);
+    background: var(--highlight-bg-dim);
+    box-shadow: 0 0 15px var(--highlight-shadow-dim);
+    border-color: var(--highlight-border-dim);
   }
   50% {
-    background-color: var(--bg-highlight);
-    box-shadow: var(--shadow-highlight);
+    background: var(--highlight-bg-bright);
+    box-shadow: 0 0 20px var(--highlight-shadow-bright);
+    border-color: var(--highlight-border-bright);
   }
   100% {
-    background-color: var(--bg-highlight-dim);
-    box-shadow: var(--shadow-highlight-dim);
+    background: var(--highlight-bg-dim);
+    box-shadow: 0 0 15px var(--highlight-shadow-dim);
+    border-color: var(--highlight-border-dim);
   }
 }
 

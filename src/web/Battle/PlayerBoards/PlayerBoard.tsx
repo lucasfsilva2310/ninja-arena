@@ -9,8 +9,8 @@ import { CurrentActions } from "../ActionsAndEffects/CurrentActions";
 import { CurrentActionsOnEnemy } from "../ActionsAndEffects/CurrentActionsOnEnemy";
 import { Abilities } from "../Abilities/Abilities";
 import { ActiveEffects } from "../ActionsAndEffects/ActiveEffects";
-import { PlayerCharacterName } from "../PlayerNames/PlayerCharacterName";
-import { EnemyCharacterName } from "../PlayerNames/EnemyCharacterName";
+import { PlayerCharacterName } from "../PlayerCharacterInfo/PlayerCharacterInfo";
+import { EnemyCharacterName } from "../PlayerCharacterInfo/EnemyCharacterInfo";
 
 interface PlayerBoardProps {
   game: GameEngine;

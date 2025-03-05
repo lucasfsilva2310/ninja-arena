@@ -160,40 +160,6 @@
   color: #1e293b; /* Keep text color dark for readability */
 }
 
-/* When a character is a possible target, highlight the entire container */
-.character-name-container:has(.character-selected) {
-  background-color: rgba(
-    253,
-    224,
-    71,
-    0.4
-  ); /* Light yellow with transparency */
-  animation: targetPulse 2s infinite ease-in-out;
-  box-shadow: 0 0 8px rgba(253, 224, 71, 0.4);
-  padding: 0.5rem;
-}
-
-/* Create the pulsing animation */
-@keyframes targetPulse {
-  0% {
-    background-color: rgba(253, 224, 71, 0.2); /* Start more transparent */
-    box-shadow: 0 0 4px rgba(253, 224, 71, 0.2);
-  }
-  50% {
-    background-color: rgba(253, 224, 71, 0.6); /* Peak opacity */
-    box-shadow: 0 0 12px rgba(253, 224, 71, 0.6);
-  }
-  100% {
-    background-color: rgba(253, 224, 71, 0.2); /* Return to transparent */
-    box-shadow: 0 0 4px rgba(253, 224, 71, 0.2);
-  }
-}
-
-/* Remove the previous underline effect */
-.character-selected::after {
-  display: none;
-}
-
 /* Hover Effects */
 .character-name-container:hover {
   border-color: #3b82f6;

@@ -1,4 +1,4 @@
-import "./PlayerNames.css";
+import "./PlayerCharacterInfo.css";
 import React from "react";
 import { Character } from "../../../models/character.model";
 import { HealthBar } from "../HealthBar/HealthBar";

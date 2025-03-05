@@ -87,4 +87,24 @@
 
   --empty-clean-scroll-background: url("/assets/scroll-open-only-medium.jpg");
   --scroll-with-base-background: url("/assets/scroll-medium-open-full.png");
+
+  /* Highlight colors */
+  --color-highlight: #fbbf24; /* Amber color for highlight */
+  --color-highlight-dim: rgba(251, 191, 36, 0.5); /* Dimmed amber */
+
+  /* Highlight shadows for images */
+  --shadow-highlight: 0 0 8px rgba(59, 130, 246, 1); /* Bright blue */
+  --shadow-highlight-dim: 0 0 4px rgba(59, 130, 246, 0.5); /* Dimmed blue */
+
+  /* Selection highlight colors */
+  --highlight-primary: rgba(79, 70, 229, 1); /* Base indigo */
+  --highlight-secondary: rgba(147, 51, 234, 1); /* Base purple */
+
+  /* Background highlights with opacity */
+  --highlight-bg-dim: rgba(79, 70, 229, 0.2);
+  --highlight-bg-bright: rgba(79, 70, 229, 0.4);
+
+  /* Shadow highlights with opacity */
+  --highlight-shadow-dim: rgba(79, 70, 229, 0.2);
+  --highlight-shadow-bright: rgba(79, 70, 229, 0.4);
 }

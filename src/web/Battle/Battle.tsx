@@ -1,4 +1,5 @@
 import "./Battle.css";
+import "./BattleFooter/BattleFooter.css";
 
 import React, { useState, useEffect } from "react";
 import { GameEngine } from "../../models/game-engine";
@@ -14,7 +15,6 @@ import { AvailableChakra } from "./AvailableChakra/AvailableChakra";
 import { PlayerBoard } from "./PlayerBoards/PlayerBoard";
 import { PlayerInfo } from "./PlayerInfo/PlayerInfo";
 import BattleOptions from "./BattleOptions/BattleOptions";
-import "./BattleFooter/BattleFooter.css";
 
 interface BattleProps {
   game: GameEngine;
@@ -334,6 +334,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               </button>
             </div>
 
+            {/* Player 1 */}
             <div className="teams-container">
               <div className="team-container">
                 <PlayerBoard
@@ -348,6 +349,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 />
               </div>
 
+              {/* Player 2 */}
               <div className="team-container">
                 <PlayerBoard
                   game={game}
