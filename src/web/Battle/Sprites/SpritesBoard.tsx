@@ -1,7 +1,7 @@
 import "./Sprites.css";
 
 import { GameEngine } from "../../../models/game-engine";
-import { Sprite } from "./Sprite";
+import { SpriteAnimator } from "./SpriteAnimated";
 
 interface SpritesBoardProps {
   game: GameEngine;
@@ -13,16 +13,20 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({ game }) => {
       <div className="sprites-arena">
         <div className="sprites-row">
           {game.player1.characters.map((char, index) => (
-            <div key={`player1-sprite-${index}`} className="sprite-position">
-              <Sprite characterName={char.name} />
-            </div>
+            <SpriteAnimator
+              key={`player1-sprite-${index}`}
+              characterName={char.name}
+              isEnemy={false}
+            />
           ))}
         </div>
         <div className="sprites-row">
           {game.player2.characters.map((char, index) => (
-            <div key={`player2-sprite-${index}`} className="sprite-position">
-              <Sprite characterName={char.name} isEnemy />
-            </div>
+            <SpriteAnimator
+              key={`player2-sprite-${index}`}
+              characterName={char.name}
+              isEnemy={true}
+            />
           ))}
         </div>
       </div>
