@@ -103,6 +103,7 @@
 
   --empty-clean-scroll-background: url("/assets/scroll-open-only-medium.jpg");
   --scroll-with-base-background: url("/assets/scroll-medium-open-full.png");
+  --sprites-arena-background: url("/arenas/default.png");
 
   /* Highlight colors */
   --color-highlight: #fbbf24; /* Amber color for highlight */

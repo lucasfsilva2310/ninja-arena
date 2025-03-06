@@ -18,6 +18,7 @@ import { PlayerBoard } from "./PlayerBoards/PlayerBoard";
 import { PlayerInfo } from "./PlayerInfo/PlayerInfo";
 import BattleOptions from "./BattleOptions/BattleOptions";
 import { TurnTimer } from "./TurnTimer/TurnTimer";
+import { SpritesBoard } from "./Sprites/SpritesBoard";
 
 interface BattleProps {
   game: GameEngine;
@@ -457,6 +458,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               >
                 End Turn
               </button>
+              <SpritesBoard game={game} />
             </div>
 
             <div className="board-section">

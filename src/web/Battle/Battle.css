@@ -581,7 +581,7 @@
   align-items: center;
   gap: 1rem;
   padding: 0.5rem;
-  width: 300px; /* Adjust as needed */
+  width: 400px; /* Increased width to accommodate sprites */
 }
 
 /* Footer Section */
@@ -671,16 +671,4 @@
   gap: 1rem;
   padding: 0.5rem;
   margin-top: auto;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-  .battle-footer {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .center-column {
-    width: auto;
-  }
 }
