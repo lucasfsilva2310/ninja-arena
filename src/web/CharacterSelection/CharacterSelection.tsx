@@ -1,10 +1,10 @@
 import "./CharacterSelection.css";
 
 import { useState, DragEvent, useEffect } from "react";
-
 import { Character } from "../../models/character.model";
 import { Ability } from "../../models/ability.model";
 import { availableCharacters } from "../../database/available-characters";
+
 import AbilityDescriptionFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
 
 interface CharacterSelectionProps {
@@ -155,7 +155,7 @@ export default function CharacterSelection({
                     onDragOver={(e) => handleDragOver(e, index)}
                     onDrop={(e) => handleDrop(e, index)}
                   >
-                    {selectedCharacters[index] && (
+                    {selectedCharacters[index] ? (
                       <div
                         className="selected-character-container"
                         draggable
@@ -164,21 +164,27 @@ export default function CharacterSelection({
                         }
                         onDragEnd={handleDragEnd}
                       >
-                        <img
-                          src={`/characters/${selectedCharacters[index].name
-                            .split(" ")
-                            .join("")
-                            .toLowerCase()}/${selectedCharacters[index].name
-                            .split(" ")
-                            .join("")
-                            .toLowerCase()}.png`}
-                          alt={selectedCharacters[index].name}
-                          className="selected-sprite"
-                          draggable={false}
-                        />
+                        <div className="character-portrait">
+                          <img
+                            src={`/characters/${selectedCharacters[index].name
+                              .split(" ")
+                              .join("")
+                              .toLowerCase()}/${selectedCharacters[index].name
+                              .split(" ")
+                              .join("")
+                              .toLowerCase()}.png`}
+                            alt={selectedCharacters[index].name}
+                            className="character-image"
+                            draggable={false}
+                            onError={(e) => {
+                              e.currentTarget.src = "/characters/default.png";
+                            }}
+                          />
+                        </div>
                       </div>
+                    ) : (
+                      <span>?</span>
                     )}
-                    {!selectedCharacters[index] && <span>?</span>}
                   </div>
                 ))}
             </div>
@@ -221,7 +227,7 @@ export default function CharacterSelection({
                 onDragStart={(e) => handleDragStart(e, char)}
                 onDragEnd={handleDragEnd}
               >
-                <div className="character-sprite">
+                <div className="character-portrait">
                   <img
                     src={`/characters/${char.name
                       .split(" ")
@@ -231,7 +237,11 @@ export default function CharacterSelection({
                       .join("")
                       .toLowerCase()}.png`}
                     alt={char.name}
+                    className="character-image"
                     draggable={false}
+                    onError={(e) => {
+                      e.currentTarget.src = "/characters/default.png";
+                    }}
                   />
                 </div>
                 <div className="character-info">

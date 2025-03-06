@@ -1,4 +1,4 @@
-import "./PlayerCharacterInfo.css";
+import "./CharacterInfo.css";
 import React, { useState, useEffect } from "react";
 import { Character } from "../../../models/character.model";
 import { HealthBar } from "../HealthBar/HealthBar";
@@ -31,7 +31,7 @@ export const EnemyCharacterName: React.FC<EnemyCharacterNameProps> = ({
 
   return (
     <div className="character-name-container enemy">
-      <div className="character-portrait">
+      <div className="character-portrait enemy">
         <img
           src={
             isDeathAnimationComplete && character.hp <= 0

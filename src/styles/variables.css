@@ -23,13 +23,8 @@
   --color-secondary-dark: #695640;
 
   /* Background Colors */
-  --bg-primary: rgba(215, 198, 180, 0.9); /* Light brown with transparency */
-  --bg-secondary: rgba(
-    244,
-    235,
-    220,
-    0.9
-  ); /* Lighter brown with transparency */
+  --bg-primary: rgba(215, 198, 180, 0.9);
+  --bg-secondary: rgba(242, 235, 224, 0.9);
   --bg-overlay: rgba(255, 255, 255, 0.9);
   --bg-tooltip: rgba(15, 23, 42, 0.95);
 
@@ -44,6 +39,7 @@
   --color-success: #10b981;
   --color-success-hover: #059669;
   --color-error: #ef4444;
+  --color-selected: #3b82f6;
   --color-warning: #f59e0b;
   --color-disabled: #94a3b8;
 
@@ -64,6 +60,7 @@
   --font-family-default-italic: "MangaItalic", sans-serif;
 
   /* Font Sizes */
+  --font-xxs: 0.5rem; /* 8px */
   --font-xs: 0.75rem; /* 12px */
   --font-sm: 0.875rem; /* 14px */
   --font-base: 1rem; /* 16px */

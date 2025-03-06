@@ -2,11 +2,12 @@ import "./styles/reset.css";
 import "./App.css";
 
 import { useState, useEffect, useCallback } from "react";
-import CharacterSelection from "./web/CharacterSelection/CharacterSelection";
 import { GameEngine } from "./models/game-engine";
 import { Character } from "./models/character.model";
 import { Player } from "./models/player.model";
 import { AICharacters } from "./database/ai-characters";
+
+import CharacterSelection from "./web/CharacterSelection/CharacterSelection";
 import Battle from "./web/Battle/Battle";
 
 function App() {
