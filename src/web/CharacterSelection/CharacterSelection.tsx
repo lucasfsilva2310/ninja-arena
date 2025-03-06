@@ -142,7 +142,7 @@ export default function CharacterSelection({
       <div className="selection-header">
         <div className="selection-header-wrapper">
           <div className="selected-characters">
-            <h3>Selected Characters:</h3>
+            <h3 className="selected-characters-title">Selected Characters:</h3>
             <div className="selected-list">
               {Array(3)
                 .fill(null)

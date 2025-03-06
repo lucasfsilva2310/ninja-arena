@@ -46,7 +46,8 @@
   gap: 2rem;
 }
 
-button {
+.confirm-button,
+.cancel-button {
   font-family: var(--font-family-manga-bold);
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-md);
@@ -59,7 +60,7 @@ button {
   min-width: 100px;
 }
 
-button:hover:not(:disabled) {
+.confirm-button :hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }

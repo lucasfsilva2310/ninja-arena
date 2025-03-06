@@ -70,7 +70,7 @@
   margin-top: 1rem;
 }
 
-button {
+.cancel-button {
   font-family: var(--font-family-manga-bold);
   padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-md);
@@ -82,7 +82,7 @@ button {
   min-width: 100px;
 }
 
-button:hover:not(:disabled) {
+.cancel-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   background-color: #d43f3f;
