@@ -6,10 +6,10 @@
   z-index: 1;
   width: 98%;
   height: 100%;
-  padding: 1rem;
+  padding: 0.75rem;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  gap: 0.75rem;
 }
 
 .battle-container {
@@ -72,15 +72,14 @@
 .teams-container {
   display: flex;
   justify-content: space-between;
-  gap: var(--spacing-xl);
-  height: calc(100% - 120px);
+  gap: 1rem;
+  height: 100%;
 }
 
 .team-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  max-width: 460px;
   gap: 0.75rem;
 }
 
@@ -246,7 +245,7 @@
 }
 
 .end-turn-button {
-  width: 15%;
+  width: 120px;
   height: 42px;
   padding: 0.6rem;
   background-color: rgb(190, 34, 20);
@@ -257,9 +256,10 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: var(--font-family-title);
+  margin-top: 0.5rem;
 }
 
-.end-turn-button:hover {
+.end-turn-button:hover:not(:disabled) {
   background-color: #059669;
 }
 
@@ -537,28 +537,150 @@
   margin: 0.5rem 0;
 }
 
-/* Add new styles */
+.header-center {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Chakra Section */
+.chakra-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+/* Battle Content */
+.battle-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.battle-boards-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  height: 100%;
+}
+
+.board-section {
+  flex: 1;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.center-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+  width: 300px; /* Adjust as needed */
+}
+
+/* Footer Section */
+.battle-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 0.5rem;
+  margin-top: auto;
+}
+
+/* Header Section */
 .header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  gap: var(--spacing-md);
+  gap: 1rem;
+  padding: 0.5rem;
 }
 
-.battle-content {
+.header-center {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Battle Section */
+.battle-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex: 1;
+  min-height: 0; /* Important for preventing overflow */
+}
+
+.board-section {
+  flex: 1;
+  max-width: 460px;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  height: calc(100% - var(--footer-height));
+  overflow-y: auto;
 }
 
-/* Add new styles */
-.header-center {
+.center-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-md);
-  flex: 1;
-  max-width: 800px; /* Adjust based on your needs */
+  gap: 1rem;
+  padding: 0.5rem;
+  width: 300px; /* Adjust as needed */
+}
+
+/* End Turn Button */
+.end-turn-button {
+  width: 120px;
+  height: 42px;
+  padding: 0.6rem;
+  background-color: rgb(190, 34, 20);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-family-title);
+  margin-top: 0.5rem;
+}
+
+.end-turn-button:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.end-turn-button:disabled {
+  background-color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Footer Section */
+.battle-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 0.5rem;
+  margin-top: auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .battle-footer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .center-column {
+    width: auto;
+  }
 }

@@ -77,39 +77,6 @@
   opacity: 0.7;
 }
 
-@keyframes containerPulse {
-  0% {
-    background: var(--highlight-bg-dim);
-    box-shadow: 0 0 15px var(--highlight-shadow-dim);
-  }
-  50% {
-    background: var(--highlight-bg-bright);
-    box-shadow: 0 0 20px var(--highlight-shadow-bright);
-    border-color: var(--highlight-border-bright);
-  }
-  100% {
-    background: var(--highlight-bg-dim);
-    box-shadow: 0 0 15px var(--highlight-shadow-dim);
-  }
-}
-
-/* Mobile responsiveness */
-@media (max-width: 640px) {
-  .character-name-container {
-    padding: var(--spacing-xs);
-    gap: var(--spacing-sm);
-  }
-
-  .character-portrait {
-    width: 48px;
-    height: 48px;
-  }
-
-  .character-name {
-    font-size: var(--font-sm);
-  }
-}
-
 /* Enemy-specific styles */
 .character-name-container.enemy {
   flex-direction: row-reverse;
@@ -122,17 +89,6 @@
 /* Add death animation styles */
 .character-dying {
   animation: deathFade 1s ease-in-out;
-}
-
-@keyframes deathFade {
-  0% {
-    filter: grayscale(0);
-    opacity: 1;
-  }
-  100% {
-    filter: grayscale(1);
-    opacity: 0.7;
-  }
 }
 
 /* Add new styles for enemy character images */
@@ -166,6 +122,33 @@
 /* Update death animation for enemy characters */
 .character-portrait.enemy .character-dying {
   animation: deathFadeEnemy 1s ease-in-out;
+}
+
+@keyframes containerPulse {
+  0% {
+    background: var(--highlight-bg-dim);
+    box-shadow: 0 0 15px var(--highlight-shadow-dim);
+  }
+  50% {
+    background: var(--highlight-bg-bright);
+    box-shadow: 0 0 20px var(--highlight-shadow-bright);
+    border-color: var(--highlight-border-bright);
+  }
+  100% {
+    background: var(--highlight-bg-dim);
+    box-shadow: 0 0 15px var(--highlight-shadow-dim);
+  }
+}
+
+@keyframes deathFade {
+  0% {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+  100% {
+    filter: grayscale(1);
+    opacity: 0.7;
+  }
 }
 
 @keyframes deathFadeEnemy {

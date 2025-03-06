@@ -3,7 +3,7 @@
 .character-card {
   position: relative;
   width: 100%;
-  padding: 1rem;
+  padding: 0.5rem;
   background-image: var(--scroll-with-base-background);
   background-size: 100% 100%;
   background-position: center;
@@ -20,7 +20,7 @@
   gap: 2rem;
 
   width: 100%;
-  padding: 1rem;
+  padding: 0.7rem;
 }
 
 .character-name-box {

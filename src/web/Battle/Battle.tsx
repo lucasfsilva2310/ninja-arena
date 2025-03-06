@@ -418,13 +418,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 onTimeEnd={handleTimeEnd}
                 turnCount={turnCount}
               />
-
-              <AvailableChakra
-                game={game}
-                activeChakras={player1ActiveChakras}
-                selectedChakras={selectedChakras}
-                setChakraTransformModal={setChakraTransformModal}
-              />
             </div>
 
             <PlayerInfo
@@ -435,8 +428,28 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             />
           </div>
 
-          <div className="battle-content">
-            <div className="end-turn-button-container">
+          <div className="battle-section">
+            <div className="board-section">
+              <PlayerBoard
+                game={game}
+                handleTargetClick={handleTargetClick}
+                possibleTargets={possibleTargets}
+                selectedActions={selectedActions}
+                removeSelectedAction={removeSelectedAction}
+                handleAbilityClick={handleAbilityClick}
+                playerActiveChakras={player1ActiveChakras}
+                isEnemy={false}
+                isPlayerTurn={isPlayerTurn}
+              />
+            </div>
+
+            <div className="center-column">
+              <AvailableChakra
+                game={game}
+                activeChakras={player1ActiveChakras}
+                selectedChakras={selectedChakras}
+                setChakraTransformModal={setChakraTransformModal}
+              />
               <button
                 onClick={executeTurn}
                 className="end-turn-button"
@@ -446,50 +459,33 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               </button>
             </div>
 
-            {/* Player 1 */}
-            <div className="teams-container">
-              <div className="team-container">
-                <PlayerBoard
-                  game={game}
-                  handleTargetClick={handleTargetClick}
-                  possibleTargets={possibleTargets}
-                  selectedActions={selectedActions}
-                  removeSelectedAction={removeSelectedAction}
-                  handleAbilityClick={handleAbilityClick}
-                  playerActiveChakras={player1ActiveChakras}
-                  isEnemy={false}
-                  isPlayerTurn={isPlayerTurn}
-                />
-              </div>
-
-              {/* Player 2 */}
-              <div className="team-container">
-                <PlayerBoard
-                  game={game}
-                  handleTargetClick={handleTargetClick}
-                  possibleTargets={possibleTargets}
-                  selectedActions={selectedActions}
-                  removeSelectedAction={removeSelectedAction}
-                  isEnemy={true}
-                  isPlayerTurn={isPlayerTurn}
-                />
-              </div>
+            <div className="board-section">
+              <PlayerBoard
+                game={game}
+                handleTargetClick={handleTargetClick}
+                possibleTargets={possibleTargets}
+                selectedActions={selectedActions}
+                removeSelectedAction={removeSelectedAction}
+                isEnemy={true}
+                isPlayerTurn={isPlayerTurn}
+              />
             </div>
           </div>
-        </div>
-        <div className="battle-footer">
-          <BattleOptions
-            onSurrender={handleSurrender}
-            onHistory={handleShowHistory}
-            onExample={() => {
-              /* implement later */
-            }}
-          />
-          <AbilityFooter
-            selectedCharacter={selectedCharacterForAbilitiesPreview}
-            currentSelectedAbility={selectedAbility}
-            context="battle"
-          />
+
+          <div className="battle-footer">
+            <BattleOptions
+              onSurrender={handleSurrender}
+              onHistory={handleShowHistory}
+              onExample={() => {
+                /* implement later */
+              }}
+            />
+            <AbilityFooter
+              selectedCharacter={selectedCharacterForAbilitiesPreview}
+              currentSelectedAbility={selectedAbility}
+              context="battle"
+            />
+          </div>
         </div>
       </div>
     </>
