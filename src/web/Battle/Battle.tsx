@@ -458,7 +458,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               >
                 End Turn
               </button>
-              <SpritesBoard game={game} />
+              <SpritesBoard
+                game={game}
+                selectedActions={selectedActions}
+                // TODO: Add isExecutingTurn new state
+                // isExecutingTurn={isExecutingTurn}
+              />
             </div>
 
             <div className="board-section">
