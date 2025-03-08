@@ -28,8 +28,8 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   const speed = 150; //ms
-  const width = 40;
-  const height = 40;
+  const width = 60;
+  const height = 60;
 
   const characterNameLower = characterName
     .toLowerCase()
@@ -46,6 +46,13 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
       `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-1.png`,
       `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-2.png`,
       `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-3.png`,
+      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-4.png`,
+      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-5.png`,
+      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-6.png`,
+      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-7.png`,
+      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-8.png`,
+      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-9.png`,
+      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-10.png`,
     ];
   } else {
     // Normal ability animation
@@ -100,6 +107,7 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
 
   // Function to handle image load errors
   const handleImageError = () => {
+    console.log("Failed to load image:", imagePaths[currentIndex]);
     setError(`Failed to load image: ${imagePaths[currentIndex]}`);
   };
 

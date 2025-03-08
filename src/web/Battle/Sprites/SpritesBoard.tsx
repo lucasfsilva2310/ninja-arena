@@ -50,9 +50,12 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
   // Track animation frame for coordinating effects
   const [animationFrame, setAnimationFrame] = useState(0);
 
+  // Track if animations have been initialized
+  const initialized = useRef(false);
   // Set up initial animations (all idle)
   useEffect(() => {
-    if (!isExecutingTurn) {
+    if (!initialized.current) {
+      // Only run on first mount to avoid resetting animations
       const initialAnimations: CharacterAnimation[] = [
         ...game.player1.characters.map((char, index) => ({
           characterName: normalizeString(char.name),
@@ -71,8 +74,9 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       ];
       setCharacterAnimations(initialAnimations);
       setDebugInfo("Initial animations set");
+      initialized.current = true;
     }
-  }, [isExecutingTurn]);
+  }, [game]);
 
   // Debug selectedActions and isExecutingTurn changes
   useEffect(() => {
@@ -95,16 +99,29 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     }
   }, [selectedActions, isExecutingTurn]);
 
-  // Handle turn execution
+  // Reset animations to idle when not executing turn
   useEffect(() => {
-    console.log("handleTurnExecution", isExecutingTurn, selectedActions.length);
+    if (!isExecutingTurn && animationPhase !== "idle") {
+      setAnimationPhase("idle");
+      setCharacterAnimations((prev) =>
+        prev.map((anim) => ({
+          ...anim,
+          abilityName: "idle",
+          isTarget: false,
+        }))
+      );
+      setDebugInfo((prev) => `${prev}\nReset to idle state`);
+    }
+  }, [isExecutingTurn, animationPhase]);
+
+  // Handle turn execution - CRITICAL ANIMATION TRIGGER
+  useEffect(() => {
     if (isExecutingTurn && selectedActions.length > 0) {
       // Reset to start fresh
-      // setAnimationPhase("idle");
       setCurrentActionIndex(0);
       setAnimationFrame(0);
 
-      // Start the animation sequence after a short delay
+      // Start the animation sequence immediately
       setAnimationPhase("executing");
       setDebugInfo(
         (prev) =>
@@ -113,100 +130,102 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     }
   }, [isExecutingTurn, selectedActions]);
 
-  // Handle animation phases
+  // Handle animation phases - MAIN ANIMATION LOGIC
   useEffect(() => {
-    console.log(
-      "handleAnimationPhases",
-      animationPhase,
-      selectedActions.length
-    );
+    // Don't proceed if we're idle or have no actions
     if (animationPhase === "idle" || selectedActions.length === 0) return;
 
-    setDebugInfo(
-      (prev) =>
-        `${prev}\nAnimation phase: ${animationPhase}, Action index: ${currentActionIndex}`
-    );
-
+    // Check if we've reached the end of all actions
     if (currentActionIndex >= selectedActions.length) {
       setAnimationPhase("idle");
       setCurrentActionIndex(0);
+      setDebugInfo((prev) => `${prev}\nCompleted all actions`);
       return;
     }
 
     const currentAction = selectedActions[currentActionIndex];
+
+    // Safety check
+    if (
+      !currentAction ||
+      !currentAction.character ||
+      !currentAction.target ||
+      !currentAction.ability
+    ) {
+      console.error("Invalid action data", currentAction);
+      setAnimationPhase("idle");
+      return;
+    }
+
     // Normalize the character and target names from the current action
     const normalizedCharacterName = normalizeString(
       currentAction.character.name
     );
     const normalizedTargetName = normalizeString(currentAction.target.name);
+    const normalizedAbilityName = normalizeString(currentAction.ability.name);
 
-    // Log the actual values to debug
-    console.log("Current action:", {
-      character: normalizedCharacterName,
-      ability: normalizeString(currentAction.ability.name),
+    // Determine which player is attacking and which is being targeted
+    // Position of the player is inverted because selectedActions are from the perspective of the attacking player
+    const targetPlayer = currentAction.player;
+    const attackingPlayer =
+      targetPlayer === game.player1 ? game.player2 : game.player1;
+
+    console.log("Action detailed info:", {
+      phase: animationPhase,
+      attacker: normalizedCharacterName,
+      attackingPlayer: attackingPlayer === game.player1 ? "player1" : "player2",
+      ability: normalizedAbilityName,
       target: normalizedTargetName,
-      player: currentAction.player === game.player1 ? "player1" : "player2",
+      targetPlayer: targetPlayer === game.player1 ? "player1" : "player2",
     });
 
-    console.log("beforeExecuting", animationPhase);
     if (animationPhase === "executing") {
       // Update animation for the character executing the ability
       setCharacterAnimations((prev) => {
-        // Log current animations for debugging
-        console.log("Current animations before update:", prev);
-
         const newAnimations = prev.map((anim) => {
-          // Simplified attacker matching logic
+          // COMPLETE REWRITE: Clear matching logic for the attacker
+
+          // First determine which player this animation character belongs to
+          const animationPlayer = anim.isEnemy ? game.player2 : game.player1;
+
+          // The character is an attacker if:
+          // 1. Its name matches the attacker's name AND
+          // 2. It belongs to the attacking player
           const isAttacker =
             anim.characterName === normalizedCharacterName &&
-            ((anim.isEnemy && currentAction.player === game.player2) ||
-              (!anim.isEnemy && currentAction.player === game.player1));
+            animationPlayer === attackingPlayer;
 
-          // Log matching attempt
-          if (anim.characterName === normalizedCharacterName) {
-            console.log("Found character match:", {
-              animName: anim.characterName,
-              animIsEnemy: anim.isEnemy,
-              actionPlayer:
-                currentAction.player === game.player1 ? "player1" : "player2",
-              isMatch: isAttacker,
-            });
+          if (isAttacker) {
+            console.log(
+              `CORRECT MATCH - Found attacker: ${anim.characterName} (${
+                anim.isEnemy ? "enemy" : "ally"
+              }), setting ability to ${normalizedAbilityName}`
+            );
+            return {
+              ...anim,
+              abilityName: normalizedAbilityName,
+              isTarget: false,
+            };
           }
 
-          return isAttacker
-            ? {
-                ...anim,
-                abilityName: normalizeString(currentAction.ability.name),
-              }
-            : anim;
+          return anim;
         });
 
-        // Log animations after update
-        console.log("New animations after update:", newAnimations);
-
-        setDebugInfo(
-          (prev) =>
-            `${prev}\nCharacter ${normalizedCharacterName} using ${normalizeString(
-              currentAction.ability.name
-            )}`
-        );
         return newAnimations;
       });
 
-      // Set a timer to track animation frames for coordination
+      // Set a timer to track animation frames
       const frameInterval = setInterval(() => {
         setAnimationFrame((prev) => {
           const nextFrame = prev + 1;
-          setDebugInfo(
-            (currentInfo) => `${currentInfo}\nAnimation frame: ${nextFrame}`
-          );
 
           // At frame 8, trigger the target reaction
           if (nextFrame >= 8) {
             clearInterval(frameInterval);
             setAnimationPhase("reacting");
             setDebugInfo(
-              (currentInfo) => `${currentInfo}\nTriggering damage reaction`
+              (currentInfo) =>
+                `${currentInfo}\nTriggering damage reaction for ${normalizedTargetName}`
             );
             return 0;
           }
@@ -220,39 +239,33 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     if (animationPhase === "reacting") {
       // Update animation for the target character to show damage
       setCharacterAnimations((prev) => {
-        // Log current animations
-        console.log("Current animations before damage:", prev);
-
         const newAnimations = prev.map((anim) => {
-          // Simplified target matching logic
+          // COMPLETE REWRITE: Clear matching logic for the target
+
+          // First determine which player this animation character belongs to
+          const animationPlayer = anim.isEnemy ? game.player2 : game.player1;
+
+          // The character is a target if:
+          // 1. Its name matches the target's name AND
+          // 2. It belongs to the target player
           const isTarget =
             anim.characterName === normalizedTargetName &&
-            ((anim.isEnemy && currentAction.player === game.player1) ||
-              (!anim.isEnemy && currentAction.player === game.player2));
-
-          // Log target match attempts
-          if (anim.characterName === normalizedTargetName) {
-            console.log("Found target match:", {
-              animName: anim.characterName,
-              animIsEnemy: anim.isEnemy,
-              actionPlayer:
-                currentAction.player === game.player1 ? "player1" : "player2",
-              isMatch: isTarget,
-            });
-          }
+            animationPlayer === targetPlayer;
 
           if (isTarget) {
-            setDebugInfo(
-              (currentInfo) =>
-                `${currentInfo}\nTarget ${normalizedTargetName} taking damage`
+            console.log(
+              `CORRECT MATCH - Found target: ${anim.characterName} (${
+                anim.isEnemy ? "enemy" : "ally"
+              }), setting damage animation`
             );
-            return { ...anim, abilityName: "damage", isTarget: true };
+            return {
+              ...anim,
+              abilityName: "damage",
+              isTarget: true,
+            };
           }
           return anim;
         });
-
-        // Log animations after damage update
-        console.log("New animations after damage:", newAnimations);
 
         return newAnimations;
       });
@@ -275,8 +288,6 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
           isTarget: false,
         }))
       );
-
-      setDebugInfo((prev) => `${prev}\nAction completed, resetting to idle`);
 
       // Move to the next action or complete the sequence
       setTimeout(() => {
@@ -304,13 +315,31 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     index: number
   ) => {
     const normalizedName = normalizeString(characterName);
+
+    // Log each lookup attempt for debugging
+    console.log(
+      `Looking for animation: ${normalizedName}, isEnemy=${isEnemy}, index=${index}`
+    );
+
+    const animation = characterAnimations.find(
+      (anim) =>
+        anim.characterName === normalizedName &&
+        anim.isEnemy === isEnemy &&
+        anim.index === index
+    );
+
+    if (!animation) {
+      console.warn(
+        `No animation found for: ${normalizedName}, isEnemy=${isEnemy}, index=${index}`
+      );
+    } else {
+      console.log(
+        `Found animation: ${animation.abilityName} for ${normalizedName}`
+      );
+    }
+
     return (
-      characterAnimations.find(
-        (anim) =>
-          anim.characterName === normalizedName &&
-          anim.isEnemy === isEnemy &&
-          anim.index === index
-      ) || {
+      animation || {
         characterName: normalizedName,
         isEnemy,
         abilityName: "idle",
@@ -323,16 +352,9 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
   return (
     <div className="sprites-board">
       <div className="sprites-arena">
-        <div className="sprites-row">
+        <div className="sprites-row asd ">
           {game.player1.characters.map((char, index) => {
             const animation = getCharacterAnimation(char.name, false, index);
-            console.log({
-              key: `player1-sprite-${index}`,
-              characterName: char.name,
-              abilityName: animation.abilityName,
-              isDamaged: animation.isTarget,
-              isEnemy: false,
-            });
             return (
               <SpriteAnimator
                 key={`player1-sprite-${index}`}
@@ -344,10 +366,9 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
             );
           })}
         </div>
-        <div className="sprites-row">
+        <div className="sprites-row dsa">
           {game.player2.characters.map((char, index) => {
             const animation = getCharacterAnimation(char.name, true, index);
-            console.log(characterAnimations);
             return (
               <SpriteAnimator
                 key={`player2-sprite-${index}`}

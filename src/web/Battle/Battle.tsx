@@ -67,6 +67,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   // Add a new state for the battle history modal
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
+  const [isExecutingTurn, setIsExecutingTurn] = useState(false);
+
   // Check if game is over
   useEffect(() => {
     if (game.checkGameOver()) {
@@ -240,21 +242,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       setSelectedActions(actionsWithoutRandom);
     }
 
-    // Execute the remaining valid actions (or empty list if all had Random)
-    executeRemainingActions(actionsWithoutRandom);
-  };
-
-  // New function to execute the remaining valid actions
-  const executeRemainingActions = (actionsToExecute: SelectedAction[]) => {
-    // Skip the random chakra modal entirely
-    game.executeTurn(actionsToExecute);
-    clearStates();
-    game.nextTurn(game.player2);
-    setIsPlayerTurn(false);
-    setTurnCount((prev) => prev + 1);
-
-    // Continue with AI turn
-    executeAITurn();
+    executeTurn();
   };
 
   const executeTurn = () => {
@@ -275,6 +263,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const finalizeTurn = async () => {
+    // TODO: Temporary solution for animations
+    setIsExecutingTurn(true);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    setIsExecutingTurn(false);
+    // TODO: think about adding while to wait for isExecutionTurn to be false
+    // From SpriteBoard before finalizeTurn
     chakrasToSwitchFromRandom.forEach((chakra) =>
       game.player1.consumeChakra(chakra)
     );
@@ -298,8 +292,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
     game.player2.characters.forEach((char) => {
       if (char.hp > 0) {
-        const availableAbilities = char.abilities.filter((ability) =>
-          ability.canUse(char, game.player2.chakras)
+        const availableAbilities = char.abilities.filter(
+          (ability) =>
+            ability.canUse(char, game.player2.chakras) &&
+            !ability.effects.find(
+              (effect) => effect.damageReduction?.amount === Infinity
+            )
         );
 
         if (availableAbilities.length > 0) {
@@ -461,8 +459,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               <SpritesBoard
                 game={game}
                 selectedActions={selectedActions}
-                // TODO: Add isExecutingTurn new state
-                // isExecutingTurn={isExecutingTurn}
+                isExecutingTurn={isExecutingTurn}
               />
             </div>
 
