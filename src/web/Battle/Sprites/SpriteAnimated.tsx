@@ -14,6 +14,7 @@ interface SpriteAnimatorProps {
   isEnemy?: boolean;
   abilityName?: string;
   isDamaged?: boolean;
+  showDebug?: boolean;
 }
 
 export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
@@ -21,11 +22,19 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
   isEnemy = false,
   abilityName = "idle",
   isDamaged = false,
+  showDebug = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Add debugging
   const [error, setError] = useState<string | null>(null);
+
+  // Debug utility function
+  const debugLog = (message: string) => {
+    if (showDebug) {
+      console.log(message);
+    }
+  };
 
   const speed = 150; //ms
   const width = 60;
@@ -88,6 +97,9 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
   useEffect(() => {
     if (!imagePaths || imagePaths.length === 0) {
       setError("No image paths available");
+      debugLog(
+        `No image paths available for ${characterName}, ability: ${abilityName}`
+      );
       return;
     }
 
@@ -103,12 +115,13 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
     }, speed);
 
     return () => clearInterval(interval);
-  }, [imagePaths.join(","), speed]); // Use a stable dependency
+  }, [imagePaths.join(","), speed, characterName, abilityName, showDebug]); // Use a stable dependency
 
   // Function to handle image load errors
   const handleImageError = () => {
-    console.log("Failed to load image:", imagePaths[currentIndex]);
-    setError(`Failed to load image: ${imagePaths[currentIndex]}`);
+    const errorMessage = `Failed to load image: ${imagePaths[currentIndex]}`;
+    debugLog(errorMessage);
+    setError(errorMessage);
   };
 
   return (
@@ -123,7 +136,7 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
         style={{ ...styles.image, width, height }}
         onError={handleImageError}
       />
-      {error && <div className="sprite-error">{error}</div>}
+      {showDebug && error && <div className="sprite-error">{error}</div>}
     </div>
   );
 };

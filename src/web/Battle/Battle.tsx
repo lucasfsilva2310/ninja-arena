@@ -425,6 +425,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 game={game}
                 selectedActions={selectedActions}
                 isExecutingTurn={isExecutingTurn}
+                showDebug={false}
               />
             </div>
 

@@ -39,6 +39,24 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
   const lastExecutingTurn = useRef(isExecutingTurn);
   const previousSelectedActions = useRef(selectedActions);
 
+  // Debugging utility functions
+  const debugLog = (message: string) => {
+    if (showDebug) {
+      console.log(message);
+    }
+  };
+
+  const debugWarn = (message: string) => {
+    if (showDebug) {
+      console.warn(message);
+    }
+  };
+
+  const debugError = (message: string) => {
+    // Always log errors, but could be conditionally controlled too
+    console.error(message);
+  };
+
   // Track current animations for all characters
   const [characterAnimations, setCharacterAnimations] = useState<
     CharacterAnimation[]
@@ -152,7 +170,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       !currentAction.target ||
       !currentAction.ability
     ) {
-      console.error("Invalid action data", currentAction);
+      debugError("Invalid action data" + JSON.stringify(currentAction));
       setAnimationPhase("idle");
       return;
     }
@@ -170,14 +188,18 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     const attackingPlayer =
       targetPlayer === game.player1 ? game.player2 : game.player1;
 
-    console.log("Action detailed info:", {
-      phase: animationPhase,
-      attacker: normalizedCharacterName,
-      attackingPlayer: attackingPlayer === game.player1 ? "player1" : "player2",
-      ability: normalizedAbilityName,
-      target: normalizedTargetName,
-      targetPlayer: targetPlayer === game.player1 ? "player1" : "player2",
-    });
+    debugLog(
+      "Action detailed info:" +
+        JSON.stringify({
+          phase: animationPhase,
+          attacker: normalizedCharacterName,
+          attackingPlayer:
+            attackingPlayer === game.player1 ? "player1" : "player2",
+          ability: normalizedAbilityName,
+          target: normalizedTargetName,
+          targetPlayer: targetPlayer === game.player1 ? "player1" : "player2",
+        })
+    );
 
     if (animationPhase === "executing") {
       // Update animation for the character executing the ability
@@ -196,7 +218,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
             animationPlayer === attackingPlayer;
 
           if (isAttacker) {
-            console.log(
+            debugLog(
               `CORRECT MATCH - Found attacker: ${anim.characterName} (${
                 anim.isEnemy ? "enemy" : "ally"
               }), setting ability to ${normalizedAbilityName}`
@@ -253,7 +275,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
             animationPlayer === targetPlayer;
 
           if (isTarget) {
-            console.log(
+            debugLog(
               `CORRECT MATCH - Found target: ${anim.characterName} (${
                 anim.isEnemy ? "enemy" : "ally"
               }), setting damage animation`
@@ -306,7 +328,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         }
       }, 500); // Slight delay between actions
     }
-  }, [animationPhase, currentActionIndex, selectedActions, game]);
+  }, [animationPhase, currentActionIndex, selectedActions, game, showDebug]);
 
   // Find the animation for a specific character
   const getCharacterAnimation = (
@@ -317,7 +339,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     const normalizedName = normalizeString(characterName);
 
     // Log each lookup attempt for debugging
-    console.log(
+    debugLog(
       `Looking for animation: ${normalizedName}, isEnemy=${isEnemy}, index=${index}`
     );
 
@@ -329,11 +351,11 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     );
 
     if (!animation) {
-      console.warn(
+      debugWarn(
         `No animation found for: ${normalizedName}, isEnemy=${isEnemy}, index=${index}`
       );
     } else {
-      console.log(
+      debugLog(
         `Found animation: ${animation.abilityName} for ${normalizedName}`
       );
     }
@@ -362,6 +384,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
                 isEnemy={false}
                 abilityName={animation.abilityName}
                 isDamaged={animation.isTarget}
+                showDebug={showDebug}
               />
             );
           })}
@@ -376,6 +399,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
                 isEnemy={true}
                 abilityName={animation.abilityName}
                 isDamaged={animation.isTarget}
+                showDebug={showDebug}
               />
             );
           })}
