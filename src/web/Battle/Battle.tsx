@@ -33,33 +33,65 @@ export interface SelectedAction {
 }
 
 export default function Battle({ game, onGameOver }: BattleProps) {
+  // State responsible for tracking selected actions
   const [selectedActions, setSelectedActions] = useState<SelectedAction[]>([]);
-  const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
-    null
-  );
+
+  // State responsible for tracking target character
+  const [abilityTargetCharacter, setAbilityTargetCharacter] =
+    useState<Character | null>(null);
+
+  // State responsible for tracking selected character for abilities preview
   const [
     selectedCharacterForAbilitiesPreview,
     setSelectedCharacterForAbilitiesPreview,
   ] = useState<Character | null>(null);
+
+  // State responsible for tracking selected ability
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
-  const [possibleTargets, setPossibleTargets] = useState<Character[]>([]);
-  const [showExchangeRandomFinalModal, setShowExchangeRandomFinalModal] =
-    useState(false);
+
+  // State responsible for tracking possible targets
+  const [
+    possibleTargetsForSelectedAbility,
+    setPossibleTargetsForSelectedAbility,
+  ] = useState<Character[]>([]);
+
+  // State responsible for tracking chakra transform modal
   const [showChakraTransformModal, setChakraTransformModal] = useState(false);
-  const [randomChakraCount, setRandomChakraCount] = useState(0);
-  const [chakrasToSwitchFromRandom, setChakrasToSwitchFromRandom] = useState<
-    ChakraType[]
-  >([]);
+
+  // State responsible for tracking random chakra count at end turn
+  const [randomChakraCountAtEndTurn, setRandomChakraCountAtEndTurn] =
+    useState(0);
+
+  // State responsible for tracking chakras to switch from random
+  const [choosenChakrasToUseAsRandom, setChoosenChakrasToUseAsRandom] =
+    useState<ChakraType[]>([]);
+
+  // State responsible for tracking selected chakras
   const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
+
+  // State responsible for tracking background
   const [background, setBackground] = useState<string>(
     "/backgrounds/battle/default.png"
   );
 
-  const [player1ActiveChakras, setPlayer1ActiveChakras] = useState<
+  // State responsible for tracking main player active chakras
+  const [mainPlayerActiveChakras, setMainPlayerActiveChakras] = useState<
     ChakraType[]
   >([]);
+
+  // State responsible for tracking if the player is turn
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
-  const [turnCount, setTurnCount] = useState(1);
+
+  // State responsible for tracking turn count
+  const [turnCount, setTurnCount] = useState(game.turn);
+
+  // State responsible for tracking chakra transformation and be trigger to re select available chakras
+  const [chakraTransformCount, setChakraTransformCount] = useState(0);
+
+  // State responsible for tracking if the turn is being executed
+  const [isExecutingTurn, setIsExecutingTurn] = useState(false);
+
+  // Modals
 
   // Add a new state for the surrender confirmation modal
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
@@ -67,7 +99,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   // Add a new state for the battle history modal
   const [showHistoryModal, setShowHistoryModal] = useState(false);
 
-  const [isExecutingTurn, setIsExecutingTurn] = useState(false);
+  // Add a new state for the exchange random final modal
+  const [showExchangeRandomFinalModal, setShowExchangeRandomFinalModal] =
+    useState(false);
 
   // Check if game is over
   useEffect(() => {
@@ -87,14 +121,15 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         chakras.push(chakra as ChakraType);
       }
     });
-    setPlayer1ActiveChakras(chakras);
-  }, [game.player1, selectedChakras, turnCount]);
+    setMainPlayerActiveChakras(chakras);
+  }, [game.player1, selectedChakras, turnCount, chakraTransformCount]);
 
   const handleTransformChakras = (
     chakrasToTransform: ChakraType[],
     targetChakra: ChakraType
   ) => {
-    game.player1.transformChakras(chakrasToTransform, targetChakra);
+    game.player1.transformChakras(chakrasToTransform, targetChakra, game);
+    setChakraTransformCount((prev) => prev + 1);
   };
 
   // Get random background
@@ -112,30 +147,30 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   }, []);
 
   const clearStates = () => {
-    setSelectedCharacter(null);
+    setAbilityTargetCharacter(null);
     setSelectedAbility(null);
     setSelectedActions([]);
-    setPossibleTargets([]);
-    setChakrasToSwitchFromRandom([]);
+    setPossibleTargetsForSelectedAbility([]);
+    setChoosenChakrasToUseAsRandom([]);
     setSelectedChakras([]);
     setShowExchangeRandomFinalModal(false);
     setSelectedCharacterForAbilitiesPreview(null);
-    setRandomChakraCount(0);
+    setRandomChakraCountAtEndTurn(0);
   };
 
   const clearActionStates = () => {
     setSelectedAbility(null);
     setSelectedActions([]);
-    setPossibleTargets([]);
+    setPossibleTargetsForSelectedAbility([]);
   };
 
   const handleAbilityClick = (character: Character, ability: Ability) => {
-    if (selectedAbility === ability && selectedCharacter === character) {
+    if (selectedAbility === ability && abilityTargetCharacter === character) {
       clearActionStates();
       return;
     }
     setSelectedCharacterForAbilitiesPreview(character);
-    setSelectedCharacter(character);
+    setAbilityTargetCharacter(character);
     setSelectedAbility(ability);
     let targets: Character[] = [];
 
@@ -161,14 +196,14 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         break;
     }
 
-    setPossibleTargets([...targets]);
+    setPossibleTargetsForSelectedAbility([...targets]);
   };
 
   const handleTargetClick = (player: Player, target: Character) => {
     setSelectedCharacterForAbilitiesPreview(target);
     setSelectedAbility(null);
 
-    if (!possibleTargets.includes(target)) {
+    if (!possibleTargetsForSelectedAbility.includes(target)) {
       return;
     }
 
@@ -177,7 +212,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         ...selectedActions,
         {
           player,
-          character: selectedCharacter || target,
+          character: abilityTargetCharacter || target,
           ability: selectedAbility,
           target,
         },
@@ -189,7 +224,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       ]);
 
       setSelectedAbility(null);
-      setPossibleTargets([]);
+      setPossibleTargetsForSelectedAbility([]);
     }
   };
 
@@ -198,24 +233,17 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       const updatedActions = [...prevActions];
       const removedAction = updatedActions.splice(index, 1)[0];
 
-      // Find the chakras that need to be removed from selectedChakras
-      // This is the problem area - it's using position rather than actual chakra types
       setSelectedChakras((prevChakras) => {
-        // Create a copy of the previous chakras
         const updatedChakras = [...prevChakras];
 
-        // Calculate the starting index of the chakras to remove
-        // Find all chakras consumed by actions before the one being removed
         let startIndex = 0;
         for (let i = 0; i < index; i++) {
           startIndex += prevActions[i].ability.requiredChakra.length;
         }
 
-        // Calculate the end index
         const endIndex =
           startIndex + removedAction.ability.requiredChakra.length;
 
-        // Remove the chakras corresponding to the removed action
         updatedChakras.splice(startIndex, endIndex - startIndex);
 
         return updatedChakras;
@@ -226,19 +254,18 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const handleTimeEnd = () => {
-    // Filter out actions that require Random chakra
     const actionsWithoutRandom = selectedActions.filter(
       (action) => !action.ability.requiredChakra.includes("Random")
     );
 
-    // If we removed any actions, update the selected chakras accordingly
-    if (actionsWithoutRandom.length !== selectedActions.length) {
-      // Keep only chakras from abilities without Random requirements
+    const actionsWithRandomDiffFromSelectedActions =
+      actionsWithoutRandom.length !== selectedActions.length;
+
+    if (actionsWithRandomDiffFromSelectedActions) {
       setSelectedChakras(
         actionsWithoutRandom.flatMap((action) => action.ability.requiredChakra)
       );
 
-      // Update the actions list to remove abilities with Random
       setSelectedActions(actionsWithoutRandom);
     }
 
@@ -254,7 +281,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     );
 
     if (totalRandoms > 0) {
-      setRandomChakraCount(totalRandoms);
+      setRandomChakraCountAtEndTurn(totalRandoms);
       setShowExchangeRandomFinalModal(true);
       return;
     }
@@ -269,14 +296,15 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setIsExecutingTurn(false);
     // TODO: think about adding while to wait for isExecutionTurn to be false
     // From SpriteBoard before finalizeTurn
-    chakrasToSwitchFromRandom.forEach((chakra) =>
+
+    choosenChakrasToUseAsRandom.forEach((chakra) =>
       game.player1.consumeChakra(chakra)
     );
     game.executeTurn(selectedActions);
     clearStates();
     game.nextTurn(game.player2);
     setIsPlayerTurn(false);
-    setTurnCount((prev) => prev + 1);
+    setTurnCount(game.turn);
     // AI Action
     await executeAITurn();
   };
@@ -367,17 +395,17 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     <>
       {showExchangeRandomFinalModal && (
         <ExchangeRandomChakraFinalModal
-          availableChakras={player1ActiveChakras}
-          requiredRandomCount={randomChakraCount}
-          chakrasToSwitchFromRandom={chakrasToSwitchFromRandom}
-          setChakrasToSwitchFromRandom={setChakrasToSwitchFromRandom}
+          availableChakras={mainPlayerActiveChakras}
+          requiredRandomCount={randomChakraCountAtEndTurn}
+          chakrasToSwitchFromRandom={choosenChakrasToUseAsRandom}
+          setChakrasToSwitchFromRandom={setChoosenChakrasToUseAsRandom}
           onConfirm={finalizeTurn}
           onClose={() => setShowExchangeRandomFinalModal(false)}
         />
       )}
       {showChakraTransformModal && (
         <ChakraTransformModal
-          availableChakras={player1ActiveChakras}
+          availableChakras={mainPlayerActiveChakras}
           onClose={() => setChakraTransformModal(false)}
           onTransform={handleTransformChakras}
         />
@@ -432,11 +460,11 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               <PlayerBoard
                 game={game}
                 handleTargetClick={handleTargetClick}
-                possibleTargets={possibleTargets}
+                possibleTargets={possibleTargetsForSelectedAbility}
                 selectedActions={selectedActions}
                 removeSelectedAction={removeSelectedAction}
                 handleAbilityClick={handleAbilityClick}
-                playerActiveChakras={player1ActiveChakras}
+                playerActiveChakras={mainPlayerActiveChakras}
                 isEnemy={false}
                 isPlayerTurn={isPlayerTurn}
               />
@@ -445,7 +473,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             <div className="center-column">
               <AvailableChakra
                 game={game}
-                activeChakras={player1ActiveChakras}
+                activeChakras={mainPlayerActiveChakras}
                 selectedChakras={selectedChakras}
                 setChakraTransformModal={setChakraTransformModal}
               />
@@ -467,7 +495,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               <PlayerBoard
                 game={game}
                 handleTargetClick={handleTargetClick}
-                possibleTargets={possibleTargets}
+                possibleTargets={possibleTargetsForSelectedAbility}
                 selectedActions={selectedActions}
                 removeSelectedAction={removeSelectedAction}
                 isEnemy={true}
