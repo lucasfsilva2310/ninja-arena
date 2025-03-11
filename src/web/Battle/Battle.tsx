@@ -33,119 +33,102 @@ export interface SelectedAction {
 }
 
 export default function Battle({ game, onGameOver }: BattleProps) {
-  // State responsible for tracking selected actions
+  // State for UI interaction
   const [selectedActions, setSelectedActions] = useState<SelectedAction[]>([]);
-
-  // State responsible for tracking target character
   const [abilityTargetCharacter, setAbilityTargetCharacter] =
     useState<Character | null>(null);
-
-  // State responsible for tracking selected character for abilities preview
   const [
     selectedCharacterForAbilitiesPreview,
     setSelectedCharacterForAbilitiesPreview,
   ] = useState<Character | null>(null);
-
-  // State responsible for tracking selected ability
   const [selectedAbility, setSelectedAbility] = useState<Ability | null>(null);
-
-  // State responsible for tracking possible targets
   const [
     possibleTargetsForSelectedAbility,
     setPossibleTargetsForSelectedAbility,
   ] = useState<Character[]>([]);
-
-  // State responsible for tracking chakra transform modal
   const [showChakraTransformModal, setChakraTransformModal] = useState(false);
-
-  // State responsible for tracking random chakra count at end turn
   const [randomChakraCountAtEndTurn, setRandomChakraCountAtEndTurn] =
     useState(0);
-
-  // State responsible for tracking chakras to switch from random
   const [choosenChakrasToUseAsRandom, setChoosenChakrasToUseAsRandom] =
     useState<ChakraType[]>([]);
-
-  // State responsible for tracking selected chakras
   const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
-
-  // State responsible for tracking background
   const [background, setBackground] = useState<string>(
     "/backgrounds/battle/default.png"
   );
-
-  // State responsible for tracking main player active chakras
   const [mainPlayerActiveChakras, setMainPlayerActiveChakras] = useState<
     ChakraType[]
   >([]);
-
-  // State responsible for tracking if the player is turn
-  const [isPlayerTurn, setIsPlayerTurn] = useState(true);
-
-  // State responsible for tracking turn count
-  const [turnCount, setTurnCount] = useState(game.turn);
-
-  // State responsible for tracking chakra transformation and be trigger to re select available chakras
-  const [chakraTransformCount, setChakraTransformCount] = useState(0);
-
-  // State responsible for tracking if the turn is being executed
   const [isExecutingTurn, setIsExecutingTurn] = useState(false);
 
-  // Modals
+  // State for game state mirroring
+  const [isPlayerTurn, setIsPlayerTurn] = useState(
+    game.currentPlayer === game.player1
+  );
+  const [turnCount, setTurnCount] = useState(game.turn);
+  const [gameStateVersion, setGameStateVersion] = useState(0);
 
-  // Add a new state for the surrender confirmation modal
+  // State for modals
   const [showSurrenderModal, setShowSurrenderModal] = useState(false);
-
-  // Add a new state for the battle history modal
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-
-  // Add a new state for the exchange random final modal
   const [showExchangeRandomFinalModal, setShowExchangeRandomFinalModal] =
     useState(false);
+
+  // Subscribe to game state changes
+  useEffect(() => {
+    const unsubscribe = game.subscribe(() => {
+      setGameStateVersion((prev) => prev + 1);
+      setIsPlayerTurn(game.currentPlayer === game.player1);
+      setTurnCount(game.turn);
+    });
+
+    return unsubscribe;
+  }, [game]);
 
   // Check if game is over
   useEffect(() => {
     if (game.checkGameOver()) {
       onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
     }
-  }, [onGameOver, game, selectedActions]);
+  }, [onGameOver, game, gameStateVersion]);
 
-  // Check active chakras everytime player1 instance changes, selectedChakras changes or turn changes
+  // Calculate active chakras
   useEffect(() => {
     const chakras: ChakraType[] = [];
-    Object.entries(game.player1.getChakraCount()).forEach(([chakra, count]) => {
-      const chakraCount =
-        count - selectedChakras.filter((c) => c === chakra).length;
+    const allChakras = [...game.player1.chakras];
 
-      for (let i = 0; i < chakraCount; i++) {
-        chakras.push(chakra as ChakraType);
+    // Count each chakra type
+    const chakraCounts: Record<string, number> = {};
+
+    allChakras.forEach((chakra) => {
+      chakraCounts[chakra] = (chakraCounts[chakra] || 0) + 1;
+    });
+
+    // Subtract selected chakras
+    selectedChakras.forEach((chakra) => {
+      chakraCounts[chakra] = (chakraCounts[chakra] || 0) - 1;
+    });
+
+    // Convert counts back to array
+    Object.entries(chakraCounts).forEach(([chakra, count]) => {
+      for (let i = 0; i < count; i++) {
+        if (count > 0) {
+          chakras.push(chakra as ChakraType);
+        }
       }
     });
+
     setMainPlayerActiveChakras(chakras);
-  }, [game.player1, selectedChakras, turnCount, chakraTransformCount]);
+  }, [game.player1.chakras, selectedChakras, gameStateVersion]);
 
-  const handleTransformChakras = (
-    chakrasToTransform: ChakraType[],
-    targetChakra: ChakraType
-  ) => {
-    game.player1.transformChakras(chakrasToTransform, targetChakra, game);
-    setChakraTransformCount((prev) => prev + 1);
-  };
-
-  // Get random background
+  // Background setup
   useEffect(() => {
-    const backgrounds = [
-      // "forest.png",
-      // "training.png",
-      // "akatsuki.png",
-      "waterfall.png",
-    ];
-
+    const backgrounds = ["waterfall.png"];
     const randomBackground =
       backgrounds[Math.floor(Math.random() * backgrounds.length)];
     setBackground(`/backgrounds/battle/${randomBackground}`);
   }, []);
 
+  // Utility functions
   const clearStates = () => {
     setAbilityTargetCharacter(null);
     setSelectedAbility(null);
@@ -164,16 +147,18 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setPossibleTargetsForSelectedAbility([]);
   };
 
+  // Handle user interactions
   const handleAbilityClick = (character: Character, ability: Ability) => {
     if (selectedAbility === ability && abilityTargetCharacter === character) {
       clearActionStates();
       return;
     }
+
     setSelectedCharacterForAbilitiesPreview(character);
     setAbilityTargetCharacter(character);
     setSelectedAbility(ability);
-    let targets: Character[] = [];
 
+    let targets: Character[] = [];
     switch (ability.target) {
       case "Enemy":
         targets = game.player2.characters.filter(
@@ -235,17 +220,13 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
       setSelectedChakras((prevChakras) => {
         const updatedChakras = [...prevChakras];
-
         let startIndex = 0;
         for (let i = 0; i < index; i++) {
           startIndex += prevActions[i].ability.requiredChakra.length;
         }
-
         const endIndex =
           startIndex + removedAction.ability.requiredChakra.length;
-
         updatedChakras.splice(startIndex, endIndex - startIndex);
-
         return updatedChakras;
       });
 
@@ -253,22 +234,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     });
   };
 
+  // Handle when timer ends
   const handleTimeEnd = () => {
-    const actionsWithoutRandom = selectedActions.filter(
-      (action) => !action.ability.requiredChakra.includes("Random")
-    );
-
-    const actionsWithRandomDiffFromSelectedActions =
-      actionsWithoutRandom.length !== selectedActions.length;
-
-    if (actionsWithRandomDiffFromSelectedActions) {
-      setSelectedChakras(
-        actionsWithoutRandom.flatMap((action) => action.ability.requiredChakra)
-      );
-
-      setSelectedActions(actionsWithoutRandom);
-    }
-
+    // Even if no actions were selected, still execute the turn
     executeTurn();
   };
 
@@ -290,88 +258,58 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const finalizeTurn = async () => {
-    // TODO: Temporary solution for animations
+    // Set executing turn state to show animations
     setIsExecutingTurn(true);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    setIsExecutingTurn(false);
-    // TODO: think about adding while to wait for isExecutionTurn to be false
-    // From SpriteBoard before finalizeTurn
 
-    choosenChakrasToUseAsRandom.forEach((chakra) =>
-      game.player1.consumeChakra(chakra)
-    );
+    // Handle random chakra replacements if needed
+    if (choosenChakrasToUseAsRandom.length > 0) {
+      game.replaceRandomChakras(
+        game.player1,
+        selectedActions.filter((action) =>
+          action.ability.requiredChakra.includes("Random")
+        ),
+        choosenChakrasToUseAsRandom
+      );
+    }
+
+    // Execute player actions (even if empty)
     game.executeTurn(selectedActions);
+
+    // Wait for animations
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    setIsExecutingTurn(false);
+
+    // Clear UI states
     clearStates();
+
+    // Change to AI's turn
     game.nextTurn(game.player2);
-    setIsPlayerTurn(false);
-    setTurnCount(game.turn);
-    // AI Action
+
+    // Execute AI turn after a delay
     await executeAITurn();
   };
 
-  // TODO: Randomized AI Turn
   const executeAITurn = async () => {
-    const aiActions: {
-      player: Player;
-      character: Character;
-      ability: Ability;
-      target: Character;
-    }[] = [];
+    // Set AI turn animation and wait
+    setIsExecutingTurn(true);
 
-    game.player2.characters.forEach((char) => {
-      if (char.hp > 0) {
-        const availableAbilities = char.abilities.filter(
-          (ability) =>
-            ability.canUse(char, game.player2.chakras) &&
-            !ability.effects.find(
-              (effect) => effect.damageReduction?.amount === Infinity
-            )
-        );
+    try {
+      // Execute AI actions
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      game.executeAITurn();
+    } catch (error) {
+      console.error("Error during AI turn:", error);
+    } finally {
+      // Always end the animation and update state
+      setIsExecutingTurn(false);
+    }
+  };
 
-        if (availableAbilities.length > 0) {
-          const randomAbility =
-            availableAbilities[
-              Math.floor(Math.random() * availableAbilities.length)
-            ];
-          let targets: Character[] = [];
-
-          switch (randomAbility.target) {
-            case "Enemy":
-              targets = game.player1.characters.filter((c) => c.hp > 0);
-              break;
-            case "AllEnemies":
-              targets = game.player1.characters;
-              break;
-            case "Ally":
-              targets = game.player2.characters.filter((c) => c.hp > 0);
-              break;
-            case "AllAllies":
-              targets = game.player2.characters;
-              break;
-            case "Self":
-              targets = [char];
-              break;
-          }
-
-          if (targets.length > 0) {
-            const target = targets[Math.floor(Math.random() * targets.length)];
-            aiActions.push({
-              player: game.player2,
-              character: char,
-              ability: randomAbility,
-              target,
-            });
-          }
-        }
-      }
-    });
-
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    game.executeTurn(aiActions);
-    game.nextTurn(game.player1);
-    setIsPlayerTurn(true);
-    setTurnCount((prev) => prev + 1);
+  const handleTransformChakras = (
+    chakrasToTransform: ChakraType[],
+    targetChakra: ChakraType
+  ) => {
+    game.transformChakras(game.player1, chakrasToTransform, targetChakra);
   };
 
   const handleSurrender = () => {
@@ -472,7 +410,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
             <div className="center-column">
               <AvailableChakra
-                game={game}
                 activeChakras={mainPlayerActiveChakras}
                 selectedChakras={selectedChakras}
                 setChakraTransformModal={setChakraTransformModal}
