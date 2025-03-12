@@ -26,7 +26,7 @@ interface BattleProps {
 }
 
 export default function Battle({ game, onGameOver }: BattleProps) {
-  // State for UI interaction - now keeping track of game engine's action queue
+  // State for UI interaction
   const [selectedActions, setSelectedActions] = useState<SelectedAction[]>([]);
   const [abilityTargetCharacter, setAbilityTargetCharacter] =
     useState<Character | null>(null);
@@ -46,12 +46,17 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     useState<ChakraType[]>([]);
   const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
   const [background, setBackground] = useState<string>(
-    "/backgrounds/battle/default.png"
+    "/backgrounds/battle/waterfall.png"
   );
   const [mainPlayerActiveChakras, setMainPlayerActiveChakras] = useState<
     ChakraType[]
   >([]);
+
+  // Animation control states
   const [isExecutingTurn, setIsExecutingTurn] = useState(false);
+  const [currentActionIndex, setCurrentActionIndex] = useState(0);
+  const [actionCompleted, setActionCompleted] = useState(false);
+  const [allActionsCompleted, setAllActionsCompleted] = useState(false);
 
   // State for game state mirroring
   const [isPlayerTurn, setIsPlayerTurn] = useState(
@@ -115,13 +120,30 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setMainPlayerActiveChakras(chakras);
   }, [game.player1.chakras, selectedChakras, gameStateVersion]);
 
-  // Background setup
+  // Handle animation completion
   useEffect(() => {
-    const backgrounds = ["waterfall.png"];
-    const randomBackground =
-      backgrounds[Math.floor(Math.random() * backgrounds.length)];
-    setBackground(`/backgrounds/battle/${randomBackground}`);
-  }, []);
+    if (actionCompleted) {
+      // Reset the flag
+      setActionCompleted(false);
+
+      // Check if there are more actions
+      if (currentActionIndex < selectedActions.length - 1) {
+        // Move to the next action
+        setCurrentActionIndex((prev) => prev + 1);
+      }
+    }
+  }, [actionCompleted, currentActionIndex, selectedActions]);
+
+  // Handle all actions completed
+  useEffect(() => {
+    if (allActionsCompleted) {
+      // Reset the flag
+      setAllActionsCompleted(false);
+
+      // Continue with turn finalization
+      finalizeTurnAfterAnimations();
+    }
+  }, [allActionsCompleted]);
 
   // Utility functions
   const clearStates = () => {
@@ -135,6 +157,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setShowExchangeRandomFinalModal(false);
     setSelectedCharacterForAbilitiesPreview(null);
     setRandomChakraCountAtEndTurn(0);
+    setCurrentActionIndex(0);
+    setActionCompleted(false);
+    setAllActionsCompleted(false);
   };
 
   const clearActionStates = () => {
@@ -261,6 +286,25 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     }
   };
 
+  // Handle action animation completion
+  const handleActionAnimationComplete = (actionIndex: number) => {
+    console.log(
+      `Action animation ${actionIndex} complete, executing action effect`
+    );
+
+    // Execute the action in the game engine
+    game.executeAction(actionIndex);
+
+    // Set the action as completed
+    setActionCompleted(true);
+  };
+
+  // Handle all animations completed
+  const handleAllAnimationsComplete = () => {
+    console.log("All action animations completed");
+    setAllActionsCompleted(true);
+  };
+
   // Handle when timer ends
   const handleTimeEnd = () => {
     // Even if no actions were selected, still execute the turn
@@ -268,6 +312,25 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const executeTurn = () => {
+    // If no actions were selected, just end the turn
+    if (selectedActions.length === 0) {
+      console.log("No actions selected, ending turn directly");
+
+      // End execution state - no animations needed
+      setIsExecutingTurn(false);
+
+      // Clear all states
+      clearStates();
+
+      // Change to AI's turn
+      game.nextTurn(game.player2);
+
+      // Execute AI turn after a delay
+      executeAITurn();
+      return;
+    }
+
+    // Continue with normal execution if there are actions
     const totalRandoms = selectedActions.reduce(
       (count, action) =>
         count +
@@ -282,13 +345,11 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       return;
     }
 
-    finalizeTurn();
+    startTurnExecution();
   };
 
-  const finalizeTurn = async () => {
-    // Set executing turn state to show animations
-    setIsExecutingTurn(true);
-
+  // Start the turn execution process
+  const startTurnExecution = () => {
     // Handle random chakra replacements if needed
     if (choosenChakrasToUseAsRandom.length > 0) {
       game.replaceRandomChakras(
@@ -300,14 +361,22 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       );
     }
 
-    // Execute player actions (even if empty) using game engine's internal queue
-    game.executeTurn();
+    // Reset action index and start executing animations
+    setCurrentActionIndex(0);
+    setIsExecutingTurn(true);
+  };
 
-    // Wait for animations
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+  // Finalize turn after all animations are complete
+  const finalizeTurnAfterAnimations = async () => {
+    console.log("Finalizing turn after all animations");
+
+    // Wait for a moment to let animations settle
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    // End execution state
     setIsExecutingTurn(false);
 
-    // Clear UI states
+    // Clear all states
     clearStates();
 
     // Change to AI's turn
@@ -317,20 +386,27 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     await executeAITurn();
   };
 
+  const finalizeTurn = () => {
+    // This is now just a wrapper around startTurnExecution
+    // Kept for compatibility with existing code
+    startTurnExecution();
+  };
+
   const executeAITurn = async () => {
     // Set AI turn animation and wait
-    setIsExecutingTurn(true);
+    const aiActions = game.generateAIActions();
 
-    try {
-      // Execute AI actions
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      game.executeAITurn();
-    } catch (error) {
-      console.error("Error during AI turn:", error);
-    } finally {
-      // Always end the animation and update state
-      setIsExecutingTurn(false);
-    }
+    // Set AI actions in the game engine
+    aiActions.forEach((action) => {
+      game.addSelectedAction(action);
+    });
+
+    // Start executing AI turn
+    setIsExecutingTurn(true);
+    setCurrentActionIndex(0);
+
+    // Animation and action execution will be handled by the SpritesBoard component
+    // and the useEffect hooks monitoring actionCompleted and allActionsCompleted
   };
 
   const handleTransformChakras = (
@@ -455,6 +531,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 selectedActions={selectedActions}
                 isExecutingTurn={isExecutingTurn}
                 showDebug={false}
+                onActionAnimationComplete={handleActionAnimationComplete}
+                onAllAnimationsComplete={handleAllAnimationsComplete}
+                currentActionIndex={currentActionIndex}
               />
             </div>
 

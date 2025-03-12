@@ -97,71 +97,75 @@ export class GameEngine {
     this.notifyStateChange();
   }
 
-  // Updated executeTurn to use the internal action queue
+  // Modified to execute a single action at a time
+  executeAction(actionIndex: number) {
+    if (!this.actionQueue[actionIndex]) {
+      this.addToHistory(`Action at index ${actionIndex} not found.`);
+      return false;
+    }
+
+    const action = this.actionQueue[actionIndex];
+
+    if (action.attackerCharacter.isAlive()) {
+      this.addToHistory(
+        `${action.attackerCharacter.name} used ${action.attackerAbility.name} on ${action.targetCharacter.name}!`
+      );
+
+      // Consume specific chakras
+      action.attackerAbility.requiredChakra
+        .filter((chakra) => chakra !== "Random")
+        .forEach((chakra) => {
+          action.attackerPlayer.consumeChakra(chakra);
+        });
+
+      // For random chakras on AI player
+      const randomChakraCount = action.attackerAbility.requiredChakra.filter(
+        (chakra) => chakra === "Random"
+      ).length;
+
+      if (randomChakraCount > 0 && action.attackerPlayer === this.player2) {
+        // For AI, automatically select random chakras to consume
+        const availableChakras = [...action.attackerPlayer.chakras];
+
+        // Now consume random chakras
+        for (let i = 0; i < randomChakraCount; i++) {
+          if (availableChakras.length > 0) {
+            const randomIndex = Math.floor(
+              Math.random() * availableChakras.length
+            );
+            const chakraToConsume = availableChakras[randomIndex];
+
+            action.attackerPlayer.consumeChakra(chakraToConsume);
+            availableChakras.splice(randomIndex, 1);
+          }
+        }
+      }
+
+      // Apply ability effect
+      action.attackerAbility.applyEffect(
+        action.attackerCharacter,
+        action.attackerAbility,
+        action.targetCharacter,
+        this
+      );
+
+      this.notifyStateChange();
+      return true;
+    }
+
+    return false;
+  }
+
+  // Keep this method for compatibility, but modify to use executeAction
   executeTurn() {
     const actions = [...this.actionQueue];
 
     if (actions.length === 0) {
       this.addToHistory(`${this.currentPlayer.name} took no action this turn.`);
     } else {
-      // Process each action
-      actions.forEach((action) => {
-        if (action.attackerCharacter.isAlive()) {
-          this.addToHistory(
-            `${action.attackerCharacter.name} used ${action.attackerAbility.name} on ${action.targetCharacter.name}!`
-          );
-          // Consume ALL required chakras, both specific and random
-          const specificChakraActions =
-            action.attackerAbility.requiredChakra.filter(
-              (chakra) => chakra !== chakraTypes.Random
-            );
-
-          // Consume specific chakras
-          specificChakraActions.forEach((chakra) => {
-            action.attackerPlayer.consumeChakra(chakra);
-          });
-
-          // For random chakras, we need to find available chakras to consume
-          const randomChakraCount =
-            action.attackerAbility.requiredChakra.filter(
-              (chakra) => chakra === chakraTypes.Random
-            ).length;
-
-          // If we have random chakra requirements, consume them from what's available
-          if (randomChakraCount > 0 && action.attackerPlayer === this.player2) {
-            // For AI, automatically select random chakras to consume
-            const availableChakras = [...action.attackerPlayer.chakras];
-
-            // Remove the specific chakras we just consumed
-            specificChakraActions.forEach((chakra) => {
-              const index = availableChakras.indexOf(chakra);
-              if (index !== -1) {
-                availableChakras.splice(index, 1);
-              }
-            });
-
-            // Now consume random chakras
-            for (let i = 0; i < randomChakraCount; i++) {
-              if (availableChakras.length > 0) {
-                const randomIndex = Math.floor(
-                  Math.random() * availableChakras.length
-                );
-                const chakraToConsume = availableChakras[randomIndex];
-                action.attackerPlayer.consumeChakra(chakraToConsume);
-                availableChakras.splice(randomIndex, 1);
-              }
-            }
-          }
-          // Note: For player1, random chakras are handled by replaceRandomChakras method
-
-          // Apply ability effect
-          action.attackerAbility.applyEffect(
-            action.attackerCharacter,
-            action.attackerAbility,
-            action.targetCharacter,
-            this
-          );
-        }
+      // Process each action in a batch for backwards compatibility
+      actions.forEach((_, index) => {
+        this.executeAction(index);
       });
     }
 
