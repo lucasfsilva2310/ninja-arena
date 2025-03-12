@@ -44,6 +44,11 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
   const lastExecutingTurn = useRef(isExecutingTurn);
   const previousSelectedActions = useRef(selectedActions);
 
+  // Add a tracking ref to prevent re-animating the same action
+  const processedActionIndices = useRef<number[]>([]);
+  // Add a flag to track if all animations are completed
+  const hasNotifiedCompletion = useRef(false);
+
   // Debugging utility functions
   const debugLog = (message: string) => {
     if (showDebug) {
@@ -118,6 +123,12 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         (prev) => `${prev}\nisExecutingTurn changed: ${isExecutingTurn}`
       );
       lastExecutingTurn.current = isExecutingTurn;
+
+      // Reset processed actions when execution state changes
+      if (isExecutingTurn) {
+        processedActionIndices.current = [];
+        hasNotifiedCompletion.current = false;
+      }
     }
   }, [selectedActions, isExecutingTurn]);
 
@@ -138,10 +149,13 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
 
   // Handle turn execution - CRITICAL ANIMATION TRIGGER
   useEffect(() => {
+    // Important: Only trigger animation if we haven't processed this action yet
     if (
       isExecutingTurn &&
       selectedActions.length > 0 &&
-      animationPhase === "idle"
+      animationPhase === "idle" &&
+      currentActionIndex < selectedActions.length &&
+      !processedActionIndices.current.includes(currentActionIndex)
     ) {
       // Start the animation sequence
       setAnimationPhase("executing");
@@ -263,10 +277,15 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     }
 
     if (animationPhase === "reacting") {
-      // This is the moment to trigger the actual ability effect in the game
-      // Notify the parent component that it's time to apply the current action's effect
-      onActionAnimationComplete &&
-        onActionAnimationComplete(currentActionIndex);
+      // Important: Add this action to processed list to prevent re-animation
+      if (!processedActionIndices.current.includes(currentActionIndex)) {
+        processedActionIndices.current.push(currentActionIndex);
+
+        // This is the moment to trigger the actual ability effect in the game
+        // Notify the parent component that it's time to apply the current action's effect
+        onActionAnimationComplete &&
+          onActionAnimationComplete(currentActionIndex);
+      }
 
       // Update animation for the target character to show damage
       setCharacterAnimations((prev) => {
@@ -322,7 +341,12 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       setAnimationPhase("idle");
 
       // Notify parent that all animations are complete if this was the last action
-      if (currentActionIndex === selectedActions.length - 1) {
+      if (
+        currentActionIndex === selectedActions.length - 1 &&
+        !hasNotifiedCompletion.current &&
+        processedActionIndices.current.length === selectedActions.length
+      ) {
+        hasNotifiedCompletion.current = true;
         onAllAnimationsComplete && onAllAnimationsComplete();
         setDebugInfo((prev) => `${prev}\nAll actions completed`);
       }
@@ -427,6 +451,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
           Animation Phase: {animationPhase}
           <br />
           Current Action: {currentActionIndex + 1}/{selectedActions.length}
+          <br />
+          Processed Actions: {processedActionIndices.current.join(", ")}
           <br />
           Animation Frame: {animationFrame}
           <br />
