@@ -163,98 +163,162 @@ export class GameEngine {
     return true;
   }
 
-  // Update generateAIActions to use the new SelectedAction structure
+  // Completely revised AI action generation with proper chakra tracking
   generateAIActions(): SelectedAction[] {
     const aiActions: SelectedAction[] = [];
 
-    this.player2.characters.forEach((char) => {
-      if (char.hp > 0) {
-        const availableAbilities = char.abilities.filter(
-          (ability) =>
-            ability.canUse(char, this.player2.chakras) &&
-            !ability.effects.find(
+    // Create a copy of available chakras to track consumption
+    let availableChakras = [...this.player2.chakras];
+
+    // Keep track of characters that have already acted
+    const actedCharacters: Character[] = [];
+
+    // Keep trying to find actions until no more can be added
+    let actionAdded = true;
+
+    while (actionAdded) {
+      actionAdded = false;
+
+      // Try each character that hasn't acted yet
+      for (const char of this.player2.characters) {
+        // Skip characters that are dead or already acted
+        if (!char.isAlive() || actedCharacters.includes(char)) {
+          continue;
+        }
+
+        // Filter abilities that can be used with current chakra
+        const availableAbilities = char.abilities.filter((ability) => {
+          // Skip defensive/invulnerability abilities for AI to make game more challenging
+          if (
+            ability.effects.find(
               (effect) => effect.damageReduction?.amount === Infinity
             )
-        );
+          ) {
+            return false;
+          }
 
+          // Check if we have the required chakras (both specific and enough for random)
+          const requiredChakras = [...ability.requiredChakra];
+          const tempChakras = [...availableChakras];
+
+          // First check specific chakras
+          for (const chakra of requiredChakras.filter((c) => c !== "Random")) {
+            const index = tempChakras.indexOf(chakra);
+            if (index === -1) return false;
+            tempChakras.splice(index, 1);
+          }
+
+          // Then check if we have enough remaining chakras for random requirements
+          const randomCount = requiredChakras.filter(
+            (c) => c === "Random"
+          ).length;
+          return tempChakras.length >= randomCount;
+        });
+
+        // If there are available abilities, choose one at random
         if (availableAbilities.length > 0) {
           const randomAbility =
             availableAbilities[
               Math.floor(Math.random() * availableAbilities.length)
             ];
-          let targets: Character[] = [];
 
+          // Find valid targets for this ability
+          let targets: Character[] = [];
           switch (randomAbility.target) {
             case "Enemy":
-              targets = this.player1.characters.filter((c) => c.hp > 0);
+              targets = this.player1.characters.filter(
+                (c) => c.isAlive() && !c.isInvulnerable()
+              );
               break;
             case "AllEnemies":
-              targets = this.player1.characters;
+              targets = this.player1.characters.filter(
+                (c) => c.isAlive() && !c.isInvulnerable()
+              );
               break;
             case "Ally":
-              targets = this.player2.characters.filter((c) => c.hp > 0);
+              targets = this.player2.characters.filter((c) => c.isAlive());
               break;
             case "AllAllies":
-              targets = this.player2.characters;
+              targets = this.player2.characters.filter((c) => c.isAlive());
               break;
             case "Self":
               targets = [char];
               break;
           }
 
+          // If there are valid targets, create and add an action
           if (targets.length > 0) {
             const target = targets[Math.floor(Math.random() * targets.length)];
-            aiActions.push({
+
+            // Create the action
+            const action: SelectedAction = {
               attackerPlayer: this.player2,
               attackerCharacter: char,
               attackerAbility: randomAbility,
               targetCharacter: target,
               targetPlayer: this.player1,
-            });
+            };
+
+            // Add the action
+            aiActions.push(action);
+            actedCharacters.push(char);
+
+            // IMPORTANT: Now immediately consume the required chakras
+            // First consume specific chakras
+            randomAbility.requiredChakra
+              .filter((chakra) => chakra !== "Random")
+              .forEach((chakra) => {
+                const index = availableChakras.indexOf(chakra);
+                if (index !== -1) {
+                  availableChakras.splice(index, 1);
+                }
+              });
+
+            // Then consume chakras for random requirements
+            const randomChakraCount = randomAbility.requiredChakra.filter(
+              (chakra) => chakra === "Random"
+            ).length;
+
+            for (let i = 0; i < randomChakraCount; i++) {
+              if (availableChakras.length > 0) {
+                // Take a random chakra from the available pool
+                const randomIndex = Math.floor(
+                  Math.random() * availableChakras.length
+                );
+                // This chakra will be used for the "Random" requirement
+                availableChakras.splice(randomIndex, 1);
+              }
+            }
+
+            // We successfully added an action this iteration
+            actionAdded = true;
+
+            // Break out of the character loop since we added an action
+            break;
           }
         }
       }
-    });
+    }
 
     return aiActions;
   }
 
-  // Improved AI turn execution - updated for new structure
+  // Updated AI turn execution - chakra consumption is now handled during generation
   executeAITurn() {
     const aiActions = this.generateAIActions();
 
     if (aiActions.length === 0) {
       this.addToHistory(`${this.player2.name} took no action this turn.`);
     } else {
-      // For Random chakras in AI abilities, select random replacements
-      aiActions.forEach((action) => {
-        const randomChakrasNeeded =
-          action.attackerAbility.requiredChakra.filter(
-            (c) => c === "Random"
-          ).length;
-        if (randomChakrasNeeded > 0) {
-          // Get available chakras (copy to avoid modifying while iterating)
-          const availableChakras = [...this.player2.chakras];
+      // Log the actions that will be performed
+      this.addToHistory(
+        `${this.player2.name} is performing ${aiActions.length} actions.`
+      );
 
-          // Select random chakras as replacements
-          for (
-            let i = 0;
-            i < randomChakrasNeeded && availableChakras.length > 0;
-            i++
-          ) {
-            const randomIndex = Math.floor(
-              Math.random() * availableChakras.length
-            );
-            const selectedChakra = availableChakras[randomIndex];
-            // Remove from available to avoid selecting the same twice
-            availableChakras.splice(randomIndex, 1);
-            // Consume the selected chakra
-            this.player2.consumeChakra(selectedChakra);
-          }
-        }
-      });
+      // Process random chakra requirements - this is now handled during generation
+      // so we don't need to do it here again
 
-      // Replace action queue with AI actions and execute
+      // Set the action queue and execute turn
       this.actionQueue = aiActions;
       this.executeTurn();
     }
