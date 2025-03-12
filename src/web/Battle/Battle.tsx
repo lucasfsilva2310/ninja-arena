@@ -2,7 +2,7 @@ import "./Battle.css";
 import "./BattleFooter/BattleFooter.css";
 
 import React, { useState, useEffect } from "react";
-import { GameEngine } from "../../models/game-engine";
+import { GameEngine, SelectedAction } from "../../models/game-engine";
 import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
 import { ChakraType } from "../../models/chakra.model";
@@ -25,15 +25,8 @@ interface BattleProps {
   onGameOver: (winner: string) => void;
 }
 
-export interface SelectedAction {
-  player: Player;
-  character: Character;
-  ability: Ability;
-  target: Character;
-}
-
 export default function Battle({ game, onGameOver }: BattleProps) {
-  // State for UI interaction
+  // State for UI interaction - now keeping track of game engine's action queue
   const [selectedActions, setSelectedActions] = useState<SelectedAction[]>([]);
   const [abilityTargetCharacter, setAbilityTargetCharacter] =
     useState<Character | null>(null);
@@ -79,6 +72,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       setGameStateVersion((prev) => prev + 1);
       setIsPlayerTurn(game.currentPlayer === game.player1);
       setTurnCount(game.turn);
+      // Sync with game engine's action queue
+      setSelectedActions(game.getActionQueue());
     });
 
     return unsubscribe;
@@ -132,7 +127,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const clearStates = () => {
     setAbilityTargetCharacter(null);
     setSelectedAbility(null);
-    setSelectedActions([]);
+    // Clear game engine's action queue
+    game.clearActionQueue();
     setPossibleTargetsForSelectedAbility([]);
     setChoosenChakrasToUseAsRandom([]);
     setSelectedChakras([]);
@@ -143,8 +139,38 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
   const clearActionStates = () => {
     setSelectedAbility(null);
-    setSelectedActions([]);
+    // Clear game engine's action queue
+    game.clearActionQueue();
     setPossibleTargetsForSelectedAbility([]);
+  };
+
+  // Helper to check if a character can use an ability based on available chakras
+  const hasEnoughChakrasForAbility = (ability: Ability): boolean => {
+    const availableChakras = [...mainPlayerActiveChakras];
+    const requiredChakras = [...ability.requiredChakra];
+
+    // Count how many specific and random chakras are needed
+    const specificChakras = requiredChakras.filter((c) => c !== "Random");
+    const randomChakraCount = requiredChakras.filter(
+      (c) => c === "Random"
+    ).length;
+
+    // Check if specific chakras are available
+    for (const chakra of specificChakras) {
+      const index = availableChakras.indexOf(chakra);
+      if (index === -1) return false;
+      availableChakras.splice(index, 1);
+    }
+
+    // Check if there are enough remaining chakras for the random requirements
+    return availableChakras.length >= randomChakraCount;
+  };
+
+  // Function to get all usable abilities for a character
+  const getUsableAbilities = (character: Character): Ability[] => {
+    return character.abilities.filter((ability) =>
+      hasEnoughChakrasForAbility(ability)
+    );
   };
 
   // Handle user interactions
@@ -193,15 +219,16 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     }
 
     if (selectedAbility) {
-      setSelectedActions([
-        ...selectedActions,
-        {
-          player,
-          character: abilityTargetCharacter || target,
-          ability: selectedAbility,
-          target,
-        },
-      ]);
+      // Add selected action to game engine's queue
+      const targetPlayer =
+        player === game.player1 ? game.player2 : game.player1;
+      game.addSelectedAction({
+        attackerPlayer: player,
+        attackerCharacter: abilityTargetCharacter || target,
+        attackerAbility: selectedAbility,
+        targetCharacter: target,
+        targetPlayer: targetPlayer,
+      });
 
       setSelectedChakras((prevChakras) => [
         ...prevChakras,
@@ -214,24 +241,25 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const removeSelectedAction = (index: number) => {
-    setSelectedActions((prevActions) => {
-      const updatedActions = [...prevActions];
-      const removedAction = updatedActions.splice(index, 1)[0];
+    // Remove action from game engine's queue
+    game.removeSelectedAction(index);
 
+    // Update selected chakras
+    const actionToRemove = selectedActions[index];
+    if (actionToRemove) {
       setSelectedChakras((prevChakras) => {
         const updatedChakras = [...prevChakras];
         let startIndex = 0;
         for (let i = 0; i < index; i++) {
-          startIndex += prevActions[i].ability.requiredChakra.length;
+          startIndex +=
+            selectedActions[i].attackerAbility.requiredChakra.length;
         }
         const endIndex =
-          startIndex + removedAction.ability.requiredChakra.length;
+          startIndex + actionToRemove.attackerAbility.requiredChakra.length;
         updatedChakras.splice(startIndex, endIndex - startIndex);
         return updatedChakras;
       });
-
-      return updatedActions;
-    });
+    }
   };
 
   // Handle when timer ends
@@ -244,7 +272,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     const totalRandoms = selectedActions.reduce(
       (count, action) =>
         count +
-        action.ability.requiredChakra.filter((c) => c === "Random").length,
+        action.attackerAbility.requiredChakra.filter((c) => c === "Random")
+          .length,
       0
     );
 
@@ -266,14 +295,14 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       game.replaceRandomChakras(
         game.player1,
         selectedActions.filter((action) =>
-          action.ability.requiredChakra.includes("Random")
+          action.attackerAbility.requiredChakra.includes("Random")
         ),
         choosenChakrasToUseAsRandom
       );
     }
 
-    // Execute player actions (even if empty)
-    game.executeTurn(selectedActions);
+    // Execute player actions (even if empty) using game engine's internal queue
+    game.executeTurn();
 
     // Wait for animations
     await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -405,6 +434,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 playerActiveChakras={mainPlayerActiveChakras}
                 isEnemy={false}
                 isPlayerTurn={isPlayerTurn}
+                getUsableAbilities={getUsableAbilities}
               />
             </div>
 
@@ -438,6 +468,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 removeSelectedAction={removeSelectedAction}
                 isEnemy={true}
                 isPlayerTurn={isPlayerTurn}
+                getUsableAbilities={getUsableAbilities}
               />
             </div>
           </div>

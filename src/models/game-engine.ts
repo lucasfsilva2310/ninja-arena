@@ -3,10 +3,21 @@ import { Character } from "./character.model";
 import { ChakraType } from "./chakra.model";
 import { Player } from "./player.model";
 
+// Define the new SelectedAction interface in the GameEngine file
+export interface SelectedAction {
+  attackerPlayer: Player;
+  attackerCharacter: Character;
+  attackerAbility: Ability;
+  targetCharacter: Character;
+  targetPlayer: Player;
+}
+
 export class GameEngine {
   turn: number = 0;
   currentPlayer: Player;
   actionHistory: string[] = [];
+  // New property for action queue
+  private actionQueue: SelectedAction[] = [];
   private stateListeners: Array<() => void> = [];
 
   constructor(public player1: Player, public player2: Player) {
@@ -23,6 +34,31 @@ export class GameEngine {
 
   private notifyStateChange() {
     this.stateListeners.forEach((listener) => listener());
+  }
+
+  // New method to add an action to the queue
+  addSelectedAction(action: SelectedAction): void {
+    this.actionQueue.push(action);
+    this.notifyStateChange();
+  }
+
+  // New method to remove an action from the queue
+  removeSelectedAction(index: number): void {
+    if (index >= 0 && index < this.actionQueue.length) {
+      this.actionQueue.splice(index, 1);
+      this.notifyStateChange();
+    }
+  }
+
+  // New method to get the current action queue
+  getActionQueue(): SelectedAction[] {
+    return [...this.actionQueue];
+  }
+
+  // New method to clear the action queue
+  clearActionQueue(): void {
+    this.actionQueue = [];
+    this.notifyStateChange();
   }
 
   addToHistory(message: string) {
@@ -45,6 +81,8 @@ export class GameEngine {
     player.receiveChakra(this.turn, this);
     player.processCooldowns(this);
     player.processActiveEffects(this);
+    // Clear action queue when turn changes
+    this.clearActionQueue();
     this.notifyStateChange();
   }
 
@@ -58,17 +96,56 @@ export class GameEngine {
     this.notifyStateChange();
   }
 
-  // Method to handle Random chakra replacements
+  // Updated executeTurn to use the internal action queue
+  executeTurn() {
+    const actions = [...this.actionQueue];
+
+    if (actions.length === 0) {
+      this.addToHistory(`${this.currentPlayer.name} took no action this turn.`);
+    } else {
+      // Process each action
+      actions.forEach((action) => {
+        if (action.attackerCharacter.isAlive()) {
+          this.addToHistory(
+            `${action.attackerCharacter.name} used ${action.attackerAbility.name} on ${action.targetCharacter.name}!`
+          );
+
+          // Consume required chakras (non-Random ones)
+          action.attackerAbility.requiredChakra
+            .filter((chakra) => chakra !== "Random")
+            .forEach((chakra) => {
+              action.attackerPlayer.consumeChakra(chakra);
+            });
+
+          // Apply ability effect
+          action.attackerAbility.applyEffect(
+            action.attackerCharacter,
+            action.attackerAbility,
+            action.targetCharacter,
+            this
+          );
+        }
+      });
+    }
+
+    // Clear the queue after execution
+    this.clearActionQueue();
+    this.checkGameOver();
+    this.notifyStateChange();
+  }
+
+  // Method to handle Random chakra replacements - updated for new structure
   replaceRandomChakras(
     player: Player,
-    actionsWithRandom: Array<{ ability: Ability }>,
+    actionsWithRandom: Array<{ attackerAbility: Ability }>,
     replacementChakras: ChakraType[]
   ) {
     // Count total Random chakras needed
     const totalRandomChakras = actionsWithRandom.reduce(
       (count, action) =>
         count +
-        action.ability.requiredChakra.filter((c) => c === "Random").length,
+        action.attackerAbility.requiredChakra.filter((c) => c === "Random")
+          .length,
       0
     );
 
@@ -86,60 +163,9 @@ export class GameEngine {
     return true;
   }
 
-  // Enhanced executeTurn to handle empty actions
-  executeTurn(
-    actions: {
-      player: Player;
-      character: Character;
-      ability: Ability;
-      target: Character;
-    }[]
-  ) {
-    if (actions.length === 0) {
-      this.addToHistory(`${this.currentPlayer.name} took no action this turn.`);
-    } else {
-      // Process each action
-      actions.forEach((action) => {
-        if (action.character.isAlive()) {
-          this.addToHistory(
-            `${action.character.name} used ${action.ability.name} on ${action.target.name}!`
-          );
-
-          // Consume required chakras (non-Random ones)
-          action.ability.requiredChakra
-            .filter((chakra) => chakra !== "Random")
-            .forEach((chakra) => {
-              action.player.consumeChakra(chakra);
-            });
-
-          // Apply ability effect
-          action.ability.applyEffect(
-            action.character,
-            action.ability,
-            action.target,
-            this
-          );
-        }
-      });
-    }
-
-    this.checkGameOver();
-    this.notifyStateChange();
-  }
-
-  // Method to generate AI actions
-  generateAIActions(): {
-    player: Player;
-    character: Character;
-    ability: Ability;
-    target: Character;
-  }[] {
-    const aiActions: {
-      player: Player;
-      character: Character;
-      ability: Ability;
-      target: Character;
-    }[] = [];
+  // Update generateAIActions to use the new SelectedAction structure
+  generateAIActions(): SelectedAction[] {
+    const aiActions: SelectedAction[] = [];
 
     this.player2.characters.forEach((char) => {
       if (char.hp > 0) {
@@ -179,10 +205,11 @@ export class GameEngine {
           if (targets.length > 0) {
             const target = targets[Math.floor(Math.random() * targets.length)];
             aiActions.push({
-              player: this.player2,
-              character: char,
-              ability: randomAbility,
-              target,
+              attackerPlayer: this.player2,
+              attackerCharacter: char,
+              attackerAbility: randomAbility,
+              targetCharacter: target,
+              targetPlayer: this.player1,
             });
           }
         }
@@ -192,7 +219,7 @@ export class GameEngine {
     return aiActions;
   }
 
-  // Improved AI turn execution
+  // Improved AI turn execution - updated for new structure
   executeAITurn() {
     const aiActions = this.generateAIActions();
 
@@ -201,9 +228,10 @@ export class GameEngine {
     } else {
       // For Random chakras in AI abilities, select random replacements
       aiActions.forEach((action) => {
-        const randomChakrasNeeded = action.ability.requiredChakra.filter(
-          (c) => c === "Random"
-        ).length;
+        const randomChakrasNeeded =
+          action.attackerAbility.requiredChakra.filter(
+            (c) => c === "Random"
+          ).length;
         if (randomChakrasNeeded > 0) {
           // Get available chakras (copy to avoid modifying while iterating)
           const availableChakras = [...this.player2.chakras];
@@ -226,8 +254,9 @@ export class GameEngine {
         }
       });
 
-      // Execute AI actions
-      this.executeTurn(aiActions);
+      // Replace action queue with AI actions and execute
+      this.actionQueue = aiActions;
+      this.executeTurn();
     }
 
     // Always move to next turn (back to player1)

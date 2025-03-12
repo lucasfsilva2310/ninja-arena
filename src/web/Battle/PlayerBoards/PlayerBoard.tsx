@@ -2,9 +2,8 @@ import "./PlayerBoard.css";
 import { Ability } from "../../../models/ability.model";
 import { ChakraType } from "../../../models/chakra.model";
 import { Character } from "../../../models/character.model";
-import { GameEngine } from "../../../models/game-engine";
+import { GameEngine, SelectedAction } from "../../../models/game-engine";
 import { Player } from "../../../models/player.model";
-import { SelectedAction } from "../Battle";
 import { CurrentActions } from "../ActionsAndEffects/CurrentActions";
 import { CurrentActionsOnEnemy } from "../ActionsAndEffects/CurrentActionsOnEnemy";
 import { Abilities } from "../Abilities/Abilities";
@@ -22,6 +21,7 @@ interface PlayerBoardProps {
   playerActiveChakras?: ChakraType[];
   isPlayerTurn: boolean;
   isEnemy: boolean;
+  getUsableAbilities?: (character: Character) => Ability[];
 }
 
 export const PlayerBoard: React.FC<PlayerBoardProps> = ({
@@ -34,6 +34,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   playerActiveChakras,
   isPlayerTurn,
   isEnemy,
+  getUsableAbilities,
 }) => {
   const player = isEnemy ? game.player2 : game.player1;
   const CharacterNameComponent = isEnemy
@@ -78,6 +79,11 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                   selectedActions={selectedActions}
                   handleAbilityClick={handleAbilityClick}
                   isPlayerTurn={!isEnemy && isPlayerTurn}
+                  usableAbilities={
+                    getUsableAbilities
+                      ? getUsableAbilities(char)
+                      : char.abilities
+                  }
                 />
               )}
             </div>

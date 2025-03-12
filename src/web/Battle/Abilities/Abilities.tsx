@@ -3,8 +3,8 @@ import React from "react";
 import { Character } from "../../../models/character.model";
 import { Ability } from "../../../models/ability.model";
 import { ChakraType } from "../../../models/chakra.model";
-import { SelectedAction } from "../Battle";
 import { getChakraColor } from "../../../utils/getChakraColor";
+import { SelectedAction } from "../../../models/game-engine";
 
 interface AbilitiesProps {
   character: Character;
@@ -12,6 +12,7 @@ interface AbilitiesProps {
   selectedActions: SelectedAction[];
   handleAbilityClick: (character: Character, ability: Ability) => void;
   isPlayerTurn?: boolean;
+  usableAbilities?: Ability[];
 }
 
 export const Abilities: React.FC<AbilitiesProps> = ({
@@ -20,15 +21,22 @@ export const Abilities: React.FC<AbilitiesProps> = ({
   selectedActions,
   handleAbilityClick,
   isPlayerTurn = true,
+  usableAbilities,
 }) => {
   return (
     <div className="abilities-container">
       {character.abilities.map((ability) => {
+        const isInUsableAbilities =
+          !usableAbilities || usableAbilities.includes(ability);
+
         const isAbilityDisabled =
           !isPlayerTurn ||
           !ability.canUse(character, activeChakras) ||
-          selectedActions.some((action) => action.character === character) ||
-          ability.isOnCooldown();
+          selectedActions.some(
+            (action) => action.attackerCharacter === character
+          ) ||
+          ability.isOnCooldown() ||
+          !isInUsableAbilities;
 
         return (
           <div
