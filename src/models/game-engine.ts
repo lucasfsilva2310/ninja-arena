@@ -1,6 +1,6 @@
 import { Ability } from "./ability.model";
 import { Character } from "./character.model";
-import { ChakraType } from "./chakra.model";
+import { ChakraType, chakraTypes } from "./chakra.model";
 import { Player } from "./player.model";
 
 // Define the new SelectedAction interface in the GameEngine file
@@ -24,7 +24,7 @@ export class GameEngine {
     this.currentPlayer = player1;
   }
 
-  // Observer pattern for state changes
+  // Observer pattern for state changes on React components
   subscribe(listener: () => void): () => void {
     this.stateListeners.push(listener);
     return () => {
@@ -32,6 +32,7 @@ export class GameEngine {
     };
   }
 
+  // Observer pattern for state changes on React components
   private notifyStateChange() {
     this.stateListeners.forEach((listener) => listener());
   }
@@ -109,13 +110,49 @@ export class GameEngine {
           this.addToHistory(
             `${action.attackerCharacter.name} used ${action.attackerAbility.name} on ${action.targetCharacter.name}!`
           );
+          // Consume ALL required chakras, both specific and random
+          const specificChakraActions =
+            action.attackerAbility.requiredChakra.filter(
+              (chakra) => chakra !== chakraTypes.Random
+            );
 
-          // Consume required chakras (non-Random ones)
-          action.attackerAbility.requiredChakra
-            .filter((chakra) => chakra !== "Random")
-            .forEach((chakra) => {
-              action.attackerPlayer.consumeChakra(chakra);
+          // Consume specific chakras
+          specificChakraActions.forEach((chakra) => {
+            action.attackerPlayer.consumeChakra(chakra);
+          });
+
+          // For random chakras, we need to find available chakras to consume
+          const randomChakraCount =
+            action.attackerAbility.requiredChakra.filter(
+              (chakra) => chakra === chakraTypes.Random
+            ).length;
+
+          // If we have random chakra requirements, consume them from what's available
+          if (randomChakraCount > 0 && action.attackerPlayer === this.player2) {
+            // For AI, automatically select random chakras to consume
+            const availableChakras = [...action.attackerPlayer.chakras];
+
+            // Remove the specific chakras we just consumed
+            specificChakraActions.forEach((chakra) => {
+              const index = availableChakras.indexOf(chakra);
+              if (index !== -1) {
+                availableChakras.splice(index, 1);
+              }
             });
+
+            // Now consume random chakras
+            for (let i = 0; i < randomChakraCount; i++) {
+              if (availableChakras.length > 0) {
+                const randomIndex = Math.floor(
+                  Math.random() * availableChakras.length
+                );
+                const chakraToConsume = availableChakras[randomIndex];
+                action.attackerPlayer.consumeChakra(chakraToConsume);
+                availableChakras.splice(randomIndex, 1);
+              }
+            }
+          }
+          // Note: For player1, random chakras are handled by replaceRandomChakras method
 
           // Apply ability effect
           action.attackerAbility.applyEffect(
@@ -134,7 +171,7 @@ export class GameEngine {
     this.notifyStateChange();
   }
 
-  // Method to handle Random chakra replacements - updated for new structure
+  // Method to handle Random chakra replacements
   replaceRandomChakras(
     player: Player,
     actionsWithRandom: Array<{ attackerAbility: Ability }>,

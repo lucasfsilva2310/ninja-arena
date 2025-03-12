@@ -211,23 +211,22 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const handleTargetClick = (player: Player, target: Character) => {
-    setSelectedCharacterForAbilitiesPreview(target);
-    setSelectedAbility(null);
-
     if (!possibleTargetsForSelectedAbility.includes(target)) {
+      setSelectedAbility(null);
       return;
     }
 
     if (selectedAbility) {
-      // Add selected action to game engine's queue
-      const targetPlayer =
-        player === game.player1 ? game.player2 : game.player1;
+      // Decide attacker from isPlayerTurn
+      const attackerPlayer = isPlayerTurn ? game.player1 : game.player2;
+
+      // Target is decided by the function argument
       game.addSelectedAction({
-        attackerPlayer: player,
+        attackerPlayer: attackerPlayer || player,
         attackerCharacter: abilityTargetCharacter || target,
         attackerAbility: selectedAbility,
         targetCharacter: target,
-        targetPlayer: targetPlayer,
+        targetPlayer: player,
       });
 
       setSelectedChakras((prevChakras) => [
