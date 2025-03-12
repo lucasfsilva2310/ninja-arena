@@ -376,14 +376,26 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     // End execution state
     setIsExecutingTurn(false);
 
-    // Clear all states
-    clearStates();
+    // Check whose turn it was and proceed accordingly
+    const isNotAI = game.currentPlayer === game.player1;
+    if (isNotAI) {
+      // It was player 1's turn, now switch to AI
+      // Clear all states
+      clearStates();
 
-    // Change to AI's turn
-    game.nextTurn(game.player2);
+      // Change to AI's turn
+      game.nextTurn(game.player2);
 
-    // Execute AI turn after a delay
-    await executeAITurn();
+      // Execute AI turn after a delay
+      await executeAITurn();
+    } else {
+      // It was AI's turn, now switch to player 1
+      // Clear all states
+      clearStates();
+
+      // Change to player 1's turn
+      game.nextTurn(game.player1);
+    }
   };
 
   const finalizeTurn = () => {
@@ -393,20 +405,42 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const executeAITurn = async () => {
-    // Set AI turn animation and wait
+    console.log("Executing AI turn");
+
+    // Generate AI actions
     const aiActions = game.generateAIActions();
+    console.log(`AI generated ${aiActions.length} actions`);
+
+    // If AI has no actions, just end its turn
+    if (aiActions.length === 0) {
+      console.log("AI has no actions, ending turn");
+
+      // Add a message to history
+      game.addToHistory(`${game.player2.name} took no action this turn.`);
+
+      // Move to player's turn
+      game.nextTurn(game.player1);
+      return;
+    }
 
     // Set AI actions in the game engine
     aiActions.forEach((action) => {
       game.addSelectedAction(action);
     });
 
+    // Reset animation-related state
+    setCurrentActionIndex(0);
+    setActionCompleted(false);
+    setAllActionsCompleted(false);
+
+    // Important: Set a small delay to ensure React state updates
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
     // Start executing AI turn
     setIsExecutingTurn(true);
-    setCurrentActionIndex(0);
 
-    // Animation and action execution will be handled by the SpritesBoard component
-    // and the useEffect hooks monitoring actionCompleted and allActionsCompleted
+    // We'll wait for the allActionsCompleted effect to handle the rest
+    // This is triggered by SpritesBoard component through handleAllAnimationsComplete
   };
 
   const handleTransformChakras = (

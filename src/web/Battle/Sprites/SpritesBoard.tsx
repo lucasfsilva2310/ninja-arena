@@ -157,17 +157,34 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       currentActionIndex < selectedActions.length &&
       !processedActionIndices.current.includes(currentActionIndex)
     ) {
-      // Start the animation sequence
-      setAnimationPhase("executing");
-      setAnimationFrame(0);
-      setDebugInfo(
-        (prev) =>
-          `${prev}\nStarting execution of action ${currentActionIndex + 1}/${
-            selectedActions.length
-          }`
+      debugLog(
+        `Starting animation for action ${currentActionIndex + 1}/${
+          selectedActions.length
+        }`
       );
+
+      // Add a small delay before starting new animations
+      // This creates visual separation between consecutive actions
+      setTimeout(() => {
+        // Start the animation sequence
+        setAnimationPhase("executing");
+        setAnimationFrame(0);
+        setDebugInfo(
+          (prev) =>
+            `${prev}\nStarting execution of action ${currentActionIndex + 1}/${
+              selectedActions.length
+            }`
+        );
+      }, 200);
     }
   }, [isExecutingTurn, selectedActions, animationPhase, currentActionIndex]);
+
+  // Store the current target character for the current action animation
+  const [currentAnimationTarget, setCurrentAnimationTarget] = useState<{
+    name: string;
+    isEnemy: boolean;
+    index: number;
+  } | null>(null);
 
   // Handle animation phases - MAIN ANIMATION LOGIC
   useEffect(() => {
@@ -208,6 +225,11 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     const attackerPlayer = currentAction.attackerPlayer;
     const targetPlayer = currentAction.targetPlayer;
 
+    // Find the target's index in its player's team
+    const targetIndex = targetPlayer.characters.findIndex(
+      (char) => char === currentAction.targetCharacter
+    );
+
     debugLog(
       "Action detailed info:" +
         JSON.stringify({
@@ -218,22 +240,37 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
           ability: normalizedAbilityName,
           target: normalizedTargetName,
           targetPlayer: targetPlayer === game.player1 ? "player1" : "player2",
+          targetIndex: targetIndex,
         })
     );
 
     if (animationPhase === "executing") {
+      // Store the current target for this animation
+      setCurrentAnimationTarget({
+        name: normalizedTargetName,
+        isEnemy: targetPlayer === game.player2,
+        index: targetIndex,
+      });
+
       // Update animation for the character executing the ability
       setCharacterAnimations((prev) => {
         const newAnimations = prev.map((anim) => {
           // First determine which player this animation character belongs to
           const animationPlayer = anim.isEnemy ? game.player2 : game.player1;
 
+          // Find the attacker's index in its player's team
+          const attackerIndex = attackerPlayer.characters.findIndex(
+            (char) => char === currentAction.attackerCharacter
+          );
+
           // The character is an attacker if:
           // 1. Its name matches the attacker's name AND
-          // 2. It belongs to the attacking player
+          // 2. It belongs to the attacking player AND
+          // 3. It has the same index as the attacker in the team
           const isAttacker =
             anim.characterName === normalizedCharacterName &&
-            animationPlayer === attackerPlayer;
+            animationPlayer === attackerPlayer &&
+            anim.index === attackerIndex;
 
           if (isAttacker) {
             debugLog(
@@ -265,7 +302,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
             setAnimationPhase("reacting");
             setDebugInfo(
               (currentInfo) =>
-                `${currentInfo}\nTriggering damage reaction for ${normalizedTargetName}`
+                `${currentInfo}\nTriggering damage reaction for ${normalizedTargetName} at index ${targetIndex}`
             );
             return 0;
           }
@@ -290,21 +327,18 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       // Update animation for the target character to show damage
       setCharacterAnimations((prev) => {
         const newAnimations = prev.map((anim) => {
-          // First determine which player this animation character belongs to
-          const animationPlayer = anim.isEnemy ? game.player2 : game.player1;
-
-          // The character is a target if:
-          // 1. Its name matches the target's name AND
-          // 2. It belongs to the target player
+          // IMPORTANT: Only animate the target that was stored for this specific animation
           const isTarget =
-            anim.characterName === normalizedTargetName &&
-            animationPlayer === targetPlayer;
+            currentAnimationTarget &&
+            anim.characterName === currentAnimationTarget.name &&
+            anim.isEnemy === currentAnimationTarget.isEnemy &&
+            anim.index === currentAnimationTarget.index;
 
           if (isTarget) {
             debugLog(
-              `CORRECT MATCH - Found target: ${anim.characterName} (${
+              `CORRECT TARGET MATCH - Found target: ${anim.characterName} (${
                 anim.isEnemy ? "enemy" : "ally"
-              }), setting damage animation`
+              }) at index ${anim.index}, setting damage animation`
             );
             return {
               ...anim,
@@ -320,14 +354,27 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
 
       // Set a timer for damage animation duration
       const damageTimer = setTimeout(() => {
-        setAnimationPhase("completed");
-        setDebugInfo((prev) => `${prev}\nDamage animation completed`);
+        setDebugInfo(
+          (prev) =>
+            `${prev}\nDamage animation completed for action ${
+              currentActionIndex + 1
+            }`
+        );
+
+        // Give a bit more time for the damage animation to be visible
+        setTimeout(() => {
+          setAnimationPhase("completed");
+          // Clear the current animation target when the animation completes
+          setCurrentAnimationTarget(null);
+        }, 300);
       }, 800); // Duration of damage animation
 
       return () => clearTimeout(damageTimer);
     }
 
     if (animationPhase === "completed") {
+      debugLog(`Completing action ${currentActionIndex + 1}`);
+
       // Reset characters to idle
       setCharacterAnimations((prev) =>
         prev.map((anim) => ({
@@ -340,16 +387,20 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       // Animation for current action is complete - reset to idle state for next action
       setAnimationPhase("idle");
 
-      // Notify parent that all animations are complete if this was the last action
-      if (
-        currentActionIndex === selectedActions.length - 1 &&
-        !hasNotifiedCompletion.current &&
-        processedActionIndices.current.length === selectedActions.length
-      ) {
-        hasNotifiedCompletion.current = true;
-        onAllAnimationsComplete && onAllAnimationsComplete();
-        setDebugInfo((prev) => `${prev}\nAll actions completed`);
-      }
+      // Add a significant delay between actions to make them visually distinct
+      setTimeout(() => {
+        // Notify parent that all animations are complete if this was the last action
+        if (
+          currentActionIndex === selectedActions.length - 1 &&
+          !hasNotifiedCompletion.current &&
+          processedActionIndices.current.length === selectedActions.length
+        ) {
+          debugLog("All actions completed, notifying parent");
+          hasNotifiedCompletion.current = true;
+          onAllAnimationsComplete && onAllAnimationsComplete();
+          setDebugInfo((prev) => `${prev}\nAll actions completed`);
+        }
+      }, 300); // Increased delay for better visual separation between actions
     }
   }, [
     animationPhase,
