@@ -34,6 +34,11 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
   const lastExecutingTurn = useRef(isExecutingTurn);
   const previousSelectedActions = useRef(selectedActions);
 
+  // Store the current animation phase in state to avoid infinite render loops
+  const [currentAnimationPhase, setCurrentAnimationPhase] = useState<string>(
+    animationController.getCurrentPhase()
+  );
+
   // Add a tracking ref to prevent re-animating the same action
   const processedActionIndices = useRef<number[]>([]);
   // Add a flag to track if all animations are completed
@@ -73,6 +78,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     const stateChangeSub = animationController.on(
       "stateChange",
       (data: any) => {
+        setCurrentAnimationPhase(data.phase);
         setDebugInfo((prev) => `${prev}\nAnimation phase: ${data.phase}`);
       }
     );
@@ -218,7 +224,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
   // Update character animations based on animation controller state
   useEffect(() => {
     const updateAnimations = () => {
-      const phase = animationController.getCurrentPhase();
+      // Use the current phase from state instead of calling getCurrentPhase
+      const phase = currentAnimationPhase;
       const animData = animationController.getAnimationData();
 
       if (phase === "idle" || !animData) {
@@ -296,7 +303,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     return () => {
       subscription();
     };
-  }, [game, selectedActions, currentActionIndex]);
+  }, [game, selectedActions, currentActionIndex, currentAnimationPhase]);
 
   // Find the animation for a specific character
   const getCharacterAnimation = (
@@ -389,7 +396,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         >
           <strong>Debug Info:</strong>
           <br />
-          Animation Phase: {animationController.getCurrentPhase()}
+          Animation Phase: {currentAnimationPhase}
           <br />
           Current Action: {currentActionIndex + 1}/{selectedActions.length}
           <br />

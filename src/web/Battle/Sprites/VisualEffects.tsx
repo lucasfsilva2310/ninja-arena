@@ -31,6 +31,7 @@ export const VisualEffects: React.FC<VisualEffectsProps> = ({
 }) => {
   const [activeEffects, setActiveEffects] = useState<EffectState[]>([]);
   const [lastActionId, setLastActionId] = useState<string | null>(null);
+  const [currentPhase, setCurrentPhase] = useState<string>("idle");
 
   // Debug utility
   const debugLog = (message: string) => {
@@ -45,6 +46,9 @@ export const VisualEffects: React.FC<VisualEffectsProps> = ({
     const stateChangeSub = animationController.on(
       "stateChange",
       (data: any) => {
+        // Update the current phase
+        setCurrentPhase(data.phase);
+
         // If the phase is 'attacking', this is a new action starting
         if (data.phase === "attacking") {
           // Generate unique ID for this action
@@ -57,6 +61,7 @@ export const VisualEffects: React.FC<VisualEffectsProps> = ({
     // Reset effects when animation completes
     const resetSub = animationController.on("reset", () => {
       setActiveEffects([]);
+      setCurrentPhase("idle");
     });
 
     return () => {
@@ -67,7 +72,7 @@ export const VisualEffects: React.FC<VisualEffectsProps> = ({
 
   // Process effects based on current animation phase
   useEffect(() => {
-    const phase = animationController.getCurrentPhase();
+    const phase = currentPhase;
     const animationData = animationController.getAnimationData();
     const effects = animationController.getActiveEffects();
 
@@ -134,17 +139,29 @@ export const VisualEffects: React.FC<VisualEffectsProps> = ({
         }),
       ]);
     }
+  }, [currentPhase, lastActionId]);
+
+  // Separate useEffect to handle cleanup of completed effects
+  useEffect(() => {
+    if (activeEffects.length === 0) return;
 
     // Cleanup completed effects
-    setActiveEffects((prev) =>
-      prev.filter(
-        (effect) =>
-          effect.progress < 1 ||
-          Date.now() - parseInt(effect.id.split("-")[2]) <
-            effect.effect.duration
-      )
-    );
-  }, [animationController.getCurrentPhase(), lastActionId, activeEffects]);
+    const cleanup = () => {
+      setActiveEffects((prev) =>
+        prev.filter(
+          (effect) =>
+            effect.progress < 1 ||
+            Date.now() - parseInt(effect.id.split("-")[2]) <
+              effect.effect.duration
+        )
+      );
+    };
+
+    // Run cleanup on a timer to avoid too many renders
+    const cleanupTimer = setTimeout(cleanup, 100);
+
+    return () => clearTimeout(cleanupTimer);
+  }, [activeEffects]);
 
   // Animate active effects
   useEffect(() => {
@@ -208,14 +225,13 @@ export const VisualEffects: React.FC<VisualEffectsProps> = ({
     // Fixed positions for demo - in real implementation, get these from the DOM
     if (positionSource === "attacker") {
       const context = animationController.getAnimationData();
-      const isEnemyAttacker =
-        animationController.getCurrentPhase() === "impact";
+      const isEnemyAttacker = currentPhase === "impact";
       return { x: isEnemyAttacker ? 200 : 100, y: 150 };
     }
 
     if (positionSource === "target") {
       const context = animationController.getAnimationData();
-      const isEnemyTarget = animationController.getCurrentPhase() === "impact";
+      const isEnemyTarget = currentPhase === "impact";
       return { x: isEnemyTarget ? 100 : 200, y: 150 };
     }
 
@@ -285,7 +301,7 @@ export const VisualEffects: React.FC<VisualEffectsProps> = ({
             <br />
             {activeEffects.length} active effects
             <br />
-            Phase: {animationController.getCurrentPhase()}
+            Phase: {currentPhase}
           </div>
         </div>
       )}

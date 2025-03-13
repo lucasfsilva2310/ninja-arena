@@ -1,6 +1,6 @@
 import "./Sprites.css";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 
 const styles = {
   image: {
@@ -45,48 +45,52 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
     .replace(/\s+/g, "") // Replace all spaces, not just the first one
     .trim();
 
-  // Build image paths based on ability name
-  let imagePaths = [];
+  // Use useMemo to create stable image paths
+  const imagePaths = useMemo(() => {
+    let paths = [];
 
-  // If showing damage animation, use that instead of the ability
-  if (isDamaged) {
-    imagePaths = [
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-0.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-1.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-2.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-3.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-4.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-5.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-6.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-7.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-8.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-9.png`,
-      `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-10.png`,
-    ];
-  } else {
-    // Normal ability animation
-    imagePaths = [
-      `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-0.png`,
-      `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-1.png`,
-      `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-2.png`,
-      `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-3.png`,
-      `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-4.png`,
-      `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-5.png`,
-    ];
+    // If showing damage animation, use that instead of the ability
+    if (isDamaged) {
+      paths = [
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-0.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-1.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-2.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-3.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-4.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-5.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-6.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-7.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-8.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-9.png`,
+        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-10.png`,
+      ];
+    } else {
+      // Normal ability animation
+      paths = [
+        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-0.png`,
+        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-1.png`,
+        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-2.png`,
+        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-3.png`,
+        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-4.png`,
+        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-5.png`,
+      ];
 
-    // Add more frames for non-idle abilities
-    if (abilityName !== "idle") {
-      imagePaths.push(
-        ...[
-          `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-6.png`,
-          `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-7.png`,
-          `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-8.png`,
-          `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-9.png`,
-          `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-10.png`,
-        ]
-      );
+      // Add more frames for non-idle abilities
+      if (abilityName !== "idle") {
+        paths.push(
+          ...[
+            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-6.png`,
+            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-7.png`,
+            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-8.png`,
+            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-9.png`,
+            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-10.png`,
+          ]
+        );
+      }
     }
-  }
+
+    return paths;
+  }, [characterNameLower, abilityName, isDamaged]);
 
   // Reset animation when props change
   useEffect(() => {
@@ -115,7 +119,7 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
     }, speed);
 
     return () => clearInterval(interval);
-  }, [imagePaths.join(","), speed, characterName, abilityName, showDebug]); // Use a stable dependency
+  }, [imagePaths, speed, characterName, abilityName, showDebug]); // Removed the join operation
 
   // Function to handle image load errors
   const handleImageError = () => {

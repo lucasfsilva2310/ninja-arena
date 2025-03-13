@@ -52,8 +52,8 @@ export const abilityAnimations: Record<string, AbilityAnimation> = {
   // Default animation for any ability
   default: {
     attacker: {
-      phases: ["attack", "recover"],
-      durations: [500, 300],
+      phases: ["attack"],
+      durations: [1000],
     },
     target: {
       phases: ["idle", "damaged"],
@@ -65,8 +65,8 @@ export const abilityAnimations: Record<string, AbilityAnimation> = {
   // Example specific ability animations
   fireball: {
     attacker: {
-      phases: ["attack", "recover"],
-      durations: [500, 300],
+      phases: ["attack"],
+      durations: [1000],
     },
     target: {
       phases: ["idle", "damaged"],
@@ -97,8 +97,8 @@ export const abilityAnimations: Record<string, AbilityAnimation> = {
 
   rasengan: {
     attacker: {
-      phases: ["attack", "recover"],
-      durations: [600, 300],
+      phases: ["attack"],
+      durations: [600],
     },
     target: {
       phases: ["idle", "damaged"],
