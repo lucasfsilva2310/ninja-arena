@@ -82,34 +82,156 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     return unsubscribe;
   }, [game]);
 
-  // Calculate active chakras
-  useEffect(() => {
-    const chakras: ChakraType[] = [];
+  // Calculate remaining chakras ONLY for ability availability checks
+  const getChakrasForAbilityAvailability = (): ChakraType[] => {
+    // Start with all player chakras
     const allChakras = [...game.player1.chakras];
 
-    // Count each chakra type
+    // Create a map to count chakras by type
     const chakraCounts: Record<string, number> = {};
 
+    // Count each chakra type
     allChakras.forEach((chakra) => {
       chakraCounts[chakra] = (chakraCounts[chakra] || 0) + 1;
     });
 
-    // Subtract selected chakras
-    selectedChakras.forEach((chakra) => {
-      chakraCounts[chakra] = (chakraCounts[chakra] || 0) - 1;
+    // Track specific chakras used by selected actions
+    selectedActions.forEach((action) => {
+      const requiredChakras = action.attackerAbility.requiredChakra;
+
+      // Subtract specific chakras first
+      requiredChakras.forEach((chakra) => {
+        if (chakra !== "Random") {
+          chakraCounts[chakra] = (chakraCounts[chakra] || 0) - 1;
+        }
+      });
     });
 
-    // Convert counts back to array
+    // Calculate how many random chakras are needed
+    const totalRandomNeeded = selectedActions.reduce(
+      (count, action) =>
+        count +
+        action.attackerAbility.requiredChakra.filter((c) => c === "Random")
+          .length,
+      0
+    );
+
+    // Calculate total remaining chakras
+    let totalRemainingChakras = 0;
+    const remainingChakras: ChakraType[] = [];
+
+    // Add remaining chakras to the array
     Object.entries(chakraCounts).forEach(([chakra, count]) => {
       for (let i = 0; i < count; i++) {
         if (count > 0) {
-          chakras.push(chakra as ChakraType);
+          remainingChakras.push(chakra as ChakraType);
+          totalRemainingChakras++;
         }
       }
     });
 
-    setMainPlayerActiveChakras(chakras);
-  }, [game.player1.chakras, selectedChakras, gameStateVersion]);
+    // If total random needed is greater than 0, we need to reserve chakras for those random requirements
+    if (totalRandomNeeded > 0) {
+      // Remove chakras that would be used for random requirements
+      remainingChakras.splice(
+        0,
+        Math.min(totalRandomNeeded, remainingChakras.length)
+      );
+    }
+
+    return remainingChakras;
+  };
+
+  // Calculate ALL active chakras available to the player (for UI display and modal)
+  const getAllAvailableChakras = (): ChakraType[] => {
+    // Start with all player chakras
+    const allChakras = [...game.player1.chakras];
+
+    // Create a map to count chakras by type
+    const chakraCounts: Record<string, number> = {};
+
+    // Count each chakra type
+    allChakras.forEach((chakra) => {
+      chakraCounts[chakra] = (chakraCounts[chakra] || 0) + 1;
+    });
+
+    // Track specific chakras used by selected actions
+    selectedActions.forEach((action) => {
+      const requiredChakras = action.attackerAbility.requiredChakra;
+
+      // Subtract ONLY specific chakras (not Random)
+      requiredChakras.forEach((chakra) => {
+        if (chakra !== "Random") {
+          chakraCounts[chakra] = (chakraCounts[chakra] || 0) - 1;
+        }
+      });
+    });
+
+    // Calculate available chakras
+    const availableChakras: ChakraType[] = [];
+
+    // Add remaining chakras to the array
+    Object.entries(chakraCounts).forEach(([chakra, count]) => {
+      for (let i = 0; i < count; i++) {
+        if (count > 0) {
+          availableChakras.push(chakra as ChakraType);
+        }
+      }
+    });
+
+    return availableChakras;
+  };
+
+  // Helper to check if a character can use an ability based on available chakras
+  const hasEnoughChakrasForAbility = (ability: Ability): boolean => {
+    // Get the chakras remaining after accounting for already selected actions
+    const remainingChakras = getChakrasForAbilityAvailability();
+    const requiredChakras = [...ability.requiredChakra];
+
+    // Count how many specific and random chakras are needed for this ability
+    const specificChakras = requiredChakras.filter((c) => c !== "Random");
+    const randomChakraCount = requiredChakras.filter(
+      (c) => c === "Random"
+    ).length;
+
+    // Create a copy of remaining chakras to work with
+    const availableChakras = [...remainingChakras];
+
+    // Check if specific chakras are available
+    for (const chakra of specificChakras) {
+      const index = availableChakras.indexOf(chakra);
+      if (index === -1) return false;
+      availableChakras.splice(index, 1);
+    }
+
+    // Check if there are enough remaining chakras for the random requirements
+    return availableChakras.length >= randomChakraCount;
+  };
+
+  // Calculate active chakras
+  useEffect(() => {
+    // Update mainPlayerActiveChakras to show ALL available chakras (not accounting for Random reservations)
+    const availableChakras = getAllAvailableChakras();
+    setMainPlayerActiveChakras(availableChakras);
+  }, [game.player1.chakras, selectedActions, gameStateVersion]);
+
+  // Sync selectedChakras with actual chakra usage for UI elements that depend on it
+  useEffect(() => {
+    // Calculate all used chakras (specific only, not reserving for Random)
+    const allUsedChakras: ChakraType[] = [];
+
+    // Add all specific chakras
+    selectedActions.forEach((action) => {
+      action.attackerAbility.requiredChakra.forEach((chakra) => {
+        if (chakra !== "Random") {
+          allUsedChakras.push(chakra);
+        }
+      });
+    });
+
+    // Set the selected chakras (used for UI display only)
+    setSelectedChakras(allUsedChakras);
+  }, [selectedActions]);
 
   // Handle animation completion
   useEffect(() => {
@@ -144,7 +266,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     game.clearActionQueue();
     setPossibleTargetsForSelectedAbility([]);
     setChoosenChakrasToUseAsRandom([]);
-    setSelectedChakras([]);
+
     setShowExchangeRandomFinalModal(false);
     setSelectedCharacterForAbilitiesPreview(null);
     setRandomChakraCountAtEndTurn(0);
@@ -158,28 +280,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     // Clear game engine's action queue
     game.clearActionQueue();
     setPossibleTargetsForSelectedAbility([]);
-  };
-
-  // Helper to check if a character can use an ability based on available chakras
-  const hasEnoughChakrasForAbility = (ability: Ability): boolean => {
-    const availableChakras = [...mainPlayerActiveChakras];
-    const requiredChakras = [...ability.requiredChakra];
-
-    // Count how many specific and random chakras are needed
-    const specificChakras = requiredChakras.filter((c) => c !== "Random");
-    const randomChakraCount = requiredChakras.filter(
-      (c) => c === "Random"
-    ).length;
-
-    // Check if specific chakras are available
-    for (const chakra of specificChakras) {
-      const index = availableChakras.indexOf(chakra);
-      if (index === -1) return false;
-      availableChakras.splice(index, 1);
-    }
-
-    // Check if there are enough remaining chakras for the random requirements
-    return availableChakras.length >= randomChakraCount;
   };
 
   // Function to get all usable abilities for a character
