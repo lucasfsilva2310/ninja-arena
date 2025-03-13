@@ -21,7 +21,6 @@
   border-radius: var(--radius-lg);
   width: 600px;
   max-width: 90%;
-  max-height: 40vh;
   box-shadow: var(--shadow-lg);
   text-align: center;
   position: relative;
