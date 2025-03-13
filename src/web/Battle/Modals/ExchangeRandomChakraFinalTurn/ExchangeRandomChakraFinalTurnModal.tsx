@@ -4,7 +4,7 @@ import {
   chakraTypesWithoutRandom,
   initialChakraObj,
 } from "../../../../models/chakra.model";
-import "./ExchangeRandomChakraFinalModal.css";
+import "./ExchangeRandomChakraFinalTurnModal.css";
 import { getChakraColor } from "../../../../utils/getChakraColor";
 
 interface ModalProps {
@@ -18,7 +18,7 @@ interface ModalProps {
   onClose: () => void;
 }
 
-export default function ExchangeRandomChakraFinalModal({
+export default function ExchangeRandomChakraFinalTurnModal({
   availableChakras,
   requiredRandomCount,
   chakrasToSwitchFromRandom,

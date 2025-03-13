@@ -7,7 +7,7 @@ import { Ability } from "../../models/ability.model";
 import { Character } from "../../models/character.model";
 import { ChakraType } from "../../models/chakra.model";
 import { Player } from "../../models/player.model";
-import ExchangeRandomChakraFinalModal from "./Modals/ExchangeRandomChakra/ExchangeRandomChakraFinalModal";
+import ExchangeRandomChakraFinalTurnModal from "./Modals/ExchangeRandomChakraFinalTurn/ExchangeRandomChakraFinalTurnModal";
 import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";
 import SurrenderConfirmationModal from "./Modals/SurrenderConfirmation/SurrenderConfirmationModal";
 import BattleHistoryModal from "./Modals/BattleHistory/BattleHistoryModal";
@@ -45,9 +45,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   const [choosenChakrasToUseAsRandom, setChoosenChakrasToUseAsRandom] =
     useState<ChakraType[]>([]);
   const [selectedChakras, setSelectedChakras] = useState<ChakraType[]>([]);
-  const [background, setBackground] = useState<string>(
-    "/backgrounds/battle/waterfall.png"
-  );
+  const [background, _] = useState<string>("/backgrounds/battle/waterfall.png");
   const [mainPlayerActiveChakras, setMainPlayerActiveChakras] = useState<
     ChakraType[]
   >([]);
@@ -300,8 +298,79 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
   // Handle when timer ends
   const handleTimeEnd = () => {
-    // Even if no actions were selected, still execute the turn
-    executeTurn();
+    // If there are any actions with Random chakra requirements, remove them
+    if (selectedActions.length > 0) {
+      // Filter out actions that need Random chakra
+      const filteredActions = selectedActions.filter(
+        (action) => !action.attackerAbility.requiredChakra.includes("Random")
+      );
+
+      // If we actually removed some actions, we need to update the game state
+      if (filteredActions.length !== selectedActions.length) {
+        console.log(
+          `Timer ended - Removed ${
+            selectedActions.length - filteredActions.length
+          } actions requiring Random chakra`
+        );
+
+        // Update the game's action queue with only specific chakra actions
+        game.clearActionQueue();
+        filteredActions.forEach((action) => game.addSelectedAction(action));
+
+        // Update selected chakras to match the filtered actions
+        const updatedChakras: ChakraType[] = [];
+        filteredActions.forEach((action) => {
+          action.attackerAbility.requiredChakra.forEach((chakra) => {
+            if (chakra !== "Random") {
+              updatedChakras.push(chakra);
+            }
+          });
+        });
+
+        // Directly set the selected chakras to the updated list
+        setSelectedChakras(updatedChakras);
+      }
+
+      // If there are no actions left after filtering, just end the turn
+      if (filteredActions.length === 0) {
+        console.log(
+          "No valid actions remain after removing Random chakra requirements"
+        );
+
+        // End execution state - no animations needed
+        setIsExecutingTurn(false);
+
+        // Clear all states
+        clearStates();
+
+        // Change to AI's turn
+        game.nextTurn(game.player2);
+
+        // Check for game over
+        if (game.checkGameOver()) {
+          onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
+          return;
+        }
+
+        // Execute AI turn after a delay
+        executeAITurn();
+        return;
+      }
+
+      // Execute turn with remaining actions, bypassing the Random chakra check
+      startTimerExpiredTurnExecution();
+    } else {
+      // No actions, just end the turn
+      executeTurn();
+    }
+  };
+
+  // Special execution for timer expiration - bypasses the Random chakra modal
+  const startTimerExpiredTurnExecution = () => {
+    // Reset action index and start executing animations immediately
+    // No need to check for Random chakra since we've already filtered those actions
+    setCurrentActionIndex(0);
+    setIsExecutingTurn(true);
   };
 
   const executeTurn = () => {
@@ -478,22 +547,31 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setShowHistoryModal(true);
   };
 
+  const handleCloseExchangeRandomFinalModal = () => {
+    setChoosenChakrasToUseAsRandom([]);
+    setShowExchangeRandomFinalModal(false);
+  };
+
+  const handleCloseChakraTransformModal = () => {
+    setChakraTransformModal(false);
+  };
+
   return (
     <>
       {showExchangeRandomFinalModal && (
-        <ExchangeRandomChakraFinalModal
+        <ExchangeRandomChakraFinalTurnModal
           availableChakras={mainPlayerActiveChakras}
           requiredRandomCount={randomChakraCountAtEndTurn}
           chakrasToSwitchFromRandom={choosenChakrasToUseAsRandom}
           setChakrasToSwitchFromRandom={setChoosenChakrasToUseAsRandom}
           onConfirm={finalizeTurn}
-          onClose={() => setShowExchangeRandomFinalModal(false)}
+          onClose={handleCloseExchangeRandomFinalModal}
         />
       )}
       {showChakraTransformModal && (
         <ChakraTransformModal
           availableChakras={mainPlayerActiveChakras}
-          onClose={() => setChakraTransformModal(false)}
+          onClose={handleCloseChakraTransformModal}
           onTransform={handleTransformChakras}
         />
       )}
