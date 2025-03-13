@@ -84,13 +84,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     return unsubscribe;
   }, [game]);
 
-  // Check if game is over
-  useEffect(() => {
-    if (game.checkGameOver()) {
-      onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
-    }
-  }, [onGameOver, game, gameStateVersion]);
-
   // Calculate active chakras
   useEffect(() => {
     const chakras: ChakraType[] = [];
@@ -325,6 +318,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
       // Change to AI's turn
       game.nextTurn(game.player2);
 
+      // Check for game over in case player's inaction led to defeat
+      if (game.checkGameOver()) {
+        onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
+        return;
+      }
+
       // Execute AI turn after a delay
       executeAITurn();
       return;
@@ -376,6 +375,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     // End execution state
     setIsExecutingTurn(false);
 
+    // Check for game over after all animations have completed
+    if (game.checkGameOver()) {
+      onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
+      return; // Don't proceed with turn transition if game is over
+    }
+
     // Check whose turn it was and proceed accordingly
     const isNotAI = game.currentPlayer === game.player1;
     if (isNotAI) {
@@ -417,6 +422,12 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
       // Add a message to history
       game.addToHistory(`${game.player2.name} took no action this turn.`);
+
+      // Check for game over in case AI won with no actions
+      if (game.checkGameOver()) {
+        onGameOver(game.player1.isDefeated() ? "IA venceu!" : "Você venceu!");
+        return;
+      }
 
       // Move to player's turn
       game.nextTurn(game.player1);
