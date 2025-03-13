@@ -2,6 +2,8 @@ import "./Sprites.css";
 import { useState, useEffect, useRef } from "react";
 import { GameEngine, SelectedAction } from "../../../models/game-engine";
 import { SpriteAnimator } from "./SpriteAnimated";
+import VisualEffects from "./VisualEffects";
+import animationController from "../../../services/AnimationController";
 
 interface SpritesBoardProps {
   game: GameEngine;
@@ -11,18 +13,6 @@ interface SpritesBoardProps {
   onActionAnimationComplete?: (actionIndex: number) => void; // Callback when an action animation completes
   onAllAnimationsComplete?: () => void; // Callback when all animations complete
   currentActionIndex: number; // Track which action is currently being animated
-}
-
-// Animation phases for action sequence
-type AnimationPhase = "idle" | "executing" | "reacting" | "completed";
-
-// Track individual character animations
-interface CharacterAnimation {
-  characterName: string;
-  isEnemy: boolean;
-  abilityName: string;
-  index: number;
-  isTarget: boolean;
 }
 
 // Helper function to normalize strings for comparison
@@ -67,42 +57,82 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     console.error(message);
   };
 
-  // Track current animations for all characters
+  // Track current animation phases for all characters
   const [characterAnimations, setCharacterAnimations] = useState<
-    CharacterAnimation[]
+    {
+      characterName: string;
+      isEnemy: boolean;
+      abilityName: string;
+      index: number;
+      isTarget: boolean;
+    }[]
   >([]);
 
-  // Track the current phase of animation
-  const [animationPhase, setAnimationPhase] = useState<AnimationPhase>("idle");
-  // Track animation frame for coordinating effects
-  const [animationFrame, setAnimationFrame] = useState(0);
-
-  // Track if animations have been initialized
-  const initialized = useRef(false);
-  // Set up initial animations (all idle)
+  // Subscribe to animation controller updates
   useEffect(() => {
-    if (!initialized.current) {
-      // Only run on first mount to avoid resetting animations
-      const initialAnimations: CharacterAnimation[] = [
-        ...game.player1.characters.map((char, index) => ({
-          characterName: normalizeString(char.name),
-          isEnemy: false,
-          abilityName: "idle",
-          index,
-          isTarget: false,
-        })),
-        ...game.player2.characters.map((char, index) => ({
-          characterName: normalizeString(char.name),
-          isEnemy: true,
-          abilityName: "idle",
-          index,
-          isTarget: false,
-        })),
-      ];
-      setCharacterAnimations(initialAnimations);
-      setDebugInfo("Initial animations set");
-      initialized.current = true;
-    }
+    const stateChangeSub = animationController.on(
+      "stateChange",
+      (data: any) => {
+        setDebugInfo((prev) => `${prev}\nAnimation phase: ${data.phase}`);
+      }
+    );
+
+    const actionCompleteSub = animationController.on(
+      "actionComplete",
+      (context: any) => {
+        if (
+          onActionAnimationComplete &&
+          !processedActionIndices.current.includes(currentActionIndex)
+        ) {
+          processedActionIndices.current.push(currentActionIndex);
+          onActionAnimationComplete(currentActionIndex);
+
+          // Check if all actions are complete
+          if (
+            currentActionIndex === selectedActions.length - 1 &&
+            !hasNotifiedCompletion.current &&
+            processedActionIndices.current.length === selectedActions.length
+          ) {
+            hasNotifiedCompletion.current = true;
+            onAllAnimationsComplete && onAllAnimationsComplete();
+            setDebugInfo((prev) => `${prev}\nAll actions completed`);
+          }
+        }
+      }
+    );
+
+    return () => {
+      stateChangeSub();
+      actionCompleteSub();
+    };
+  }, [
+    onActionAnimationComplete,
+    onAllAnimationsComplete,
+    currentActionIndex,
+    selectedActions.length,
+  ]);
+
+  // Initialize character animations
+  useEffect(() => {
+    // Set up initial animations (all idle)
+    const initialAnimations = [
+      ...game.player1.characters.map((char, index) => ({
+        characterName: normalizeString(char.name),
+        isEnemy: false,
+        abilityName: "idle",
+        index,
+        isTarget: false,
+      })),
+      ...game.player2.characters.map((char, index) => ({
+        characterName: normalizeString(char.name),
+        isEnemy: true,
+        abilityName: "idle",
+        index,
+        isTarget: false,
+      })),
+    ];
+    setCharacterAnimations(initialAnimations);
+    setDebugInfo("Initial animations set");
   }, [game]);
 
   // Debug selectedActions and isExecutingTurn changes
@@ -128,24 +158,12 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       if (isExecutingTurn) {
         processedActionIndices.current = [];
         hasNotifiedCompletion.current = false;
+      } else {
+        // Reset animations when not executing turn
+        animationController.reset();
       }
     }
   }, [selectedActions, isExecutingTurn]);
-
-  // Reset animations to idle when not executing turn
-  useEffect(() => {
-    if (!isExecutingTurn && animationPhase !== "idle") {
-      setAnimationPhase("idle");
-      setCharacterAnimations((prev) =>
-        prev.map((anim) => ({
-          ...anim,
-          abilityName: "idle",
-          isTarget: false,
-        }))
-      );
-      setDebugInfo((prev) => `${prev}\nReset to idle state`);
-    }
-  }, [isExecutingTurn, animationPhase]);
 
   // Handle turn execution - CRITICAL ANIMATION TRIGGER
   useEffect(() => {
@@ -153,7 +171,6 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
     if (
       isExecutingTurn &&
       selectedActions.length > 0 &&
-      animationPhase === "idle" &&
       currentActionIndex < selectedActions.length &&
       !processedActionIndices.current.includes(currentActionIndex)
     ) {
@@ -166,9 +183,28 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       // Add a small delay before starting new animations
       // This creates visual separation between consecutive actions
       setTimeout(() => {
-        // Start the animation sequence
-        setAnimationPhase("executing");
-        setAnimationFrame(0);
+        const currentAction = selectedActions[currentActionIndex];
+
+        // Safety check
+        if (
+          !currentAction ||
+          !currentAction.attackerCharacter ||
+          !currentAction.targetCharacter ||
+          !currentAction.attackerAbility
+        ) {
+          debugError("Invalid action data" + JSON.stringify(currentAction));
+          return;
+        }
+
+        // Start the animation using our controller
+        animationController.startAction(
+          currentAction.attackerPlayer,
+          currentAction.attackerCharacter,
+          currentAction.attackerAbility,
+          currentAction.targetCharacter,
+          currentAction.targetPlayer
+        );
+
         setDebugInfo(
           (prev) =>
             `${prev}\nStarting execution of action ${currentActionIndex + 1}/${
@@ -177,240 +213,90 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         );
       }, 200);
     }
-  }, [isExecutingTurn, selectedActions, animationPhase, currentActionIndex]);
+  }, [isExecutingTurn, selectedActions, currentActionIndex]);
 
-  // Store the current target character for the current action animation
-  const [currentAnimationTarget, setCurrentAnimationTarget] = useState<{
-    name: string;
-    isEnemy: boolean;
-    index: number;
-  } | null>(null);
-
-  // Handle animation phases - MAIN ANIMATION LOGIC
+  // Update character animations based on animation controller state
   useEffect(() => {
-    // Don't proceed if we're idle or have no actions
-    if (
-      animationPhase === "idle" ||
-      selectedActions.length === 0 ||
-      currentActionIndex >= selectedActions.length
-    )
-      return;
+    const updateAnimations = () => {
+      const phase = animationController.getCurrentPhase();
+      const animData = animationController.getAnimationData();
 
-    const currentAction = selectedActions[currentActionIndex];
-
-    // Safety check
-    if (
-      !currentAction ||
-      !currentAction.attackerCharacter ||
-      !currentAction.targetCharacter ||
-      !currentAction.attackerAbility
-    ) {
-      debugError("Invalid action data" + JSON.stringify(currentAction));
-      setAnimationPhase("idle");
-      return;
-    }
-
-    // Normalize the character and target names from the current action
-    const normalizedCharacterName = normalizeString(
-      currentAction.attackerCharacter.name
-    );
-    const normalizedTargetName = normalizeString(
-      currentAction.targetCharacter.name
-    );
-    const normalizedAbilityName = normalizeString(
-      currentAction.attackerAbility.name
-    );
-
-    // Determine which player is attacking and which is being targeted
-    const attackerPlayer = currentAction.attackerPlayer;
-    const targetPlayer = currentAction.targetPlayer;
-
-    // Find the target's index in its player's team
-    const targetIndex = targetPlayer.characters.findIndex(
-      (char) => char === currentAction.targetCharacter
-    );
-
-    debugLog(
-      "Action detailed info:" +
-        JSON.stringify({
-          phase: animationPhase,
-          attacker: normalizedCharacterName,
-          attackingPlayer:
-            attackerPlayer === game.player1 ? "player1" : "player2",
-          ability: normalizedAbilityName,
-          target: normalizedTargetName,
-          targetPlayer: targetPlayer === game.player1 ? "player1" : "player2",
-          targetIndex: targetIndex,
-        })
-    );
-
-    if (animationPhase === "executing") {
-      // Store the current target for this animation
-      setCurrentAnimationTarget({
-        name: normalizedTargetName,
-        isEnemy: targetPlayer === game.player2,
-        index: targetIndex,
-      });
-
-      // Update animation for the character executing the ability
-      setCharacterAnimations((prev) => {
-        const newAnimations = prev.map((anim) => {
-          // First determine which player this animation character belongs to
-          const animationPlayer = anim.isEnemy ? game.player2 : game.player1;
-
-          // Find the attacker's index in its player's team
-          const attackerIndex = attackerPlayer.characters.findIndex(
-            (char) => char === currentAction.attackerCharacter
-          );
-
-          // The character is an attacker if:
-          // 1. Its name matches the attacker's name AND
-          // 2. It belongs to the attacking player AND
-          // 3. It has the same index as the attacker in the team
-          const isAttacker =
-            anim.characterName === normalizedCharacterName &&
-            animationPlayer === attackerPlayer &&
-            anim.index === attackerIndex;
-
-          if (isAttacker) {
-            debugLog(
-              `CORRECT MATCH - Found attacker: ${anim.characterName} (${
-                anim.isEnemy ? "enemy" : "ally"
-              }), setting ability to ${normalizedAbilityName}`
-            );
-            return {
-              ...anim,
-              abilityName: normalizedAbilityName,
-              isTarget: false,
-            };
-          }
-
-          return anim;
-        });
-
-        return newAnimations;
-      });
-
-      // Set a timer to track animation frames
-      const frameInterval = setInterval(() => {
-        setAnimationFrame((prev) => {
-          const nextFrame = prev + 1;
-
-          // At frame 8, trigger the target reaction
-          if (nextFrame >= 8) {
-            clearInterval(frameInterval);
-            setAnimationPhase("reacting");
-            setDebugInfo(
-              (currentInfo) =>
-                `${currentInfo}\nTriggering damage reaction for ${normalizedTargetName} at index ${targetIndex}`
-            );
-            return 0;
-          }
-          return nextFrame;
-        });
-      }, 150); // Same speed as the animation in SpriteAnimated
-
-      return () => clearInterval(frameInterval);
-    }
-
-    if (animationPhase === "reacting") {
-      // Important: Add this action to processed list to prevent re-animation
-      if (!processedActionIndices.current.includes(currentActionIndex)) {
-        processedActionIndices.current.push(currentActionIndex);
-
-        // This is the moment to trigger the actual ability effect in the game
-        // Notify the parent component that it's time to apply the current action's effect
-        onActionAnimationComplete &&
-          onActionAnimationComplete(currentActionIndex);
+      if (phase === "idle" || !animData) {
+        // Reset all characters to idle when not animating
+        setCharacterAnimations((prev) =>
+          prev.map((anim) => ({
+            ...anim,
+            abilityName: "idle",
+            isTarget: false,
+          }))
+        );
+        return;
       }
 
-      // Update animation for the target character to show damage
+      // Get the current action being executed
+      const currentAction =
+        currentActionIndex < selectedActions.length
+          ? selectedActions[currentActionIndex]
+          : null;
+
+      if (!currentAction) return;
+
       setCharacterAnimations((prev) => {
-        const newAnimations = prev.map((anim) => {
-          // IMPORTANT: Only animate the target that was stored for this specific animation
+        return prev.map((anim) => {
+          // Check if this character is the attacker
+          const isAttacker =
+            normalizeString(currentAction.attackerCharacter.name) ===
+              anim.characterName &&
+            ((anim.isEnemy && currentAction.attackerPlayer === game.player2) ||
+              (!anim.isEnemy && currentAction.attackerPlayer === game.player1));
+
+          // Determine if this character is a target
           const isTarget =
-            currentAnimationTarget &&
-            anim.characterName === currentAnimationTarget.name &&
-            anim.isEnemy === currentAnimationTarget.isEnemy &&
-            anim.index === currentAnimationTarget.index;
+            phase === "impact" &&
+            normalizeString(currentAction.targetCharacter.name) ===
+              anim.characterName &&
+            ((anim.isEnemy && currentAction.targetPlayer === game.player2) ||
+              (!anim.isEnemy && currentAction.targetPlayer === game.player1));
 
-          if (isTarget) {
-            debugLog(
-              `CORRECT TARGET MATCH - Found target: ${anim.characterName} (${
-                anim.isEnemy ? "enemy" : "ally"
-              }) at index ${anim.index}, setting damage animation`
-            );
-            return {
-              ...anim,
-              abilityName: "damage",
-              isTarget: true,
-            };
+          // Set animation name based on character role and phase
+          let abilityName = "idle";
+
+          if (isAttacker) {
+            // Attacker animation
+            if (phase === "attacking") {
+              abilityName = normalizeString(currentAction.attackerAbility.name);
+            } else if (phase === "recovery") {
+              abilityName = "recover";
+            }
+          } else if (isTarget) {
+            // Target animation
+            if (phase === "impact") {
+              abilityName = "damaged";
+            }
           }
-          return anim;
+
+          return {
+            ...anim,
+            abilityName,
+            isTarget,
+          };
         });
-
-        return newAnimations;
       });
+    };
 
-      // Set a timer for damage animation duration
-      const damageTimer = setTimeout(() => {
-        setDebugInfo(
-          (prev) =>
-            `${prev}\nDamage animation completed for action ${
-              currentActionIndex + 1
-            }`
-        );
+    // Subscribe to animation controller state changes
+    const subscription = animationController.on(
+      "stateChange",
+      updateAnimations
+    );
 
-        // Give a bit more time for the damage animation to be visible
-        setTimeout(() => {
-          setAnimationPhase("completed");
-          // Clear the current animation target when the animation completes
-          setCurrentAnimationTarget(null);
-        }, 300);
-      }, 800); // Duration of damage animation
+    // Initial update
+    updateAnimations();
 
-      return () => clearTimeout(damageTimer);
-    }
-
-    if (animationPhase === "completed") {
-      debugLog(`Completing action ${currentActionIndex + 1}`);
-
-      // Reset characters to idle
-      setCharacterAnimations((prev) =>
-        prev.map((anim) => ({
-          ...anim,
-          abilityName: "idle",
-          isTarget: false,
-        }))
-      );
-
-      // Animation for current action is complete - reset to idle state for next action
-      setAnimationPhase("idle");
-
-      // Add a significant delay between actions to make them visually distinct
-      setTimeout(() => {
-        // Notify parent that all animations are complete if this was the last action
-        if (
-          currentActionIndex === selectedActions.length - 1 &&
-          !hasNotifiedCompletion.current &&
-          processedActionIndices.current.length === selectedActions.length
-        ) {
-          debugLog("All actions completed, notifying parent");
-          hasNotifiedCompletion.current = true;
-          onAllAnimationsComplete && onAllAnimationsComplete();
-          setDebugInfo((prev) => `${prev}\nAll actions completed`);
-        }
-      }, 300); // Increased delay for better visual separation between actions
-    }
-  }, [
-    animationPhase,
-    currentActionIndex,
-    selectedActions,
-    game,
-    showDebug,
-    onActionAnimationComplete,
-    onAllAnimationsComplete,
-  ]);
+    return () => {
+      subscription();
+    };
+  }, [game, selectedActions, currentActionIndex]);
 
   // Find the animation for a specific character
   const getCharacterAnimation = (
@@ -486,7 +372,11 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
             );
           })}
         </div>
+
+        {/* Add visual effects layer */}
+        <VisualEffects showDebug={showDebug} />
       </div>
+
       {showDebug && (
         <div
           className="debug-info"
@@ -499,13 +389,11 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         >
           <strong>Debug Info:</strong>
           <br />
-          Animation Phase: {animationPhase}
+          Animation Phase: {animationController.getCurrentPhase()}
           <br />
           Current Action: {currentActionIndex + 1}/{selectedActions.length}
           <br />
           Processed Actions: {processedActionIndices.current.join(", ")}
-          <br />
-          Animation Frame: {animationFrame}
           <br />
           {debugInfo}
         </div>
