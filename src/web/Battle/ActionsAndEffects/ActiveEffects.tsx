@@ -4,14 +4,16 @@ import { Character } from "../../../models/character.model";
 
 interface ActiveEffectsProps {
   character: Character;
+  isEnemy?: boolean;
 }
 
-export const ActiveEffects: React.FC<ActiveEffectsProps> = ({ character }) => {
-  // Group effects by ability name
+export const ActiveEffects: React.FC<ActiveEffectsProps> = ({
+  character,
+  isEnemy = false,
+}) => {
+  // Group effects by ability
   const groupedEffects = character.activeEffects.reduce((acc, effect) => {
-    if (!acc[effect.name]) {
-      acc[effect.name] = [];
-    }
+    acc[effect.name] = acc[effect.name] || [];
     acc[effect.name].push(effect);
     return acc;
   }, {} as Record<string, typeof character.activeEffects>);
@@ -20,18 +22,20 @@ export const ActiveEffects: React.FC<ActiveEffectsProps> = ({ character }) => {
     <div className="active-effects">
       {Object.entries(groupedEffects).map(([abilityName, effects]) => {
         // Get the longest duration among all effects for this ability
-        const maxDuration = Math.max(
-          ...effects.map(
-            (effect) =>
-              effect.damageReduction?.remainingTurns ||
-              effect.buff?.remainingTurns ||
-              effect.transformation?.remainingTurns ||
-              0
-          )
-        );
+        const maxDuration = effects.reduce((max, effect) => {
+          const duration =
+            effect.damageReduction?.remainingTurns ||
+            effect.buff?.remainingTurns ||
+            effect.transformation?.remainingTurns ||
+            0;
+          return Math.max(max, duration);
+        }, 0);
 
         return (
-          <div key={abilityName} className="effect-icon-container">
+          <div
+            key={abilityName}
+            className={`effect-icon-container ${isEnemy ? "enemy" : "player"}`}
+          >
             <img
               src={`/abilities/${character.name
                 .split(" ")

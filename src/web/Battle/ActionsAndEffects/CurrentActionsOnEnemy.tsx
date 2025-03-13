@@ -21,7 +21,7 @@ export const CurrentActionsOnEnemy: React.FC<CurrentActionsOnEnemyProps> = ({
           action.targetCharacter === character && (
             <div
               key={actionIndex}
-              className="effect-icon-container"
+              className="effect-icon-container enemy"
               onClick={() => removeSelectedAction(actionIndex)}
             >
               <img

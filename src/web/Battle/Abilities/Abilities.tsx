@@ -13,6 +13,7 @@ interface AbilitiesProps {
   handleAbilityClick: (character: Character, ability: Ability) => void;
   isPlayerTurn?: boolean;
   usableAbilities?: Ability[];
+  isEnemy?: boolean;
 }
 
 export const Abilities: React.FC<AbilitiesProps> = ({
@@ -22,6 +23,7 @@ export const Abilities: React.FC<AbilitiesProps> = ({
   handleAbilityClick,
   isPlayerTurn = true,
   usableAbilities,
+  isEnemy = false,
 }) => {
   return (
     <div className="abilities-container">
@@ -41,7 +43,7 @@ export const Abilities: React.FC<AbilitiesProps> = ({
         return (
           <div
             key={ability.name}
-            className={`ability-icon-container`}
+            className={`ability-icon-container ${isEnemy ? "enemy" : "player"}`}
             onClick={() =>
               !isAbilityDisabled && handleAbilityClick(character, ability)
             }
@@ -67,33 +69,6 @@ export const Abilities: React.FC<AbilitiesProps> = ({
                 {ability.currentCooldown}
               </div>
             )}
-            <div className="ability-tooltip">
-              <h4>{ability.name}</h4>
-              <p>{ability.description}</p>
-              <div className="ability-details">
-                <span>
-                  Chakra:{" "}
-                  {ability.requiredChakra.map((chakra, index) => (
-                    <React.Fragment key={index}>
-                      {index > 0 && ", "}
-                      <span
-                        style={{
-                          color: getChakraColor(chakra),
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {chakra}
-                      </span>
-                    </React.Fragment>
-                  ))}
-                </span>
-                {ability.currentCooldown > 0 && (
-                  <span className="cooldown">
-                    Cooldown: {ability.currentCooldown}
-                  </span>
-                )}
-              </div>
-            </div>
           </div>
         );
       })}

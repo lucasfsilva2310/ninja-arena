@@ -67,10 +67,11 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                   character={char}
                   selectedActions={selectedActions}
                   removeSelectedAction={removeSelectedAction}
+                  isEnemy={false}
                 />
               </div>
               <div className="character-effects">
-                <ActiveEffects character={char} />
+                <ActiveEffects character={char} isEnemy={false} />
               </div>
               {handleAbilityClick && playerActiveChakras && (
                 <Abilities
@@ -84,6 +85,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                       ? getUsableAbilities(char)
                       : char.abilities
                   }
+                  isEnemy={isEnemy}
                 />
               )}
             </div>
@@ -92,13 +94,14 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
           <>
             <div className="character-info-abilities-container">
               <div className="character-effects">
-                <ActiveEffects character={char} />
+                <ActiveEffects character={char} isEnemy={true} />
               </div>
               <div className="character-actions">
                 <ActionsComponent
                   character={char}
                   selectedActions={selectedActions}
                   removeSelectedAction={removeSelectedAction}
+                  isEnemy={true}
                 />
               </div>
             </div>

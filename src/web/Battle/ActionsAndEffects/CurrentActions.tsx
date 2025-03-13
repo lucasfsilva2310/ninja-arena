@@ -7,12 +7,14 @@ interface CurrentActionsProps {
   character: Character;
   selectedActions: SelectedAction[];
   removeSelectedAction: (index: number) => void;
+  isEnemy?: boolean;
 }
 
 export const CurrentActions: React.FC<CurrentActionsProps> = ({
   character,
   selectedActions,
   removeSelectedAction,
+  isEnemy = false,
 }) => {
   return (
     <div className="current-actions">
@@ -21,7 +23,9 @@ export const CurrentActions: React.FC<CurrentActionsProps> = ({
           action.targetCharacter === character && (
             <div
               key={action.attackerAbility.name + actionIndex}
-              className="effect-icon-container"
+              className={`effect-icon-container ${
+                isEnemy ? "enemy" : "player"
+              }`}
               onClick={() => removeSelectedAction(actionIndex)}
             >
               <img

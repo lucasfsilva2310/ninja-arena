@@ -9,7 +9,7 @@ export const getChakraColor = (chakraType: string): string => {
     case "Bloodline":
       return "#ef4444"; // Red
     case "Random":
-      return "#000000"; // Black
+      return "#ffffff"; // White
     default:
       return "#94a3b8"; // Default gray
   }

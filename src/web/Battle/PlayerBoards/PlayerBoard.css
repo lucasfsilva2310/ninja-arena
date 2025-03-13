@@ -21,10 +21,16 @@
 
   width: 100%;
   padding: 0.7rem;
+
+  overflow: visible;
+  position: relative;
 }
 
 .character-name-box {
   width: 40%;
+
+  overflow: visible;
+  position: relative;
 }
 
 .character-actions {
@@ -35,6 +41,9 @@
 
   height: 30px;
   width: 100%;
+
+  overflow: visible;
+  position: relative;
 }
 
 .character-info-abilities-container {
@@ -42,6 +51,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.05rem;
+
+  overflow: visible;
+  position: relative;
 }
 
 /* Effects Styling */
@@ -55,6 +67,9 @@
 
   height: 30px;
   width: 100%;
+
+  overflow: visible;
+  position: relative;
 }
 
 /* Player team (left side) effects and actions */
