@@ -1,5 +1,4 @@
-import { Ability } from "../../models/ability.model";
-import { Character } from "../../models/character.model";
+import { Ability } from "../../../models/ability.model";
 
 export const narutoKick = new Ability(
   "Naruto Kick",
@@ -70,10 +69,3 @@ export const kagebunshin = new Ability(
   ],
   "Self"
 );
-
-export const naruto = new Character("Naruto", [
-  kagebunshin,
-  narutoKick,
-  rasengan,
-  escapeClone,
-]);

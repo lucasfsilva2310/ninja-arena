@@ -1,6 +1,7 @@
 import "./Sprites.css";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { getSpritePaths } from "../../../config/animationConfig";
 
 const styles = {
   image: {
@@ -42,55 +43,47 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
 
   const characterNameLower = characterName
     .toLowerCase()
-    .replace(/\s+/g, "") // Replace all spaces, not just the first one
+    .replace(/\s+/g, "")
     .trim();
 
-  // Use useMemo to create stable image paths
+  // Use useMemo to create stable image paths, now using the configuration
   const imagePaths = useMemo(() => {
-    let paths = [];
+    let paths: string[] = [];
 
-    // If showing damage animation, use that instead of the ability
+    // If showing damage animation, use damage sprites
     if (isDamaged) {
-      paths = [
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-0.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-1.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-2.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-3.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-4.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-5.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-6.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-7.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-8.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-9.png`,
-        `characters/${characterNameLower}/sprites/damage/${characterNameLower}-sprites-10.png`,
-      ];
-    } else {
-      // Normal ability animation
-      paths = [
-        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-0.png`,
-        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-1.png`,
-        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-2.png`,
-        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-3.png`,
-        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-4.png`,
-        `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-5.png`,
-      ];
+      // Try to get from config first
+      const configPaths = getSpritePaths(characterName, "damaged", false);
 
-      // Add more frames for non-idle abilities
-      if (abilityName !== "idle") {
-        paths.push(
-          ...[
-            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-6.png`,
-            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-7.png`,
-            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-8.png`,
-            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-9.png`,
-            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-10.png`,
-          ]
+      if (configPaths.length > 0) {
+        paths = configPaths;
+      } else {
+        // Fallback to default pattern
+        paths = Array.from(
+          { length: 11 },
+          (_, i) =>
+            `characters/${characterNameLower}/sprites/damaged/${characterNameLower}-sprites-${i}.png`
+        );
+      }
+    } else {
+      // Try to get from config first
+      const configPaths = getSpritePaths(characterName, abilityName, true);
+
+      if (configPaths.length > 0) {
+        paths = configPaths;
+      } else {
+        // Fallback to default pattern with variable length based on ability
+        const frameCount = abilityName === "idle" ? 6 : 11;
+        paths = Array.from(
+          { length: frameCount },
+          (_, i) =>
+            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-${i}.png`
         );
       }
     }
 
     return paths;
-  }, [characterNameLower, abilityName, isDamaged]);
+  }, [characterNameLower, abilityName, isDamaged, characterName]);
 
   // Reset animation when props change
   useEffect(() => {

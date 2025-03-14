@@ -1,4 +1,6 @@
-import { ChakraType, chakraTypes } from "../models/chakra.model";
+import { ChakraType } from "../models/chakra.model";
+import { rockleeAnimations } from "./rocklee";
+import { sasukeAnimations } from "./sasuke";
 
 // Animation phases that a character can be in
 export type AnimationPhase =
@@ -25,115 +27,143 @@ export interface VisualEffect {
   color?: string; // Optional color tint
 }
 
-// Interface for character animation sequence
-export interface AnimationSequence {
-  phases: AnimationPhase[]; // Sequence of animation phases to play
-  durations: number[]; // Duration for each phase in ms
-  frames?: number[]; // Optional specific number of frames for each phase
+// Interface for sprite animation data
+export interface SpriteAnimationData {
+  sprites: string[]; // Array of sprite image paths
+  // Only need phases for fallback when no sprites are defined
+  phases?: AnimationPhase[]; // Optional sequence of animation phases (fallback)
 }
 
 // Main interface for ability animation data
 export interface AbilityAnimation {
-  attacker: AnimationSequence;
-  target: AnimationSequence;
+  attacker: SpriteAnimationData;
+  target: SpriteAnimationData;
   effects: VisualEffect[];
-  chakraColor?: ChakraType; // Optional chakra color for tinting effects
-  sound?: string; // Optional sound effect to play
+  chakraColor?: ChakraType;
+  sound?: string;
   camera?: {
-    // Optional camera movement
     shake?: boolean;
     zoom?: number;
     duration?: number;
   };
 }
 
-// Map of ability animations by ability name
-export const abilityAnimations: Record<string, AbilityAnimation> = {
-  // Default animation for any ability
+// Character ability animations organized by character -> ability
+export const characterAbilityAnimations: Record<
+  string,
+  Record<string, AbilityAnimation>
+> = {
+  // Default fallback when character/ability not found
   default: {
-    attacker: {
-      phases: ["attack"],
-      durations: [1000],
+    default: {
+      attacker: {
+        sprites: [],
+        phases: ["attack"],
+      },
+      target: {
+        sprites: [],
+        phases: ["idle", "damaged"],
+      },
+      effects: [],
     },
-    target: {
-      phases: ["idle", "damaged"],
-      durations: [500, 500],
-    },
-    effects: [],
   },
 
-  // Example specific ability animations
-  fireball: {
-    attacker: {
-      phases: ["attack"],
-      durations: [1000],
-    },
-    target: {
-      phases: ["idle", "damaged"],
-      durations: [500, 500],
-    },
-    effects: [
-      {
-        type: "projectile",
-        path: "effects/fireball",
-        start: "attacker",
-        end: "target",
-        startTime: 100,
-        duration: 600,
-        scale: 1.2,
-      },
-      {
-        type: "impact",
-        path: "effects/explosion",
-        start: "target",
-        startTime: 700,
-        duration: 400,
-        scale: 1.5,
-      },
-    ],
-    chakraColor: chakraTypes.Ninjutsu,
-    sound: "sounds/fireball.mp3",
+  // Sasuke's abilities
+  sasuke: {
+    default: sasukeAnimations.default,
+    fireball: sasukeAnimations.fireball,
+    chidori: sasukeAnimations.chidori,
   },
 
-  rasengan: {
-    attacker: {
-      phases: ["attack"],
-      durations: [600],
-    },
-    target: {
-      phases: ["idle", "damaged"],
-      durations: [600, 600],
-    },
-    effects: [
-      {
-        type: "aura",
-        path: "effects/chakra-swirl",
-        start: "attacker",
-        startTime: 100,
-        duration: 400,
-        scale: 1.2,
-        color: "#2196F3",
-      },
-      {
-        type: "impact",
-        path: "effects/rasengan-impact",
-        start: "target",
-        startTime: 700,
-        duration: 500,
-        scale: 1.8,
-      },
-    ],
-    chakraColor: chakraTypes.Ninjutsu,
-    sound: "sounds/rasengan.mp3",
-    camera: {
-      shake: true,
-      duration: 500,
-    },
+  // Rock Lee's abilities
+  rocklee: {
+    default: rockleeAnimations.default,
+    primarylotus: rockleeAnimations.primarylotus,
+    hiddenlotus: rockleeAnimations.hiddenlotus,
+    konohasenpu: rockleeAnimations.konohasenpu,
+    releaseweights: rockleeAnimations.releaseweights,
+    backflip: rockleeAnimations.backflip,
   },
 };
 
 // Helper function to get animation data for an ability
-export function getAbilityAnimation(abilityName: string): AbilityAnimation {
-  const normalizedName = abilityName.toLowerCase().replace(/\s+/g, "");
-  return abilityAnimations[normalizedName] || abilityAnimations.default;
+export function getAbilityAnimation(
+  characterName: string,
+  abilityName: string
+): AbilityAnimation {
+  const normalizedCharName = characterName.toLowerCase().replace(/\s+/g, "");
+  const normalizedAbilityName = abilityName.toLowerCase().replace(/\s+/g, "");
+
+  // Try to get character-specific ability
+  const character = characterAbilityAnimations[normalizedCharName];
+  if (character) {
+    // Try to get specific ability for this character
+    const ability = character[normalizedAbilityName];
+    if (ability) {
+      return ability;
+    }
+
+    // Fall back to character default
+    if (character.default) {
+      return character.default;
+    }
+  }
+
+  // Global fallback
+  return characterAbilityAnimations.default.default;
+}
+
+// Helper to calculate animation duration based on sprite count
+export function calculateAnimationDuration(
+  sprites: string[],
+  frameSpeed: number = 150
+): number {
+  return sprites.length * frameSpeed;
+}
+
+// Helper to get animation duration for a character, ability and phase
+export function getAnimationDuration(
+  characterName: string,
+  abilityName: string,
+  isAttacker: boolean = true,
+  frameSpeed: number = 150
+): number {
+  const sprites = getSpritePaths(characterName, abilityName, isAttacker);
+
+  // If we have sprites, use their count to determine duration
+  if (sprites.length > 0) {
+    return sprites.length * frameSpeed;
+  }
+
+  // Default fallback durations
+  return isAttacker ? 1000 : 500;
+}
+
+// Helper to get sprite paths for a character and ability
+export function getSpritePaths(
+  characterName: string,
+  abilityName: string,
+  isAttacker: boolean = true
+): string[] {
+  const animation = getAbilityAnimation(characterName, abilityName);
+  return isAttacker ? animation.attacker.sprites : animation.target.sprites;
+}
+
+// Add this utility function to generate sprite paths
+export function generateSpritePaths(
+  characterName: string,
+  abilityName: string,
+  frameCount: number,
+  startIndex: number = 0
+): string[] {
+  const normalizedCharName = characterName.toLowerCase().replace(/\s+/g, "");
+  const normalizedAbilityName = abilityName.toLowerCase().replace(/\s+/g, "");
+
+  return Array.from(
+    { length: frameCount },
+    (_, i) =>
+      `characters/${normalizedCharName}/sprites/${normalizedAbilityName}/${normalizedCharName}-sprites-${
+        i + startIndex
+      }.png`
+  );
 }

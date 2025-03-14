@@ -107,27 +107,34 @@ export class AnimationController {
 
   // Get dynamic timeout based on animation data if available
   private getDynamicTimeout(phase: AnimationPhase): number {
-    if (!this.context.animationData) {
+    if (!this.context.animationData || !this.context.attackerCharacter) {
       return this.phaseTimeouts[phase];
     }
 
-    // Use animation-specific durations if available
+    const frameSpeed = 150;
+    const attackerName = this.context.attackerCharacter.name;
+    const abilityName = this.context.attackerAbility?.name || "default";
+    const targetName = this.context.targetCharacter?.name || "";
+
     switch (phase) {
       case "attacking":
+        // Use sprite count to determine duration
         return (
-          this.context.animationData.attacker.durations[0] ||
+          this.context.animationData.attacker.sprites.length * frameSpeed ||
           this.phaseTimeouts[phase]
         );
+
       case "impact":
+        // Use target sprite count
         return (
-          this.context.animationData.target.durations[0] ||
+          this.context.animationData.target.sprites.length * frameSpeed ||
           this.phaseTimeouts[phase]
         );
+
       case "recovery":
-        return (
-          this.context.animationData.attacker.durations[1] ||
-          this.phaseTimeouts[phase]
-        );
+        // For recovery, we can use a fixed time or another sprite set
+        return this.phaseTimeouts[phase];
+
       default:
         return this.phaseTimeouts[phase];
     }
@@ -149,12 +156,18 @@ export class AnimationController {
       attackerAbility,
       targetPlayer,
       targetCharacter,
-      animationData: getAbilityAnimation(attackerAbility.name),
+      animationData: getAbilityAnimation(
+        attackerCharacter.name,
+        attackerAbility.name
+      ),
       currentPhase: "attacking",
-      activeEffects: getAbilityAnimation(attackerAbility.name).effects,
+      activeEffects: getAbilityAnimation(
+        attackerCharacter.name,
+        attackerAbility.name
+      ).effects,
     };
 
-    // Start the animation sequence directly with attacking (skipping preparation)
+    // Start the animation sequence directly with attacking
     this.setPhase("attacking");
     this.emit("actionStarted", this.context);
   }

@@ -1,6 +1,4 @@
-import { Ability } from "../../models/ability.model";
-import { Character } from "../../models/character.model";
-import { kawarimi } from "../abilities/kawarimi";
+import { Ability } from "../../../models/ability.model";
 
 export const fireball = new Ability(
   "Fireball",
@@ -55,10 +53,3 @@ export const sharingan = new Ability(
   ],
   "Self"
 );
-
-export const sasuke = new Character("Sasuke", [
-  fireball,
-  sharingan,
-  chidori,
-  kawarimi,
-]);

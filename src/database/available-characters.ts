@@ -1,5 +1,5 @@
 import { naruto } from "./characters/naruto";
-import { rockLee } from "./characters/rock-lee";
+import { rockLee } from "./characters/rocklee/rocklee";
 import { sakura } from "./characters/sakura";
 import { sasuke } from "./characters/sasuke";
 
