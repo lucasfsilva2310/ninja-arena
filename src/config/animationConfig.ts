@@ -1,4 +1,5 @@
 import { ChakraType } from "../models/chakra.model";
+import { narutoAnimations } from "./naruto";
 import { rockleeAnimations } from "./rocklee";
 import { sasukeAnimations } from "./sasuke";
 
@@ -66,6 +67,15 @@ export const characterAbilityAnimations: Record<
       },
       effects: [],
     },
+  },
+
+  // Naruto's abilities
+  naruto: {
+    default: narutoAnimations.default,
+    rasengan: narutoAnimations.rasengan,
+    escapeclone: narutoAnimations.escapeclone,
+    kagebunshin: narutoAnimations.kagebunshin,
+    narutokick: narutoAnimations.narutokick,
   },
 
   // Sasuke's abilities

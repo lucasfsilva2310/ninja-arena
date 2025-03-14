@@ -1,13 +1,12 @@
-import { chakraTypes } from "../../models/chakra.model";
-import { generateSpritePaths } from "../animationConfig";
+import { AbilityAnimation, generateSpritePaths } from "../animationConfig";
 
-export const narutoDefaultAnimation = {
+export const narutoDefaultAnimation: AbilityAnimation = {
   attacker: {
-    sprites: generateSpritePaths("naruto", "idle", 6),
+    sprites: generateSpritePaths("naruto", "idle", 3),
     phases: ["attack"],
   },
   target: {
-    sprites: generateSpritePaths("naruto", "damaged", 11),
+    sprites: generateSpritePaths("naruto", "damaged", 9),
     phases: ["idle", "damaged"],
   },
   effects: [],
