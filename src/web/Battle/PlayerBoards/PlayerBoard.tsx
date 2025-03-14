@@ -47,12 +47,12 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       className={`character-card ${isEnemy ? "enemy-card" : ""}`}
       key={`${char.name}-${charIndex}${isEnemy ? "-enemy" : ""}`}
     >
-      <div className="character-info-container">
+      <div className={`character-info-container`}>
         {!isEnemy ? (
           <>
             <div className="character-name-box">
               <div
-                className="character-actions"
+                className="character-stats-container"
                 onClick={() => handleTargetClick(player, char)}
               >
                 <CharacterNameComponent
@@ -61,7 +61,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 />
               </div>
             </div>
-            <div className="character-info-abilities-container">
+            <div className={`character-info-abilities-container player`}>
               <div className="character-actions">
                 <ActionsComponent
                   character={char}
@@ -92,10 +92,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
           </>
         ) : (
           <>
-            <div className="character-info-abilities-container">
-              <div className="character-effects">
-                <ActiveEffects character={char} isEnemy={true} />
-              </div>
+            <div className="character-info-abilities-container enemy">
               <div className="character-actions">
                 <ActionsComponent
                   character={char}
@@ -103,6 +100,9 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                   removeSelectedAction={removeSelectedAction}
                   isEnemy={true}
                 />
+              </div>
+              <div className="character-effects">
+                <ActiveEffects character={char} isEnemy={true} />
               </div>
             </div>
             <div className="character-name-box">

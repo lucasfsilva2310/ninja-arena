@@ -3,6 +3,14 @@
 .current-actions {
   display: flex;
   flex-wrap: wrap;
+
+  height: 25px;
+  width: 70%;
+
+  background-color: var(--bg-current-actions);
+  border: 2px solid rgba(230, 87, 59, 0.82);
+  border-radius: var(--radius-md);
+
   gap: var(--spacing-sm);
 }
 
@@ -157,4 +165,8 @@
   gap: var(--spacing-sm);
   height: 102px;
   position: relative;
+  width: 70%;
+  background-color: var(--bg-active-actions);
+  border-radius: var(--radius-md);
+  border: 2px solid rgba(31, 129, 227, 0.85);
 }

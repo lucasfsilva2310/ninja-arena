@@ -265,10 +265,6 @@
   position: relative; /* Create stacking context */
 }
 
-.active-effects {
-  height: 102px;
-}
-
 .ability-active:hover {
   transform: translateY(-2px);
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
