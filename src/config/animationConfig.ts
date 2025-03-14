@@ -1,6 +1,7 @@
 import { ChakraType } from "../models/chakra.model";
 import { narutoAnimations } from "./naruto";
 import { rockleeAnimations } from "./rocklee";
+import { sakuraAnimations } from "./sakura";
 import { sasukeAnimations } from "./sasuke";
 
 // Animation phases that a character can be in
@@ -78,11 +79,22 @@ export const characterAbilityAnimations: Record<
     narutokick: narutoAnimations.narutokick,
   },
 
+  // Sakura's abilities
+  sakura: {
+    default: sakuraAnimations.default,
+    angerpunch: sakuraAnimations.angerpunch,
+    innerstrength: sakuraAnimations.innerstrength,
+    kawarimi: sakuraAnimations.kawarimi,
+    heal: sakuraAnimations.heal,
+  },
+
   // Sasuke's abilities
   sasuke: {
     default: sasukeAnimations.default,
     fireball: sasukeAnimations.fireball,
     chidori: sasukeAnimations.chidori,
+    kawarimi: sasukeAnimations.kawarimi,
+    sharingan: sasukeAnimations.sharingan,
   },
 
   // Rock Lee's abilities
