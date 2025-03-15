@@ -2,6 +2,9 @@ import "./CharacterInfo.css";
 import React, { useState, useEffect } from "react";
 import { Character } from "../../../models/character.model";
 import { HealthBar } from "../HealthBar/HealthBar";
+import { getCharacterAvatar } from "../../../utils/getCharacterAvatar";
+import { getCharacterDefaultAvatar } from "../../../utils/getCharacterDefaultAvatar";
+import { getCharacterDeadAvatar } from "../../../utils/getCharacterDeadAvatar";
 
 interface PlayerCharacterNameProps {
   character: Character;
@@ -27,12 +30,13 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
     .toLowerCase()}`;
 
   // Check if this character should use MP4
+  // TEMPORARY: Only Rocklee uses MP4
   const isVideoCharacter = normalizedCharacterName === "rocklee";
 
-  const characterImagePath = `/characters/${normalizedCharacterName}/${normalizedCharacterName}.png`;
-  const characterVideoPath = `/characters/${normalizedCharacterName}/${normalizedCharacterName}.mp4`;
-  const characterDefaultImagePath = "/characters/default.png";
-  const characterDeadImagePath = "/characters/dead.png";
+  const characterImagePath = getCharacterAvatar(character);
+  const characterVideoPath = `/characters/${normalizedCharacterName}/avatar/${normalizedCharacterName}.mp4`;
+  const characterDefaultImagePath = getCharacterDefaultAvatar();
+  const characterDeadImagePath = getCharacterDeadAvatar();
 
   return (
     <div className="character-name-container">
@@ -75,7 +79,6 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
               character.hp <= 0 ? "character-dying" : ""
             }`}
             onError={(e) => {
-              // Fallback to default image if character image doesn't exist
               e.currentTarget.src = characterDefaultImagePath;
             }}
           />

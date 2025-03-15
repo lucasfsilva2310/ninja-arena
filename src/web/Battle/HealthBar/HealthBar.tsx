@@ -1,3 +1,4 @@
+import { healthColors } from "../../../constants/health-colors";
 import "./HealthBar.css";
 import React, { useEffect, useState } from "react";
 
@@ -30,9 +31,9 @@ export const HealthBar: React.FC<HealthBarProps> = ({
   }, [currentHP, onAnimationComplete]);
 
   const getHealthColor = () => {
-    if (currentHP > 66) return "#22c55e";
-    if (currentHP > 33) return "#eab308";
-    return "#ef4444";
+    if (currentHP > 66) return healthColors.GREEN;
+    if (currentHP > 33) return healthColors.YELLOW;
+    return healthColors.RED;
   };
 
   return (

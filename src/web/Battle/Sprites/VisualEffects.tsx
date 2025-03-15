@@ -3,7 +3,7 @@ import "./Sprites.css";
 import animationController, {
   AnimationContext,
 } from "../../../services/AnimationController";
-import { VisualEffect } from "../../../config/animationConfig";
+import { VisualEffect } from "../../../config/animations/animation-config";
 
 interface VisualEffectsProps {
   showDebug?: boolean;

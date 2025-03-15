@@ -3,8 +3,9 @@ import React from "react";
 import { Character } from "../../../models/character.model";
 import { Ability } from "../../../models/ability.model";
 import { ChakraType } from "../../../models/chakra.model";
-import { getChakraColor } from "../../../utils/getChakraColor";
 import { SelectedAction } from "../../../models/game-engine";
+import { getCharacterAbility } from "../../../utils/getCharacterAbility";
+import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";
 
 interface AbilitiesProps {
   character: Character;
@@ -49,19 +50,13 @@ export const Abilities: React.FC<AbilitiesProps> = ({
             }
           >
             <img
-              src={`/abilities/${character.name
-                .split(" ")
-                .join("")
-                .toLowerCase()}/${ability.name
-                .split(" ")
-                .join("")
-                .toLowerCase()}.png`}
+              src={getCharacterAbility({ character, ability })}
               alt={ability.name}
               className={`ability-icon ${
                 isAbilityDisabled ? "ability-inactive" : "ability-active"
               }`}
               onError={(e) => {
-                e.currentTarget.src = "/abilities/default.png";
+                e.currentTarget.src = getCharacterDefaultAbility();
               }}
             />
             {ability.currentCooldown > 0 && (

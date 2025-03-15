@@ -2,6 +2,9 @@ import "./CharacterInfo.css";
 import React, { useState, useEffect } from "react";
 import { Character } from "../../../models/character.model";
 import { HealthBar } from "../HealthBar/HealthBar";
+import { getCharacterAvatar } from "../../../utils/getCharacterAvatar";
+import { getCharacterDefaultAvatar } from "../../../utils/getCharacterDefaultAvatar";
+import { getCharacterDeadAvatar } from "../../../utils/getCharacterDeadAvatar";
 
 interface EnemyCharacterNameProps {
   character: Character;
@@ -21,13 +24,10 @@ export const EnemyCharacterName: React.FC<EnemyCharacterNameProps> = ({
     }
   }, [character.hp]);
 
-  const characterImagePath = `/characters/${character.name
-    .split(" ")
-    .join("")
-    .toLowerCase()}/${character.name.split(" ").join("").toLowerCase()}.png`;
+  const characterImagePath = getCharacterAvatar(character);
 
-  const characterDefaultImagePath = "/characters/default.png";
-  const characterDeadImagePath = "/characters/dead.png";
+  const characterDefaultImagePath = getCharacterDefaultAvatar();
+  const characterDeadImagePath = getCharacterDeadAvatar();
 
   return (
     <div className="character-name-container enemy">

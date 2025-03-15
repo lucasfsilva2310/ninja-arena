@@ -1,6 +1,8 @@
 import "./ActionsAndEffects.css";
 import React from "react";
 import { Character } from "../../../models/character.model";
+import { getCharacterAbility } from "../../../utils/getCharacterAbility";
+import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";
 
 interface ActiveEffectsProps {
   character: Character;
@@ -37,17 +39,11 @@ export const ActiveEffects: React.FC<ActiveEffectsProps> = ({
             className={`effect-icon-container ${isEnemy ? "enemy" : "player"}`}
           >
             <img
-              src={`/abilities/${character.name
-                .split(" ")
-                .join("")
-                .toLowerCase()}/${abilityName
-                .split(" ")
-                .join("")
-                .toLowerCase()}.png`}
+              src={getCharacterAbility({ character, abilityName })}
               alt={abilityName}
               className="effect-icon"
               onError={(e) => {
-                e.currentTarget.src = "/abilities/default.png";
+                e.currentTarget.src = getCharacterDefaultAbility();
               }}
             />
             <div className="effect-tooltip">

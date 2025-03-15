@@ -2,6 +2,8 @@ import "./ActionsAndEffects.css";
 import React from "react";
 import { Character } from "../../../models/character.model";
 import { SelectedAction } from "../../../models/game-engine";
+import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";
+import { getCharacterAbility } from "../../../utils/getCharacterAbility";
 
 interface CurrentActionsProps {
   character: Character;
@@ -29,17 +31,14 @@ export const CurrentActions: React.FC<CurrentActionsProps> = ({
               onClick={() => removeSelectedAction(actionIndex)}
             >
               <img
-                src={`/abilities/${action.attackerCharacter.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}/${action.attackerAbility.name
-                  .split(" ")
-                  .join("")
-                  .toLowerCase()}.png`}
+                src={getCharacterAbility({
+                  character: action.attackerCharacter,
+                  ability: action.attackerAbility,
+                })}
                 alt={action.attackerAbility.name}
                 className="effect-icon"
                 onError={(e) => {
-                  e.currentTarget.src = "/abilities/default.png";
+                  e.currentTarget.src = getCharacterDefaultAbility();
                 }}
               />
               <div className="effect-tooltip">

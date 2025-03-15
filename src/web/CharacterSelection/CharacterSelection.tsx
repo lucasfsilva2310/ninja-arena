@@ -6,6 +6,8 @@ import { Ability } from "../../models/ability.model";
 import { availableCharacters } from "../../database/available-characters";
 
 import AbilityDescriptionFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
+import { getCharacterAvatar } from "../../utils/getCharacterAvatar";
+import { getCharacterDefaultAvatar } from "../../utils/getCharacterDefaultAvatar";
 
 interface CharacterSelectionProps {
   startGame: () => void;
@@ -31,9 +33,8 @@ export default function CharacterSelection({
     "/backgrounds/character-selection/default.png"
   );
 
+  // List of available backgrounds
   useEffect(() => {
-    // List of available backgrounds
-    // Add Logic to get random background from backgrounds folder directory
     const backgrounds = ["itachi.png"];
 
     const randomBackground =
@@ -97,7 +98,6 @@ export default function CharacterSelection({
       }
     }
 
-    // Add character to new slot
     newSelectedCharacters[index] = draggedCharacter;
     toggleCharacterSelection(draggedCharacter);
 
@@ -166,18 +166,12 @@ export default function CharacterSelection({
                       >
                         <div className="character-portrait">
                           <img
-                            src={`/characters/${selectedCharacters[index].name
-                              .split(" ")
-                              .join("")
-                              .toLowerCase()}/${selectedCharacters[index].name
-                              .split(" ")
-                              .join("")
-                              .toLowerCase()}.png`}
+                            src={getCharacterAvatar(selectedCharacters[index])}
                             alt={selectedCharacters[index].name}
                             className="character-image"
                             draggable={false}
                             onError={(e) => {
-                              e.currentTarget.src = "/characters/default.png";
+                              e.currentTarget.src = getCharacterDefaultAvatar();
                             }}
                           />
                         </div>
@@ -229,18 +223,12 @@ export default function CharacterSelection({
               >
                 <div className="character-portrait">
                   <img
-                    src={`/characters/${char.name
-                      .split(" ")
-                      .join("")
-                      .toLowerCase()}/${char.name
-                      .split(" ")
-                      .join("")
-                      .toLowerCase()}.png`}
+                    src={getCharacterAvatar(char)}
                     alt={char.name}
                     className="character-image"
                     draggable={false}
                     onError={(e) => {
-                      e.currentTarget.src = "/characters/default.png";
+                      e.currentTarget.src = getCharacterDefaultAvatar();
                     }}
                   />
                 </div>

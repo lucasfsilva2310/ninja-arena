@@ -1,7 +1,7 @@
 import "./Sprites.css";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { getSpritePaths } from "../../../config/animationConfig";
+import { getSpritePaths } from "../../../config/animations/animation-config";
 
 const styles = {
   image: {

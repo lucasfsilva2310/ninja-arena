@@ -5,7 +5,7 @@ import {
   getAbilityAnimation,
   AbilityAnimation,
   VisualEffect,
-} from "../config/animationConfig";
+} from "../config/animations/animation-config";
 
 // Define the animation phases
 export type AnimationPhase =

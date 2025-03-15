@@ -1,6 +1,6 @@
 @font-face {
   font-family: "Manga";
-  src: url("/fonts/manga.ttf") format("truetype");
+  src: url("/fonts/mangat.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -106,7 +106,7 @@
 
   --empty-clean-scroll-background: url("/assets/scroll-open-only-medium.jpg");
   --scroll-with-base-background: url("/assets/scroll-medium-open-full.png");
-  --sprites-arena-background: url("/arenas/default.png");
+  --sprites-arena-background: url("/arenas/arena-chunnin.png");
 
   /* Highlight colors */
   --color-highlight: #fbbf24; /* Amber color for highlight */

@@ -1,20 +1,16 @@
 import "./AvailableChakra.css";
 import { ChakraType, chakraTypes } from "../../../models/chakra.model";
 import { getChakraColor } from "../../../utils/getChakraColor";
+import { getDefaultChakra } from "../../../utils/getDefaultChakra";
+import { getChakraImage } from "../../../utils/getChakraImage";
 
 export const AvailableChakra = ({
   activeChakras,
-  selectedChakras,
   setChakraTransformModal,
 }: {
   activeChakras: ChakraType[];
-  selectedChakras: ChakraType[];
   setChakraTransformModal: (modal: boolean) => void;
 }) => {
-  const getChakraImage = (chakraType: string) => {
-    return `/chakras/chakra-${chakraType.toLowerCase()}.png`;
-  };
-
   // Define all chakra types to ensure they all appear
   const allChakraTypes: ChakraType[] = [
     chakraTypes.Ninjutsu,
@@ -26,10 +22,7 @@ export const AvailableChakra = ({
   // Count active chakras by type
   const getChakraCount = (chakraType: ChakraType): number => {
     const activeCount = activeChakras.filter((c) => c === chakraType).length;
-    const selectedCount = selectedChakras.filter(
-      (c) => c === chakraType
-    ).length;
-    return activeCount; // We only want to show available chakras
+    return activeCount;
   };
 
   return (
@@ -51,7 +44,7 @@ export const AvailableChakra = ({
                   alt={`${chakraType} chakra`}
                   className="chakra-image"
                   onError={(e) => {
-                    e.currentTarget.src = "/chakras/chakra-default.png";
+                    e.currentTarget.src = getDefaultChakra();
                   }}
                 />
               </div>

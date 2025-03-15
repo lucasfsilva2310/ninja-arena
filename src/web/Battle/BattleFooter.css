@@ -1,0 +1,18 @@
+.battle-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--footer-height);
+  display: flex;
+  padding: 0 var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
+@media (max-width: 1024px) {
+  .battle-footer {
+    flex-direction: column-reverse;
+    height: auto;
+    padding-bottom: var(--spacing-md);
+  }
+}

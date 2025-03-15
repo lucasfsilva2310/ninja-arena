@@ -4,6 +4,10 @@ import React, { useEffect, useState } from "react";
 
 import { Ability } from "../../../models/ability.model";
 import { Character } from "../../../models/character.model";
+import { chakraTypes } from "../../../models/chakra.model";
+import { chakraColors } from "../../../constants/chakra-colors";
+import { getCharacterAbility } from "../../../utils/getCharacterAbility";
+import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";
 
 interface AbilityFooterProps {
   selectedCharacter: Character | null;
@@ -13,18 +17,23 @@ interface AbilityFooterProps {
 
 const getChakraColor = (chakraType: string): string => {
   switch (chakraType) {
-    case "Taijutsu":
-      return "#22c55e"; // Green
-    case "Ninjutsu":
-      return "#3b82f6"; // Blue
-    case "Genjutsu":
-      return "#ffffff"; // White
-    case "Bloodline":
-      return "#ef4444"; // Red
-    case "Random":
-      return "#000000"; // Black
+    case chakraTypes.Taijutsu:
+      return chakraColors.GREEN;
+
+    case chakraTypes.Ninjutsu:
+      return chakraColors.BLUE;
+
+    case chakraTypes.Genjutsu:
+      return chakraColors.WHITE;
+
+    case chakraTypes.Bloodline:
+      return chakraColors.RED;
+
+    case chakraTypes.Random:
+      return chakraColors.BLACK;
+
     default:
-      return "#94a3b8"; // Default gray
+      return chakraColors.BLACK;
   }
 };
 
@@ -82,17 +91,14 @@ const AbilityFooter: React.FC<AbilityFooterProps> = ({
                 }`}
               >
                 <img
-                  src={`/abilities/${selectedCharacter.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}/${ability.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}.png`}
+                  src={getCharacterAbility({
+                    character: selectedCharacter,
+                    ability,
+                  })}
                   alt={ability.name}
                   className="ability-preview-icon"
                   onError={(e) => {
-                    e.currentTarget.src = "/abilities/default.png";
+                    e.currentTarget.src = getCharacterDefaultAbility();
                   }}
                 />
               </button>
@@ -105,17 +111,14 @@ const AbilityFooter: React.FC<AbilityFooterProps> = ({
             <div className="ability-description-content">
               <div className="ability-image-container">
                 <img
-                  src={`/abilities/${selectedCharacter.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}/${selectedAbility.name
-                    .split(" ")
-                    .join("")
-                    .toLowerCase()}.png`}
+                  src={getCharacterAbility({
+                    character: selectedCharacter,
+                    ability: selectedAbility,
+                  })}
                   alt={selectedAbility.name}
                   className="ability-image"
                   onError={(e) => {
-                    e.currentTarget.src = "/abilities/default.png";
+                    e.currentTarget.src = getCharacterDefaultAbility();
                   }}
                 />
               </div>

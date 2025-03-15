@@ -1,5 +1,5 @@
 import "./Battle.css";
-import "./BattleFooter/BattleFooter.css";
+import "./BattleFooter.css";
 
 import React, { useState, useEffect } from "react";
 import { GameEngine, SelectedAction } from "../../models/game-engine";
@@ -19,6 +19,7 @@ import { PlayerInfo } from "./PlayerInfo/PlayerInfo";
 import BattleOptions from "./BattleOptions/BattleOptions";
 import { TurnTimer } from "./TurnTimer/TurnTimer";
 import { SpritesBoard } from "./Sprites/SpritesBoard";
+import { getCharacterDefaultAvatar } from "../../utils/getCharacterDefaultAvatar";
 
 interface BattleProps {
   game: GameEngine;
@@ -701,7 +702,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             <PlayerInfo
               name="Player 1"
               rank="Chunin"
-              avatar="/characters/default.png"
+              avatar={getCharacterDefaultAvatar()}
             />
 
             <div className="header-center">
@@ -715,7 +716,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             <PlayerInfo
               name="Player 2"
               rank="Jonin"
-              avatar="/characters/default.png"
+              avatar={getCharacterDefaultAvatar()}
               isEnemy
             />
           </div>
@@ -739,7 +740,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
             <div className="center-column">
               <AvailableChakra
                 activeChakras={mainPlayerActiveChakras}
-                selectedChakras={selectedChakras}
                 setChakraTransformModal={setChakraTransformModal}
               />
               <button
