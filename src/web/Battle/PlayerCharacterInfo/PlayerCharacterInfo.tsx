@@ -42,7 +42,7 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
     <div className="character-name-container">
       <div
         className={`character-portrait ${
-          possibleTargets.includes(character) ? "character-selected" : ""
+          possibleTargets.includes(character) ? "character-possible-target" : ""
         }`}
       >
         {isDeathAnimationComplete && character.hp <= 0 ? (
@@ -50,7 +50,9 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
             src={characterDeadImagePath}
             alt={character.name}
             className={`character-image ${
-              possibleTargets.includes(character) ? "character-selected" : ""
+              possibleTargets.includes(character)
+                ? "character-possible-target"
+                : ""
             }`}
           />
         ) : isVideoCharacter ? (
@@ -59,7 +61,9 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
             className={`character-image ${
               character.hp <= 0 ? "character-dying" : ""
             } ${
-              possibleTargets.includes(character) ? "character-selected" : ""
+              possibleTargets.includes(character)
+                ? "character-possible-target"
+                : ""
             }`}
             autoPlay
             loop
@@ -72,7 +76,9 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
               imgElement.className = `character-image ${
                 character.hp <= 0 ? "character-dying" : ""
               } ${
-                possibleTargets.includes(character) ? "character-selected" : ""
+                possibleTargets.includes(character)
+                  ? "character-possible-target"
+                  : ""
               }`;
               e.currentTarget.parentNode?.replaceChild(
                 imgElement,
@@ -87,7 +93,9 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
             className={`character-image ${
               character.hp <= 0 ? "character-dying" : ""
             } ${
-              possibleTargets.includes(character) ? "character-selected" : ""
+              possibleTargets.includes(character)
+                ? "character-possible-target"
+                : ""
             }`}
             onError={(e) => {
               e.currentTarget.src = characterDefaultImagePath;

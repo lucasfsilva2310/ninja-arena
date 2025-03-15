@@ -33,7 +33,7 @@
   transition: all var(--transition-fast);
 }
 
-.character-portrait.character-selected {
+.character-portrait.character-possible-target {
   position: relative;
   background: var(--highlight-bg-medium-blue);
   box-shadow: 0 0 15px var(--shadow-highlight-medium);
@@ -41,16 +41,16 @@
   z-index: 1;
 }
 
-.character-image.character-selected {
+.character-image.character-possible-target {
   position: relative;
   z-index: 2;
 }
 
-.character-image:has(.character-selected) .character-image {
+.character-image:has(.character-possible-target) .character-image {
   transform: scale(1);
 }
 
-.character-image:has(.character-selected) .character-image:hover {
+.character-image:has(.character-possible-target) .character-image:hover {
   transform: scale(1.1);
 }
 
@@ -109,13 +109,13 @@
 }
 
 /* Update hover effects to maintain the flip while scaling */
-.character-image:has(.character-selected)
+.character-image:has(.character-possible-target)
   .character-portrait.enemy
   .character-image {
   transform: scaleX(-1);
 }
 
-.character-image:has(.character-selected)
+.character-image:has(.character-possible-target)
   .character-portrait.enemy
   .character-image:hover {
   transform: scaleX(-1) scale(1.1);
@@ -192,7 +192,7 @@
 }
 
 /* Selected character glow effect */
-.character-image.character-selected::after {
+.character-image.character-possible-target::after {
   content: "";
   position: absolute;
   top: -2px;
@@ -227,6 +227,6 @@
 }
 
 /* For enemy characters, maintain the flip while showing the glow */
-.character-portrait.enemy .character-image.character-selected::after {
+.character-portrait.enemy .character-image.character-possible-target::after {
   transform: scaleX(-1);
 }

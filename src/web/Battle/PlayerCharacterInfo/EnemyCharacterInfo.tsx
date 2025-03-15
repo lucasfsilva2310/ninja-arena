@@ -33,7 +33,7 @@ export const EnemyCharacterName: React.FC<EnemyCharacterNameProps> = ({
     <div className="character-name-container enemy">
       <div
         className={`character-portrait enemy ${
-          possibleTargets.includes(character) ? "character-selected" : ""
+          possibleTargets.includes(character) ? "character-possible-target" : ""
         }`}
       >
         <img
@@ -45,7 +45,11 @@ export const EnemyCharacterName: React.FC<EnemyCharacterNameProps> = ({
           alt={character.name}
           className={`character-image ${
             character.hp <= 0 ? "character-dying" : ""
-          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
+          } ${
+            possibleTargets.includes(character)
+              ? "character-possible-target"
+              : ""
+          }`}
           onError={(e) => {
             e.currentTarget.src = characterDefaultImagePath;
           }}
