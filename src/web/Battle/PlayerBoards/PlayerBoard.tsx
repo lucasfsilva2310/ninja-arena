@@ -60,7 +60,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
               />
             </div>
             <div className={`character-info-abilities-container player`}>
-              <div className="character-actions">
+              <div className={`character-actions`}>
                 <ActionsComponent
                   character={char}
                   selectedActions={selectedActions}
@@ -91,7 +91,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         ) : (
           <>
             <div className="character-info-abilities-container enemy">
-              <div className="character-actions">
+              <div className="character-actions enemy">
                 <ActionsComponent
                   character={char}
                   selectedActions={selectedActions}
@@ -99,11 +99,11 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                   isEnemy={true}
                 />
               </div>
-              <div className="character-effects">
+              <div className="character-effects enemy">
                 <ActiveEffects character={char} isEnemy={true} />
               </div>
             </div>
-            <div className="character-name-box">
+            <div className="character-name-box enemy">
               <div
                 className={`enemy-hover ${
                   possibleTargets.includes(char) ? "enemy-selected" : ""

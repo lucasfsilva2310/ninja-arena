@@ -27,11 +27,6 @@
   position: relative;
 }
 
-/* .character-name-box {
-  overflow: visible;
-  position: relative;
-} */
-
 .character-stats-container {
   display: flex;
   flex-direction: column;
@@ -56,6 +51,10 @@
 
   overflow: visible;
   position: relative;
+}
+
+.character-actions.enemy {
+  align-items: flex-end;
 }
 
 .character-info-abilities-container {
@@ -87,6 +86,10 @@
   position: relative;
 }
 
+.character-effects.enemy {
+  align-items: flex-end;
+}
+
 /* Player team (left side) effects and actions */
 .team-container:first-child .character-effects,
 .team-container:first-child .current-actions {
@@ -109,7 +112,7 @@
 /* Adjust enemy card to mirror the scroll if needed */
 .character-card.enemy-card {
   transform: scaleX(-1);
-  width: 70%;
+  width: 55%;
   padding-left: 1.1rem;
   padding-right: 1.1rem;
 }
