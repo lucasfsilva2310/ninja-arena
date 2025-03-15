@@ -354,7 +354,12 @@
   max-width: 460px;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   overflow: unset;
+}
+
+.board-section.enemy {
+  max-width: 460px;
 }
 
 .center-column {

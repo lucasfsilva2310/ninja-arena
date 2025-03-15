@@ -762,7 +762,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               />
             </div>
 
-            <div className="board-section">
+            <div className="board-section enemy">
               <PlayerBoard
                 game={game}
                 handleTargetClick={handleTargetClick}

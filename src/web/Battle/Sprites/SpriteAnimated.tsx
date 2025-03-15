@@ -50,6 +50,11 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
   const imagePaths = useMemo(() => {
     let paths: string[] = [];
 
+    // Handle defeated state first
+    if (abilityName === "defeated") {
+      return [`characters/${characterNameLower}/sprites/defeated/defeated.png`];
+    }
+
     // If showing damage animation, use damage sprites
     if (isDamaged) {
       // Try to get from config first
@@ -90,13 +95,19 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
     setCurrentIndex(0);
   }, [abilityName, isDamaged, characterName]);
 
-  // Animation loop
+  // Animation loop - only run if not in defeated state
   useEffect(() => {
     if (!imagePaths || imagePaths.length === 0) {
       setError("No image paths available");
       debugLog(
         `No image paths available for ${characterName}, ability: ${abilityName}`
       );
+      return;
+    }
+
+    // Don't animate if character is defeated
+    if (abilityName === "defeated") {
+      setCurrentIndex(0);
       return;
     }
 
@@ -112,7 +123,7 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
     }, speed);
 
     return () => clearInterval(interval);
-  }, [imagePaths, speed, characterName, abilityName, showDebug]); // Removed the join operation
+  }, [imagePaths, speed, characterName, abilityName, showDebug]);
 
   // Function to handle image load errors
   const handleImageError = () => {

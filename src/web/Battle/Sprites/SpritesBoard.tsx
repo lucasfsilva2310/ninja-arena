@@ -230,13 +230,23 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       const animData = animationController.getAnimationData();
 
       if (phase === "idle" || !animData) {
-        // Reset all characters to idle when not animating
+        // Reset all characters to idle or defeated based on HP when not animating
         setCharacterAnimations((prev) =>
-          prev.map((anim) => ({
-            ...anim,
-            abilityName: "idle",
-            isTarget: false,
-          }))
+          prev.map((anim) => {
+            // Find the character in either player's team
+            const character = anim.isEnemy
+              ? game.player2.characters[anim.index]
+              : game.player1.characters[anim.index];
+
+            // Set to defeated if HP is 0, otherwise idle
+            const abilityName = character.hp <= 0 ? "defeated" : "idle";
+
+            return {
+              ...anim,
+              abilityName,
+              isTarget: false,
+            };
+          })
         );
         return;
       }
@@ -266,18 +276,23 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
             ((anim.isEnemy && currentAction.targetPlayer === game.player2) ||
               (!anim.isEnemy && currentAction.targetPlayer === game.player1));
 
-          // Set animation name based on character role and phase
-          let abilityName = "idle";
+          // Find the character to check HP
+          const character = anim.isEnemy
+            ? game.player2.characters[anim.index]
+            : game.player1.characters[anim.index];
 
-          if (isAttacker) {
-            // Attacker animation
+          // Set animation name based on character role, phase and HP
+          let abilityName = character.hp <= 0 ? "defeated" : "idle";
+
+          if (isAttacker && character.hp > 0) {
+            // Attacker animation only if character is alive
             if (phase === "attacking") {
               abilityName = normalizeString(currentAction.attackerAbility.name);
             } else if (phase === "recovery") {
               abilityName = "recover";
             }
-          } else if (isTarget) {
-            // Target animation
+          } else if (isTarget && character.hp > 0) {
+            // Target animation only if character is alive
             if (phase === "impact") {
               abilityName = "damaged";
             }
