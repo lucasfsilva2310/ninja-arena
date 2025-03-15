@@ -40,7 +40,11 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
 
   return (
     <div className="character-name-container">
-      <div className="character-portrait">
+      <div
+        className={`character-portrait ${
+          possibleTargets.includes(character) ? "character-selected" : ""
+        }`}
+      >
         {isDeathAnimationComplete && character.hp <= 0 ? (
           <img
             src={characterDeadImagePath}
@@ -54,19 +58,21 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
             src={characterVideoPath}
             className={`character-image ${
               character.hp <= 0 ? "character-dying" : ""
-            } ${possibleTargets.includes(character) ? "character-selected" : ""}
-            `}
+            } ${
+              possibleTargets.includes(character) ? "character-selected" : ""
+            }`}
             autoPlay
             loop
             muted
             playsInline
             onError={(e) => {
-              // Create a fallback image element if video fails to load
               const imgElement = document.createElement("img");
               imgElement.src = characterDefaultImagePath;
               imgElement.alt = character.name;
               imgElement.className = `character-image ${
                 character.hp <= 0 ? "character-dying" : ""
+              } ${
+                possibleTargets.includes(character) ? "character-selected" : ""
               }`;
               e.currentTarget.parentNode?.replaceChild(
                 imgElement,
@@ -80,8 +86,9 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
             alt={character.name}
             className={`character-image ${
               character.hp <= 0 ? "character-dying" : ""
-            } ${possibleTargets.includes(character) ? "character-selected" : ""}
-            `}
+            } ${
+              possibleTargets.includes(character) ? "character-selected" : ""
+            }`}
             onError={(e) => {
               e.currentTarget.src = characterDefaultImagePath;
             }}

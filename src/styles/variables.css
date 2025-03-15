@@ -113,16 +113,19 @@
   --color-highlight-dim: rgba(251, 191, 36, 0.5); /* Dimmed amber */
 
   /* Highlight shadows for images */
-  --shadow-highlight: 0 0 8px rgba(59, 130, 246, 1); /* Bright blue */
-  --shadow-highlight-dim: 0 0 4px rgba(59, 130, 246, 0.5); /* Dimmed blue */
-
+  --shadow-highlight: 0 0 25px rgb(20, 108, 250); /* Bright blue */
+  --shadow-highlight-dim: 0 0 25px rgba(20, 108, 250, 0.5); /* Dimmed blue */
+  --shadow-highlight-medium: 0 0 25px rgba(20, 108, 250, 0.8); /* Medium blue */
+  --shadow-highlight-bright: 0 0 25px rgba(20, 108, 250, 1); /* Bright blue */
   /* Selection highlight colors */
   --highlight-primary: rgba(79, 70, 229, 1); /* Base indigo */
   --highlight-secondary: rgba(147, 51, 234, 1); /* Base purple */
 
   /* Background highlights with opacity */
   --highlight-bg-dim: rgba(79, 70, 229, 0.2);
-  --highlight-bg-bright: rgba(79, 70, 229, 0.4);
+  --highlight-bg-dim-blue: rgba(59, 130, 246, 0.2);
+  --highlight-bg-medium-blue: rgba(59, 130, 246, 0.4);
+  --highlight-bg-bright-blue: rgba(59, 130, 246, 0.8);
 
   /* Shadow highlights with opacity */
   --highlight-shadow-dim: rgba(79, 70, 229, 0.2);

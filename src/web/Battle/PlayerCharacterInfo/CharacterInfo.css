@@ -33,10 +33,17 @@
   transition: all var(--transition-fast);
 }
 
-.character-image:has(.character-selected) {
-  background: var(--highlight-bg-dim);
-  box-shadow: 0 0 15px var(--highlight-shadow-dim);
-  animation: containerPulse 2s infinite ease-in-out;
+.character-portrait.character-selected {
+  position: relative;
+  background: var(--highlight-bg-medium-blue);
+  box-shadow: 0 0 15px var(--shadow-highlight-medium);
+  animation: containerPulse 3s infinite ease-in-out;
+  z-index: 1;
+}
+
+.character-image.character-selected {
+  position: relative;
+  z-index: 2;
 }
 
 .character-image:has(.character-selected) .character-image {
@@ -131,17 +138,32 @@
 
 @keyframes containerPulse {
   0% {
-    background: var(--highlight-bg-dim);
-    box-shadow: 0 0 15px var(--highlight-shadow-dim);
+    opacity: 1;
+    box-shadow: var(--shadow-highlight-dim);
   }
-  50% {
-    background: var(--highlight-bg-bright);
-    box-shadow: 0 0 20px var(--highlight-shadow-bright);
-    border-color: var(--highlight-border-bright);
+  20% {
+    opacity: 0.8;
+    box-shadow: var(--shadow-highlight-medium);
+  }
+  33% {
+    opacity: 0.7;
+    box-shadow: var(--shadow-highlight-medium);
+  }
+  66% {
+    opacity: 0.6;
+    box-shadow: var(--shadow-highlight-medium);
+  }
+  80% {
+    opacity: 0.7;
+    box-shadow: var(--shadow-highlight-dim);
+  }
+  90% {
+    opacity: 0.8;
+    box-shadow: var(--shadow-highlight-dim);
   }
   100% {
-    background: var(--highlight-bg-dim);
-    box-shadow: 0 0 15px var(--highlight-shadow-dim);
+    opacity: 1;
+    box-shadow: var(--shadow-highlight-dim);
   }
 }
 
@@ -170,35 +192,37 @@
 }
 
 /* Selected character glow effect */
-.character-image.character-selected {
-  position: relative;
-}
-
 .character-image.character-selected::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgb(
-    59,
-    131,
-    246
-  ); /* Using the blue color (--color-selected) with opacity */
-  animation: glowPulse 1.5s infinite ease-in-out;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: var(--radius-lg);
+  background: var(--highlight-bg-medium-blue);
+  box-shadow: var(--shadow-highlight-medium);
+  animation: glowPulse 3s infinite ease-in-out;
   pointer-events: none;
+  z-index: -1;
 }
 
 @keyframes glowPulse {
   0% {
-    opacity: 0.2;
+    opacity: 0.3;
+    box-shadow: var(--shadow-highlight-dim);
   }
-  50% {
-    opacity: 1;
+  33% {
+    opacity: 0.6;
+    box-shadow: var(--shadow-highlight-medium);
+  }
+  66% {
+    opacity: 0.9;
+    box-shadow: var(--shadow-highlight-medium);
   }
   100% {
-    opacity: 0.2;
+    opacity: 0.3;
+    box-shadow: var(--shadow-highlight-dim);
   }
 }
 
