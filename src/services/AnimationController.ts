@@ -217,6 +217,11 @@ export class AnimationController {
     return this.context.activeEffects;
   }
 
+  // Get current animation context
+  getCurrentContext(): AnimationContext {
+    return this.context;
+  }
+
   // Get character animation phase for a character
   getCharacterPhase(characterName: string, isEnemy: boolean): string {
     if (!this.context.animationData) return "idle";

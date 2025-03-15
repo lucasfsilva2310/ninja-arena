@@ -1,312 +1,558 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./Sprites.css";
+import animationController, {
+  AnimationContext,
+} from "../../../services/AnimationController";
 import { VisualEffect } from "../../../config/animationConfig";
-import animationController from "../../../services/AnimationController";
 
 interface VisualEffectsProps {
   showDebug?: boolean;
 }
 
-interface EffectState {
-  id: string;
-  effect: VisualEffect;
-  visible: boolean;
-  position: {
-    x: number;
-    y: number;
-  };
-  endPosition?: {
-    x: number;
-    y: number;
-  };
-  currentFrame: number;
-  totalFrames: number;
-  progress: number; // 0 to 1
-  scale: number;
-  rotation: number;
+interface CharacterPosition {
+  x: number;
+  y: number;
+  found: boolean;
 }
 
-export const VisualEffects: React.FC<VisualEffectsProps> = ({
-  showDebug = false,
-}) => {
-  const [activeEffects, setActiveEffects] = useState<EffectState[]>([]);
-  const [lastActionId, setLastActionId] = useState<string | null>(null);
-  const [currentPhase, setCurrentPhase] = useState<string>("idle");
+const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
+  const [activeEffects, setActiveEffects] = useState<VisualEffect[]>([]);
+  const [effectStates, setEffectStates] = useState<
+    {
+      effect: VisualEffect;
+      currentFrame: number;
+      position: { x: number; y: number };
+      isActive: boolean;
+    }[]
+  >([]);
 
-  // Debug utility
+  // Use refs to store timer IDs
+  const timersRef = useRef<number[]>([]);
+  // Keep track of whether component is mounted
+  const isMounted = useRef(true);
+
+  // Store character positions to avoid recalculating
+  const characterPositionsRef = useRef<{
+    attacker: CharacterPosition;
+    target: CharacterPosition;
+  }>({
+    attacker: { x: 200, y: 150, found: false },
+    target: { x: 500, y: 150, found: false },
+  });
+
+  // Debug utility function
   const debugLog = (message: string) => {
     if (showDebug) {
       console.log(`[VisualEffects] ${message}`);
     }
   };
 
-  // Listen for animation state changes
-  useEffect(() => {
-    // Subscribe to animation controller events
-    const stateChangeSub = animationController.on(
-      "stateChange",
-      (data: any) => {
-        // Update the current phase
-        setCurrentPhase(data.phase);
+  // Find character element position with improved error handling
+  const findCharacterPosition = useCallback(
+    (characterName: string, isAttacker: boolean): CharacterPosition => {
+      try {
+        if (!characterName) {
+          debugLog(
+            `No character name provided for ${
+              isAttacker ? "attacker" : "target"
+            }`
+          );
+          return { x: isAttacker ? 200 : 500, y: 150, found: false };
+        }
 
-        // If the phase is 'attacking', this is a new action starting
-        if (data.phase === "attacking") {
-          // Generate unique ID for this action
-          const actionId = `action-${Date.now()}`;
-          setLastActionId(actionId);
+        // Try finding sprite element by alt attribute first (most reliable)
+        const sprites = document.querySelectorAll(
+          `.sprite-image`
+        ) as NodeListOf<HTMLImageElement>;
+        let characterElement: HTMLElement | null = null;
+
+        // Find the element with alt text containing the character name
+        for (let i = 0; i < sprites.length; i++) {
+          const alt = sprites[i].alt.toLowerCase();
+          if (alt.includes(characterName.toLowerCase())) {
+            // For attacker vs target, make sure to get the right one (player1 or player2)
+            const isEnemy = sprites[i].classList.contains("sprite-enemy");
+            const context = animationController.getCurrentContext();
+            const attackerIsEnemy =
+              context.attackerPlayer === context.targetPlayer;
+
+            // Check if this is the correct character (attacker or target)
+            const isCorrectElement = isAttacker
+              ? isEnemy === attackerIsEnemy
+              : isEnemy !== attackerIsEnemy;
+
+            if (isCorrectElement) {
+              characterElement = sprites[i];
+              break;
+            }
+          }
+        }
+
+        if (!characterElement) {
+          debugLog(`Character element not found for ${characterName}`);
+          return { x: isAttacker ? 200 : 500, y: 150, found: false };
+        }
+
+        // Get position relative to the arena
+        const arenaElement = characterElement.closest(".sprites-arena");
+        if (!arenaElement) {
+          debugLog(`Arena element not found`);
+          return { x: isAttacker ? 200 : 500, y: 150, found: false };
+        }
+
+        const elementRect = characterElement.getBoundingClientRect();
+        const arenaRect = arenaElement.getBoundingClientRect();
+
+        const position = {
+          x: elementRect.left - arenaRect.left + elementRect.width / 2,
+          y: elementRect.top - arenaRect.top + elementRect.height / 2,
+          found: true,
+        };
+
+        debugLog(
+          `Found ${isAttacker ? "attacker" : "target"} position: x=${
+            position.x
+          }, y=${position.y}`
+        );
+        return position;
+      } catch (error) {
+        debugLog(`Error finding position for ${characterName}: ${error}`);
+        return { x: isAttacker ? 200 : 500, y: 150, found: false };
+      }
+    },
+    [showDebug]
+  );
+
+  // Subscribe to animation controller for effects
+  useEffect(() => {
+    isMounted.current = true;
+
+    const stateChangeSub = animationController.on("stateChange", () => {
+      if (!isMounted.current) return;
+
+      const effects = animationController.getActiveEffects();
+      setActiveEffects(effects);
+
+      // Reset character positions when animation state changes
+      characterPositionsRef.current = {
+        attacker: { x: 200, y: 150, found: false },
+        target: { x: 500, y: 150, found: false },
+      };
+
+      debugLog(`Active effects updated: ${effects.length} effects`);
+    });
+
+    const actionStartedSub = animationController.on(
+      "actionStarted",
+      (context: AnimationContext) => {
+        if (!isMounted.current) return;
+
+        // Reset previous effects
+        setEffectStates([]);
+
+        // Get fresh character positions at the start of an action
+        if (context.attackerCharacter && context.targetCharacter) {
+          const attackerName = context.attackerCharacter.name
+            .toLowerCase()
+            .replace(/\s+/g, "");
+          const targetName = context.targetCharacter.name
+            .toLowerCase()
+            .replace(/\s+/g, "");
+
+          // Small delay to make sure DOM is updated
+          setTimeout(() => {
+            characterPositionsRef.current = {
+              attacker: findCharacterPosition(attackerName, true),
+              target: findCharacterPosition(targetName, false),
+            };
+
+            debugLog(`Updated character positions:
+            Attacker: ${attackerName} at (${characterPositionsRef.current.attacker.x}, ${characterPositionsRef.current.attacker.y})
+            Target: ${targetName} at (${characterPositionsRef.current.target.x}, ${characterPositionsRef.current.target.y})`);
+          }, 50);
         }
       }
     );
 
-    // Reset effects when animation completes
-    const resetSub = animationController.on("reset", () => {
-      setActiveEffects([]);
-      setCurrentPhase("idle");
+    return () => {
+      isMounted.current = false;
+      stateChangeSub();
+      actionStartedSub();
+
+      // Clean up any remaining timers
+      timersRef.current.forEach((timer) => window.clearTimeout(timer));
+      timersRef.current = [];
+    };
+  }, [showDebug, findCharacterPosition]);
+
+  // Initialize and update effect animations
+  useEffect(() => {
+    // Clear previous timers
+    timersRef.current.forEach((timer) => window.clearTimeout(timer));
+    timersRef.current = [];
+
+    // Initialize effect states
+    const newEffectStates = activeEffects.map((effect) => {
+      const startPos = getEffectPosition(effect, "start");
+      debugLog(
+        `Initializing ${effect.type} effect at position: ${startPos.x}, ${startPos.y}`
+      );
+
+      return {
+        effect,
+        currentFrame: 0,
+        position: startPos,
+        isActive: false,
+      };
+    });
+
+    setEffectStates(newEffectStates);
+
+    // Process each effect
+    activeEffects.forEach((effect, index) => {
+      // Start effect animation after its startTime
+      const startTimer = window.setTimeout(() => {
+        if (!isMounted.current) return;
+
+        debugLog(`Starting effect: ${effect.type} at ${effect.startTime}ms`);
+
+        // Mark this effect as active
+        setEffectStates((prev) => {
+          const newState = [...prev];
+          if (newState[index]) {
+            newState[index].isActive = true;
+
+            // Re-calculate position just before starting animation to ensure accuracy
+            if (effect.type === "projectile") {
+              newState[index].position = getEffectPosition(effect, "start");
+              debugLog(
+                `Starting projectile at updated position: ${newState[index].position.x}, ${newState[index].position.y}`
+              );
+            }
+          }
+          return newState;
+        });
+
+        // For projectiles, we need to animate position
+        if (effect.type === "projectile" && effect.end) {
+          animateProjectile(effect, index);
+        }
+
+        // For all effects, we need to animate the sprite frames
+        animateEffectFrames(effect, index);
+
+        // Clean up effect after its duration
+        const endTimer = window.setTimeout(() => {
+          if (!isMounted.current) return;
+
+          setEffectStates((prev) => {
+            const newState = [...prev];
+            if (newState[index]) {
+              newState[index].isActive = false;
+            }
+            return newState;
+          });
+        }, effect.duration);
+
+        timersRef.current.push(endTimer);
+      }, effect.startTime);
+
+      timersRef.current.push(startTimer);
     });
 
     return () => {
-      stateChangeSub();
-      resetSub();
+      // Clean up timers
+      timersRef.current.forEach((timer) => window.clearTimeout(timer));
+      timersRef.current = [];
     };
-  }, []);
+  }, [activeEffects, showDebug]);
 
-  // Process effects based on current animation phase
-  useEffect(() => {
-    const phase = currentPhase;
-    const animationData = animationController.getAnimationData();
-    const effects = animationController.getActiveEffects();
+  // Function to animate projectile movement
+  const animateProjectile = (effect: VisualEffect, index: number) => {
+    const startPosition = getEffectPosition(effect, "start");
+    const endPosition = getEffectPosition(effect, "end");
 
+    debugLog(
+      `Animating projectile from (${startPosition.x}, ${startPosition.y}) to (${endPosition.x}, ${endPosition.y})`
+    );
+
+    // Ensure the start and end positions are different
     if (
-      !animationData ||
-      !lastActionId ||
-      phase === "idle" ||
-      phase === "completed"
+      Math.abs(startPosition.x - endPosition.x) < 20 &&
+      Math.abs(startPosition.y - endPosition.y) < 20
     ) {
-      return;
-    }
-
-    // Filter effects that should start in the current phase
-    const newEffects = effects
-      .filter((effect) => {
-        // Check if this effect should start now based on its startTime
-        // This is a simple approximation - in a full implementation,
-        // you'd use a more precise timing mechanism
-        if (phase === "attacking" && effect.startTime < 500) return true;
-        if (
-          phase === "impact" &&
-          effect.startTime >= 500 &&
-          effect.startTime < 1000
-        )
-          return true;
-        if (phase === "recovery" && effect.startTime >= 1000) return true;
-        return false;
-      })
-      .filter((effect) => {
-        // Exclude effects already in the active list
-        return !activeEffects.some(
-          (active) =>
-            active.effect.path === effect.path &&
-            active.effect.type === effect.type
-        );
-      });
-
-    // If we have new effects, add them
-    if (newEffects.length > 0) {
-      debugLog(`Adding ${newEffects.length} new effects for phase ${phase}`);
-
-      // Add new effects to the state
-      setActiveEffects((prev) => [
-        ...prev,
-        ...newEffects.map((effect) => {
-          // Calculate positions based on effect configuration
-          const position = calculatePosition(effect.start);
-          const endPosition = effect.end
-            ? calculatePosition(effect.end)
-            : undefined;
-
-          return {
-            id: `${lastActionId}-${effect.path}-${Date.now()}`,
-            effect,
-            visible: true,
-            position,
-            endPosition,
-            currentFrame: 0,
-            totalFrames: calculateFrames(effect),
-            progress: 0,
-            scale: effect.scale || 1,
-            rotation: effect.rotation || 0,
-          };
-        }),
-      ]);
-    }
-  }, [currentPhase, lastActionId]);
-
-  // Separate useEffect to handle cleanup of completed effects
-  useEffect(() => {
-    if (activeEffects.length === 0) return;
-
-    // Cleanup completed effects
-    const cleanup = () => {
-      setActiveEffects((prev) =>
-        prev.filter(
-          (effect) =>
-            effect.progress < 1 ||
-            Date.now() - parseInt(effect.id.split("-")[2]) <
-              effect.effect.duration
-        )
+      debugLog(
+        "Start and end positions are too close, using default positions"
       );
+      // Use fallback positions
+      startPosition.x = 200;
+      endPosition.x = 500;
+    }
+
+    const framesCount = Math.ceil(effect.duration / 50); // Update every 50ms
+    let currentFrame = 0;
+
+    const updatePosition = () => {
+      if (!isMounted.current) return;
+
+      if (currentFrame < framesCount) {
+        const progress = currentFrame / framesCount;
+        const newX =
+          startPosition.x + (endPosition.x - startPosition.x) * progress;
+        const newY =
+          startPosition.y + (endPosition.y - startPosition.y) * progress;
+
+        setEffectStates((prev) => {
+          const newState = [...prev];
+          if (newState[index]) {
+            newState[index].position = { x: newX, y: newY };
+          }
+          return newState;
+        });
+
+        currentFrame++;
+        const timerId = window.setTimeout(updatePosition, 50);
+        timersRef.current.push(timerId);
+      }
     };
 
-    // Run cleanup on a timer to avoid too many renders
-    const cleanupTimer = setTimeout(cleanup, 100);
-
-    return () => clearTimeout(cleanupTimer);
-  }, [activeEffects]);
-
-  // Animate active effects
-  useEffect(() => {
-    if (activeEffects.length === 0) return;
-
-    const animationFrame = requestAnimationFrame(() => {
-      setActiveEffects((prev) =>
-        prev.map((effect) => {
-          // For projectiles, update position based on progress
-          let newPosition = { ...effect.position };
-
-          if (effect.effect.type === "projectile" && effect.endPosition) {
-            // Linear interpolation between start and end positions
-            newPosition = {
-              x:
-                effect.position.x +
-                (effect.endPosition.x - effect.position.x) * effect.progress,
-              y:
-                effect.position.y +
-                (effect.endPosition.y - effect.position.y) * effect.progress,
-            };
-          }
-
-          // Update progress
-          const newProgress = Math.min(
-            1,
-            effect.progress + 16 / effect.effect.duration
-          );
-
-          // Update frame
-          const frameDuration = effect.effect.duration / effect.totalFrames;
-          const newFrame = Math.min(
-            effect.totalFrames - 1,
-            Math.floor(newProgress * effect.totalFrames)
-          );
-
-          return {
-            ...effect,
-            position: newPosition,
-            currentFrame: newFrame,
-            progress: newProgress,
-            visible: newProgress < 1,
-          };
-        })
-      );
-    });
-
-    return () => cancelAnimationFrame(animationFrame);
-  }, [activeEffects]);
-
-  // Helper to calculate position based on 'attacker', 'target', or coordinates
-  const calculatePosition = (
-    positionSource: "attacker" | "target" | { x: number; y: number }
-  ) => {
-    // In a real implementation, you would get actual positions from the DOM
-    // This is a simplified version
-    if (typeof positionSource === "object") {
-      return positionSource;
-    }
-
-    // Fixed positions for demo - in real implementation, get these from the DOM
-    if (positionSource === "attacker") {
-      const context = animationController.getAnimationData();
-      const isEnemyAttacker = currentPhase === "impact";
-      return { x: isEnemyAttacker ? 200 : 100, y: 150 };
-    }
-
-    if (positionSource === "target") {
-      const context = animationController.getAnimationData();
-      const isEnemyTarget = currentPhase === "impact";
-      return { x: isEnemyTarget ? 100 : 200, y: 150 };
-    }
-
-    return { x: 150, y: 150 }; // Default fallback
+    updatePosition();
   };
 
-  // Calculate total frames for an effect
-  const calculateFrames = (effect: VisualEffect) => {
-    // Default to 10 frames per second, or custom from effect
-    const framesPerSecond = 10;
-    return Math.max(1, Math.ceil((effect.duration / 1000) * framesPerSecond));
+  // Function to animate effect sprite frames
+  const animateEffectFrames = (effect: VisualEffect, index: number) => {
+    if (effect.path) {
+      // Get frame count from sprites array if available
+      const framesCount = effect.sprites ? effect.sprites.length : 8;
+      let currentFrame = 0;
+
+      const updateFrame = () => {
+        if (!isMounted.current) return;
+
+        if (currentFrame < framesCount) {
+          setEffectStates((prev) => {
+            const newState = [...prev];
+            if (newState[index]) {
+              newState[index].currentFrame = currentFrame;
+            }
+            return newState;
+          });
+
+          currentFrame++;
+          const timerId = window.setTimeout(
+            updateFrame,
+            effect.duration / framesCount
+          );
+          timersRef.current.push(timerId);
+        }
+      };
+
+      updateFrame();
+    }
   };
 
-  // Get current frame image path
-  const getEffectFramePath = (effect: EffectState) => {
-    return `${effect.effect.path}/${effect.currentFrame}.png`;
+  // Helper to get starting or ending position for an effect
+  const getEffectPosition = (
+    effect: VisualEffect,
+    posType: "start" | "end"
+  ): { x: number; y: number } => {
+    const position = posType === "start" ? effect.start : effect.end;
+
+    // If we already have the character positions, use them
+    if (
+      position === "attacker" &&
+      characterPositionsRef.current.attacker.found
+    ) {
+      return {
+        x: characterPositionsRef.current.attacker.x,
+        y: characterPositionsRef.current.attacker.y,
+      };
+    }
+
+    if (position === "target" && characterPositionsRef.current.target.found) {
+      return {
+        x: characterPositionsRef.current.target.x,
+        y: characterPositionsRef.current.target.y,
+      };
+    }
+
+    // Otherwise calculate fresh positions
+    if (position === "attacker" || position === "target") {
+      const context = animationController.getCurrentContext();
+      const isAttacker = position === "attacker";
+
+      // Get the appropriate character name
+      const characterName = isAttacker
+        ? context.attackerCharacter?.name.toLowerCase().replace(/\s+/g, "")
+        : context.targetCharacter?.name.toLowerCase().replace(/\s+/g, "");
+
+      if (!characterName) {
+        debugLog(`Character name not found for ${position}`);
+        return { x: isAttacker ? 200 : 500, y: 150 };
+      }
+
+      // Find the character position
+      const foundPosition = findCharacterPosition(characterName, isAttacker);
+
+      // Cache the found position for future use
+      if (isAttacker) {
+        characterPositionsRef.current.attacker = foundPosition;
+      } else {
+        characterPositionsRef.current.target = foundPosition;
+      }
+
+      return { x: foundPosition.x, y: foundPosition.y };
+    } else if (typeof position === "object") {
+      return position;
+    }
+
+    // Default fallback
+    return { x: 300, y: 150 };
+  };
+
+  // Helper to get sprite path for an effect frame
+  const getEffectSpritePath = (effect: VisualEffect, frame: number): string => {
+    if (effect.sprites && effect.sprites.length > 0) {
+      return effect.sprites[frame % effect.sprites.length];
+    }
+
+    // Default sprite path format
+    const characterName = extractCharacterFromPath(effect.path);
+    const effectName = effect.path.split("/").pop() || effect.path;
+
+    return `characters/${characterName}/sprites/${effect.path}/${characterName}-sprites-${frame}.png`;
+  };
+
+  // Helper to extract character name from path
+  const extractCharacterFromPath = (path: string): string => {
+    // Extract character name from paths like "sasuke/fireball/effects/fireball"
+    const parts = path.split("/");
+    if (parts.length > 0) {
+      return parts[0]; // Return first segment as character name
+    }
+    return "unknown";
+  };
+
+  // Calculate if projectile needs to be flipped
+  const shouldFlipProjectile = (effect: VisualEffect): boolean => {
+    if (effect.type !== "projectile") return false;
+
+    const startX = characterPositionsRef.current.attacker.x;
+    const endX = characterPositionsRef.current.target.x;
+
+    // Flip if traveling from right to left
+    return startX > endX;
   };
 
   return (
-    <div className="visual-effects-container">
-      {activeEffects.map(
-        (effect) =>
-          effect.visible && (
-            <div
-              key={effect.id}
-              className={`visual-effect effect-${effect.effect.type}`}
-              style={{
-                position: "absolute",
-                left: `${effect.position.x}px`,
-                top: `${effect.position.y}px`,
-                transform: `scale(${effect.scale}) rotate(${effect.rotation}deg)`,
-                opacity:
-                  effect.effect.type === "impact"
-                    ? // Fade in and out for impact effects
-                      effect.progress < 0.2
-                      ? effect.progress * 5
-                      : (1 - effect.progress) * 1.25
-                    : // Simple fade out for other effects
-                    effect.progress > 0.8
-                    ? (1 - effect.progress) * 5
-                    : 1,
-                zIndex: 100,
-              }}
-            >
-              <img
-                src={getEffectFramePath(effect)}
-                alt={`Effect ${effect.effect.type}`}
-                style={{ maxWidth: "60px", maxHeight: "60px" }}
-              />
-            </div>
-          )
-      )}
+    <div className="visual-effects-layer">
+      {effectStates.map((effectState, index) => {
+        const { effect, currentFrame, position, isActive } = effectState;
 
-      {showDebug && (
-        <div className="debug-effects">
+        if (!isActive) return null;
+
+        const scale = effect.scale || 1;
+        const rotation = effect.rotation || 0;
+        const effectClass = `visual-effect effect-${effect.type}`;
+        const flipStyle = shouldFlipProjectile(effect)
+          ? { transform: "scaleX(-1)" }
+          : {};
+
+        return (
           <div
+            key={`effect-${index}-${effect.type}`}
+            className={effectClass}
             style={{
-              fontSize: "10px",
-              background: "#f0f0f0",
-              padding: "5px",
               position: "absolute",
-              bottom: "5px",
-              left: "5px",
+              left: `${position.x}px`,
+              top: `${position.y}px`,
+              transform: `translate(-50%, -50%) scale(${scale}) rotate(${rotation}deg)`,
+              filter: effect.color
+                ? `drop-shadow(0 0 5px ${effect.color})`
+                : undefined,
+              animation: getEffectAnimation(effect),
             }}
           >
-            <strong>Effects Debug:</strong>
-            <br />
-            {activeEffects.length} active effects
-            <br />
-            Phase: {currentPhase}
+            <img
+              src={getEffectSpritePath(effect, currentFrame)}
+              alt={`Effect ${effect.type}`}
+              style={{
+                maxWidth: "100px",
+                maxHeight: "100px",
+                ...flipStyle,
+              }}
+              onError={(e) => {
+                if (showDebug) {
+                  console.error(
+                    `Failed to load effect sprite: ${
+                      (e.target as HTMLImageElement).src
+                    }`
+                  );
+                }
+                // Set a fallback image or hide
+                (e.target as HTMLImageElement).style.display = "none";
+              }}
+            />
+
+            {showDebug && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  fontSize: "10px",
+                  backgroundColor: "rgba(0,0,0,0.5)",
+                  color: "white",
+                  padding: "2px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {`${effect.type} (${currentFrame}) at ${Math.round(
+                  position.x
+                )},${Math.round(position.y)}`}
+              </div>
+            )}
           </div>
+        );
+      })}
+
+      {showDebug && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: "5px",
+            left: "5px",
+            fontSize: "10px",
+            backgroundColor: "rgba(0,0,0,0.7)",
+            color: "white",
+            padding: "3px",
+          }}
+        >
+          Active Effects: {activeEffects.length}
+          <br />
+          Attacker: ({Math.round(characterPositionsRef.current.attacker.x)},
+          {Math.round(characterPositionsRef.current.attacker.y)})
+          <br />
+          Target: ({Math.round(characterPositionsRef.current.target.x)},
+          {Math.round(characterPositionsRef.current.target.y)})
         </div>
       )}
     </div>
   );
+};
+
+// Helper to get the appropriate CSS animation based on effect type
+const getEffectAnimation = (effect: VisualEffect): string | undefined => {
+  switch (effect.type) {
+    case "projectile":
+      return undefined; // We're handling projectile movement with JS
+    case "impact":
+      return `impactPulse ${effect.duration}ms ease-out forwards`;
+    case "aura":
+      return `auraGlow ${effect.duration}ms ease-in-out infinite`;
+    default:
+      return undefined;
+  }
 };
 
 export default VisualEffects;

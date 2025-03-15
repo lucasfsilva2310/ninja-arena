@@ -22,6 +22,7 @@ export interface VisualEffect {
   path: string; // Path to the effect sprites
   start: "attacker" | "target" | { x: number; y: number }; // Starting position
   end?: "attacker" | "target" | { x: number; y: number }; // Ending position (for projectiles)
+  sprites?: string[]; // Array of sprite image paths
   startTime: number; // When to start the effect (ms from sequence start)
   duration: number; // How long the effect lasts
   scale?: number; // Optional scale for the effect

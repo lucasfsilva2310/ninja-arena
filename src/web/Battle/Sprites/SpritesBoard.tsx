@@ -33,6 +33,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
   const [debugInfo, setDebugInfo] = useState<string>("");
   const lastExecutingTurn = useRef(isExecutingTurn);
   const previousSelectedActions = useRef(selectedActions);
+  const spritesArenaRef = useRef<HTMLDivElement>(null);
 
   // Store the current animation phase in state to avoid infinite render loops
   const [currentAnimationPhase, setCurrentAnimationPhase] = useState<string>(
@@ -348,7 +349,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
 
   return (
     <div className="sprites-board">
-      <div className="sprites-arena">
+      <div className="sprites-arena" ref={spritesArenaRef}>
         <div className="sprites-row asd ">
           {game.player1.characters.map((char, index) => {
             const animation = getCharacterAnimation(char.name, false, index);
