@@ -50,16 +50,14 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       <div className={`character-info-container`}>
         {!isEnemy ? (
           <>
-            <div className="character-name-box">
-              <div
-                className="character-stats-container"
-                onClick={() => handleTargetClick(player, char)}
-              >
-                <CharacterNameComponent
-                  character={char}
-                  possibleTargets={possibleTargets}
-                />
-              </div>
+            <div
+              className="character-stats-container"
+              onClick={() => handleTargetClick(player, char)}
+            >
+              <CharacterNameComponent
+                character={char}
+                possibleTargets={possibleTargets}
+              />
             </div>
             <div className={`character-info-abilities-container player`}>
               <div className="character-actions">

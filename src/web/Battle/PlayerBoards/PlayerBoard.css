@@ -17,21 +17,20 @@
   justify-content: flex-start;
   align-items: flex-start;
 
-  gap: 2rem;
+  gap: 1rem;
 
   width: 100%;
+  max-height: 100px;
   padding: 0.7rem;
 
   overflow: visible;
   position: relative;
 }
 
-.character-name-box {
-  width: 40%;
-
+/* .character-name-box {
   overflow: visible;
   position: relative;
-}
+} */
 
 .character-stats-container {
   display: flex;
@@ -40,7 +39,7 @@
   gap: 0.3rem;
 
   height: 30px;
-  width: 100%;
+  width: 30%;
 
   overflow: visible;
   position: relative;
@@ -108,11 +107,14 @@
 }
 
 /* Adjust enemy card to mirror the scroll if needed */
-.character-card[class*="enemy"] {
+.character-card.enemy-card {
   transform: scaleX(-1);
+  width: 70%;
+  padding-left: 1.1rem;
+  padding-right: 1.1rem;
 }
 
 /* Prevent content from being mirrored */
-.character-card[class*="enemy"] .character-info-container {
+.character-card.enemy-card .character-info-container {
   transform: scaleX(-1);
 }

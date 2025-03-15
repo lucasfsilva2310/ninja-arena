@@ -90,20 +90,6 @@
   text-align: center;
 }
 
-/* Character Portrait */
-.character-portrait {
-  width: 96px;
-  height: 96px;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 2px solid rgb(0, 0, 0);
-  flex-shrink: 0;
-  background-color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .character-image {
   width: 100%;
   height: 100%;
@@ -113,14 +99,6 @@
 
 .character-image:hover {
   transform: scale(1.1);
-}
-
-/* Character Details */
-.character-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 /* Character States */
@@ -133,12 +111,6 @@
   text-decoration: line-through;
   opacity: 0.7;
 }
-
-/* Enemy-specific styles */
-.enemy .character-details {
-  text-align: right;
-}
-
 /* Animations */
 @keyframes selectPulse {
   0% {
@@ -369,7 +341,7 @@
 /* Battle Section */
 .battle-section {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   gap: 1rem;
   flex: 1;
   min-height: 0; /* Important for preventing overflow */

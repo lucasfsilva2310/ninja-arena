@@ -45,14 +45,17 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
           <img
             src={characterDeadImagePath}
             alt={character.name}
-            className="character-image"
+            className={`character-image ${
+              possibleTargets.includes(character) ? "character-selected" : ""
+            }`}
           />
         ) : isVideoCharacter ? (
           <video
             src={characterVideoPath}
             className={`character-image ${
               character.hp <= 0 ? "character-dying" : ""
-            }`}
+            } ${possibleTargets.includes(character) ? "character-selected" : ""}
+            `}
             autoPlay
             loop
             muted
@@ -77,21 +80,19 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
             alt={character.name}
             className={`character-image ${
               character.hp <= 0 ? "character-dying" : ""
-            }`}
+            } ${possibleTargets.includes(character) ? "character-selected" : ""}
+            `}
             onError={(e) => {
               e.currentTarget.src = characterDefaultImagePath;
             }}
           />
         )}
       </div>
-      <div className="character-details">
-        <h4
-          className={`character-name ${
-            character.hp > 0 ? "character-alive" : "character-dead"
-          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
-        >
-          {character.name}
-        </h4>
+      <div
+        className={`character-details ${
+          character.hp > 0 ? "character-alive" : "character-dead"
+        } `}
+      >
         <HealthBar
           currentHP={character.hp}
           onAnimationComplete={() => {

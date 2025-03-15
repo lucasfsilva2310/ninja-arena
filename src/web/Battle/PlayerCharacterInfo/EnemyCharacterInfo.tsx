@@ -47,14 +47,11 @@ export const EnemyCharacterName: React.FC<EnemyCharacterNameProps> = ({
           }}
         />
       </div>
-      <div className="character-details">
-        <h4
-          className={`character-name ${
-            character.hp > 0 ? "character-alive" : "character-dead"
-          } ${possibleTargets.includes(character) ? "character-selected" : ""}`}
-        >
-          {character.name}
-        </h4>
+      <div
+        className={`character-details ${
+          character.hp > 0 ? "character-alive" : "character-dead"
+        } }`}
+      >
         <HealthBar
           currentHP={character.hp}
           onAnimationComplete={() => {

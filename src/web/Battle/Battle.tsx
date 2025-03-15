@@ -328,6 +328,8 @@ export default function Battle({ game, onGameOver }: BattleProps) {
   };
 
   const handleTargetClick = (player: Player, target: Character) => {
+    setSelectedCharacterForAbilitiesPreview(target);
+
     if (!possibleTargetsForSelectedAbility.includes(target)) {
       setSelectedAbility(null);
       return;
