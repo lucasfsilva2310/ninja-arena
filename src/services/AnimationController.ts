@@ -113,23 +113,31 @@ export class AnimationController {
 
     const frameSpeed = 150;
 
+    // Get the appropriate animation data based on the phase
+    let animationData: AbilityAnimation;
+    if (phase === "attacking") {
+      // For attacking phase, use the attacker's ability animation
+      animationData = this.context.animationData;
+    } else {
+      // For impact and recovery phases, use the target's default animation
+      animationData = getAbilityAnimation(
+        this.context.targetCharacter?.name || "",
+        "default"
+      );
+    }
+
     switch (phase) {
       case "attacking":
         // Use sprite count to determine duration
         return (
-          this.context.animationData.attacker.sprites.length * frameSpeed ||
+          animationData.attacker.sprites.length * frameSpeed ||
           this.phaseTimeouts[phase]
         );
 
       case "impact":
         // Use target sprite count and ensure minimum duration
-        // USING MINIMUM DURATION FOR DAMAGE ANIMATION FOR NOW
-        const targetSprites = this.context.animationData.target.sprites;
-        return Math.max(
-          targetSprites.length * frameSpeed,
-          this.phaseTimeouts[phase],
-          1500 // Minimum 1.5 seconds for damage animation
-        );
+        const targetSprites = animationData.target.sprites;
+        return targetSprites.length * frameSpeed || this.phaseTimeouts[phase];
 
       case "recovery":
         // For recovery, we can use a fixed time or another sprite set
