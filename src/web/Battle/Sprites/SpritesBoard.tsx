@@ -270,7 +270,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
 
           // Determine if this character is a target
           const isTarget =
-            phase === "impact" &&
+            (phase === "impact" || phase === "recovery") &&
             normalizeString(currentAction.targetCharacter.name) ===
               anim.characterName &&
             ((anim.isEnemy && currentAction.targetPlayer === game.player2) ||
@@ -292,8 +292,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
               abilityName = "recover";
             }
           } else if (isTarget && character.hp > 0) {
-            // Target animation only if character is alive
-            if (phase === "impact") {
+            // Target animation - keep damaged animation during impact and recovery phases
+            if (phase === "impact" || phase === "recovery") {
               abilityName = "damaged";
             }
           }

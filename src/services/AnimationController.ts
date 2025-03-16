@@ -112,9 +112,6 @@ export class AnimationController {
     }
 
     const frameSpeed = 150;
-    const attackerName = this.context.attackerCharacter.name;
-    const abilityName = this.context.attackerAbility?.name || "default";
-    const targetName = this.context.targetCharacter?.name || "";
 
     switch (phase) {
       case "attacking":
@@ -125,10 +122,13 @@ export class AnimationController {
         );
 
       case "impact":
-        // Use target sprite count
-        return (
-          this.context.animationData.target.sprites.length * frameSpeed ||
-          this.phaseTimeouts[phase]
+        // Use target sprite count and ensure minimum duration
+        // USING MINIMUM DURATION FOR DAMAGE ANIMATION FOR NOW
+        const targetSprites = this.context.animationData.target.sprites;
+        return Math.max(
+          targetSprites.length * frameSpeed,
+          this.phaseTimeouts[phase],
+          1500 // Minimum 1.5 seconds for damage animation
         );
 
       case "recovery":

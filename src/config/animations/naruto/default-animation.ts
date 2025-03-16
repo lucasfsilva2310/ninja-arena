@@ -6,8 +6,8 @@ export const narutoDefaultAnimation: AbilityAnimation = {
     phases: ["attack"],
   },
   target: {
-    sprites: generateSpritePaths("naruto", "damaged", 9),
-    phases: ["idle", "damaged"],
+    sprites: generateSpritePaths("naruto", "damaged", 11),
+    phases: ["damaged"],
   },
   effects: [],
 };

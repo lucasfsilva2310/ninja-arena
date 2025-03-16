@@ -755,7 +755,6 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 game={game}
                 selectedActions={selectedActions}
                 isExecutingTurn={isExecutingTurn}
-                showDebug={false}
                 onActionAnimationComplete={handleActionAnimationComplete}
                 onAllAnimationsComplete={handleAllAnimationsComplete}
                 currentActionIndex={currentActionIndex}
