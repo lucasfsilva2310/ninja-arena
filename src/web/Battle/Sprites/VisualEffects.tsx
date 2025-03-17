@@ -4,9 +4,11 @@ import animationController, {
   AnimationContext,
 } from "../../../services/AnimationController";
 import { VisualEffect } from "../../../config/animations/animations.config";
+import { GameEngine } from "../../../models/game-engine";
 
 interface VisualEffectsProps {
   showDebug?: boolean;
+  game: GameEngine;
 }
 
 interface CharacterPosition {
@@ -15,7 +17,10 @@ interface CharacterPosition {
   found: boolean;
 }
 
-const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
+const VisualEffects: React.FC<VisualEffectsProps> = ({
+  showDebug = false,
+  game,
+}) => {
   const [activeEffects, setActiveEffects] = useState<VisualEffect[]>([]);
   const [effectStates, setEffectStates] = useState<
     {
@@ -60,6 +65,13 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
           return { x: isAttacker ? 200 : 500, y: 150, found: false };
         }
 
+        // Get the current animation context
+        const context = animationController.getCurrentContext();
+        if (!context) {
+          debugLog("No animation context available");
+          return { x: isAttacker ? 200 : 500, y: 150, found: false };
+        }
+
         // Try finding sprite element by alt attribute first (most reliable)
         const sprites = document.querySelectorAll(
           `.sprite-image`
@@ -70,16 +82,21 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
         for (let i = 0; i < sprites.length; i++) {
           const alt = sprites[i].alt.toLowerCase();
           if (alt.includes(characterName.toLowerCase())) {
-            // For attacker vs target, make sure to get the right one (player1 or player2)
+            // Get the enemy state from the sprite class
             const isEnemy = sprites[i].classList.contains("sprite-enemy");
-            const context = animationController.getCurrentContext();
-            const attackerIsEnemy =
-              context.attackerPlayer === context.targetPlayer;
 
-            // Check if this is the correct character (attacker or target)
+            // Determine if this is the correct character based on the animation context
+            // For attacker:
+            // - If attacker is player1, we want a non-enemy sprite
+            // - If attacker is player2, we want an enemy sprite
+            // For target:
+            // - If target is player1, we want a non-enemy sprite
+            // - If target is player2, we want an enemy sprite
             const isCorrectElement = isAttacker
-              ? isEnemy === attackerIsEnemy
-              : isEnemy !== attackerIsEnemy;
+              ? (isEnemy && context.attackerPlayer === game.player2) || // Enemy (player2) attacking
+                (!isEnemy && context.attackerPlayer === game.player1) // Player (player1) attacking
+              : (isEnemy && context.targetPlayer === game.player2) || // Enemy (player2) being targeted
+                (!isEnemy && context.targetPlayer === game.player1); // Player (player1) being targeted
 
             if (isCorrectElement) {
               characterElement = sprites[i];
@@ -120,7 +137,7 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
         return { x: isAttacker ? 200 : 500, y: 150, found: false };
       }
     },
-    [showDebug]
+    [showDebug, game]
   );
 
   // Subscribe to animation controller for effects
@@ -183,7 +200,7 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
       timersRef.current.forEach((timer) => window.clearTimeout(timer));
       timersRef.current = [];
     };
-  }, [showDebug, findCharacterPosition]);
+  }, [showDebug, findCharacterPosition, game]);
 
   // Initialize and update effect animations
   useEffect(() => {
@@ -265,7 +282,7 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
       timersRef.current.forEach((timer) => window.clearTimeout(timer));
       timersRef.current = [];
     };
-  }, [activeEffects, showDebug]);
+  }, [activeEffects, showDebug, game]);
 
   // Function to animate projectile movement
   const animateProjectile = (effect: VisualEffect, index: number) => {
@@ -358,6 +375,13 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
   ): { x: number; y: number } => {
     const position = posType === "start" ? effect.start : effect.end;
 
+    // Get the current animation context
+    const context = animationController.getCurrentContext();
+    if (!context) {
+      debugLog("No animation context available for effect position");
+      return { x: 300, y: 150 };
+    }
+
     // If we already have the character positions, use them
     if (
       position === "attacker" &&
@@ -378,10 +402,9 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
 
     // Otherwise calculate fresh positions
     if (position === "attacker" || position === "target") {
-      const context = animationController.getCurrentContext();
       const isAttacker = position === "attacker";
 
-      // Get the appropriate character name
+      // Get the appropriate character name from the context
       const characterName = isAttacker
         ? context.attackerCharacter?.name.toLowerCase().replace(/\s+/g, "")
         : context.targetCharacter?.name.toLowerCase().replace(/\s+/g, "");
@@ -444,6 +467,16 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
     return startX > endX;
   };
 
+  // Calculate if effect needs to be rotated
+  const shouldRotateEffect = (effect: VisualEffect): boolean => {
+    // Get the current animation context
+    const context = animationController.getCurrentContext();
+    if (!context) return false;
+
+    // If the attacker is player2 (enemy), rotate the effect
+    return context.attackerPlayer === game.player2;
+  };
+
   return (
     <div className="visual-effects-layer">
       {effectStates.map((effectState, index) => {
@@ -452,7 +485,9 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({ showDebug = false }) => {
         if (!isActive) return null;
 
         const scale = effect.scale || 1;
-        const rotation = effect.rotation || 0;
+        const rotation = shouldRotateEffect(effect)
+          ? 180
+          : effect.rotation || 0;
         const effectClass = `visual-effect effect-${effect.type}`;
         const flipStyle = shouldFlipProjectile(effect)
           ? { transform: "scaleX(-1)" }

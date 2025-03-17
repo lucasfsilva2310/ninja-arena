@@ -415,7 +415,7 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         </div>
 
         {/* Add visual effects layer */}
-        <VisualEffects showDebug={showDebug} />
+        <VisualEffects showDebug={showDebug} game={game} />
       </div>
 
       {showDebug && (
