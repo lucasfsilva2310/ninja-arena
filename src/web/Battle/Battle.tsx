@@ -211,10 +211,13 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
   // Calculate active chakras
   useEffect(() => {
-    // Update mainPlayerActiveChakras to show ALL available chakras (not accounting for Random reservations)
-    const availableChakras = getAllAvailableChakras();
-    setMainPlayerActiveChakras(availableChakras);
-  }, [game.player1.chakras, selectedActions, gameStateVersion]);
+    // Only update mainPlayerActiveChakras when it's the player's turn
+    if (isPlayerTurn) {
+      // Update mainPlayerActiveChakras to show ALL available chakras (not accounting for Random reservations)
+      const availableChakras = getAllAvailableChakras();
+      setMainPlayerActiveChakras(availableChakras);
+    }
+  }, [game.player1.chakras, selectedActions, gameStateVersion, isPlayerTurn]);
 
   // Sync selectedChakras with actual chakra usage for UI elements that depend on it
   useEffect(() => {
