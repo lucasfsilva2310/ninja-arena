@@ -1,13 +1,11 @@
 import { chakraTypes } from "../../../models/chakra.model";
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const sasukeFireballAnimation: AbilityAnimation = {
   attacker: {
     sprites: generateSpritePaths("sasuke", "fireball", 15),
   },
-  target: {
-    sprites: [], // Will use default damage sprites
-  },
+
   effects: [
     {
       type: "projectile",

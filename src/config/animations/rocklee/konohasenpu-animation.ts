@@ -1,13 +1,11 @@
-import { AbilityAnimation } from "../animation-config";
+import { AbilityAnimation } from "../animations.config";
 
-import { generateSpritePaths } from "../animation-config";
+import { generateSpritePaths } from "../animations.config";
 
 export const rockleeKonohaSenpuAnimation: AbilityAnimation = {
   attacker: {
     sprites: generateSpritePaths("rocklee", "konohasenpu", 24),
   },
-  target: {
-    sprites: [], // Will use default damage sprites from SpriteAnimator
-  },
+
   effects: [],
 };

@@ -1,4 +1,4 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const sakuraAngerPunchAnimation: AbilityAnimation = {
   attacker: {

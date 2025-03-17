@@ -1,4 +1,4 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const rockleeDefaultAnimation: AbilityAnimation = {
   attacker: {
@@ -6,8 +6,14 @@ export const rockleeDefaultAnimation: AbilityAnimation = {
     phases: ["attack"],
   },
   target: {
-    sprites: generateSpritePaths("rocklee", "damaged", 5),
-    phases: ["idle", "damaged"],
+    damaged: {
+      sprites: generateSpritePaths("rocklee", "damaged", 7),
+      phases: ["idle", "damaged"],
+    },
+    recover: {
+      sprites: generateSpritePaths("rocklee", "recover", 5),
+      phases: ["recover"],
+    },
   },
   effects: [],
 };

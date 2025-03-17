@@ -1,11 +1,9 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const sasukeSharinganAnimation: AbilityAnimation = {
   attacker: {
     sprites: generateSpritePaths("sasuke", "sharingan", 7),
   },
-  target: {
-    sprites: [], // Will use default damage sprites from SpriteAnimator
-  },
+
   effects: [],
 };

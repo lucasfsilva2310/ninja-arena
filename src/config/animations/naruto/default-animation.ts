@@ -1,4 +1,4 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const narutoDefaultAnimation: AbilityAnimation = {
   attacker: {
@@ -6,8 +6,13 @@ export const narutoDefaultAnimation: AbilityAnimation = {
     phases: ["attack"],
   },
   target: {
-    sprites: generateSpritePaths("naruto", "damaged", 11),
-    phases: ["damaged"],
+    damaged: {
+      sprites: generateSpritePaths("naruto", "damaged", 7),
+      phases: ["damaged"],
+    },
+    recover: {
+      sprites: generateSpritePaths("naruto", "recover", 4),
+    },
   },
   effects: [],
 };

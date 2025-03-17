@@ -1,11 +1,9 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const rockleeReleaseWeightsAnimation: AbilityAnimation = {
   attacker: {
     sprites: generateSpritePaths("rocklee", "releaseweights", 11),
   },
-  target: {
-    sprites: [], // Will use default damage sprites from SpriteAnimator
-  },
+
   effects: [],
 };

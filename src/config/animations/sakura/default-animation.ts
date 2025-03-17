@@ -1,4 +1,4 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const sakuraDefaultAnimation: AbilityAnimation = {
   attacker: {
@@ -6,8 +6,14 @@ export const sakuraDefaultAnimation: AbilityAnimation = {
     phases: ["attack"],
   },
   target: {
-    sprites: generateSpritePaths("sakura", "damaged", 11),
-    phases: ["idle", "damaged"],
+    damaged: {
+      sprites: generateSpritePaths("sakura", "damaged", 7),
+      phases: ["idle", "damaged"],
+    },
+    recover: {
+      sprites: generateSpritePaths("sakura", "recover", 5),
+      phases: ["recover"],
+    },
   },
   effects: [],
 };

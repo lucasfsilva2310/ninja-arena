@@ -1,7 +1,7 @@
 import "./Sprites.css";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { getSpritePaths } from "../../../config/animations/animation-config";
+import { getSpritePaths } from "../../../config/animations/animations.config";
 
 const styles = {
   image: {
@@ -15,6 +15,7 @@ interface SpriteAnimatorProps {
   isEnemy?: boolean;
   abilityName?: string;
   isDamaged?: boolean;
+  isRecovering?: boolean;
   showDebug?: boolean;
 }
 
@@ -23,6 +24,7 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
   isEnemy = false,
   abilityName = "idle",
   isDamaged = false,
+  isRecovering = false,
   showDebug = false,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,40 +57,29 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
       return [`characters/${characterNameLower}/sprites/defeated/defeated.png`];
     }
 
-    // If showing damage animation, use damage sprites
-    if (isDamaged) {
-      // Try to get from config first
-      const configPaths = getSpritePaths(characterName, "damaged", false);
+    // Get paths from config with new parameters
+    const configPaths = getSpritePaths(
+      characterName,
+      abilityName,
+      !isDamaged && !isRecovering,
+      isDamaged,
+      isRecovering
+    );
 
-      if (configPaths.length > 0) {
-        paths = configPaths;
-      } else {
-        // Fallback to default pattern
-        paths = Array.from(
-          { length: 11 },
-          (_, i) =>
-            `characters/${characterNameLower}/sprites/damaged/${characterNameLower}-sprites-${i}.png`
-        );
-      }
+    if (configPaths.length > 0) {
+      paths = configPaths;
     } else {
-      // Try to get from config first
-      const configPaths = getSpritePaths(characterName, abilityName, true);
-
-      if (configPaths.length > 0) {
-        paths = configPaths;
-      } else {
-        // Fallback to default pattern with variable length based on ability
-        const frameCount = abilityName === "idle" ? 6 : 11;
-        paths = Array.from(
-          { length: frameCount },
-          (_, i) =>
-            `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-${i}.png`
-        );
-      }
+      // Fallback to default pattern with variable length based on ability
+      const frameCount = abilityName === "idle" ? 6 : 11;
+      paths = Array.from(
+        { length: frameCount },
+        (_, i) =>
+          `characters/${characterNameLower}/sprites/${abilityName}/${characterNameLower}-sprites-${i}.png`
+      );
     }
 
     return paths;
-  }, [characterNameLower, abilityName, isDamaged, characterName]);
+  }, [characterNameLower, abilityName, isDamaged, isRecovering, characterName]);
 
   // Reset animation when props change
   useEffect(() => {
@@ -134,7 +125,9 @@ export const SpriteAnimator: React.FC<SpriteAnimatorProps> = ({
 
   return (
     <div
-      className={`sprite-animator ${isDamaged ? "sprite-damaged" : ""}`}
+      className={`sprite-animator ${isDamaged ? "sprite-damaged" : ""} ${
+        isRecovering ? "sprite-recovering" : ""
+      }`}
       data-ability={abilityName}
     >
       <img

@@ -37,10 +37,15 @@ export interface SpriteAnimationData {
   phases?: AnimationPhase[]; // Optional sequence of animation phases (fallback)
 }
 
+export interface SpriteAnimationDataForTarget {
+  damaged: SpriteAnimationData;
+  recover: SpriteAnimationData;
+}
+
 // Main interface for ability animation data
 export interface AbilityAnimation {
   attacker: SpriteAnimationData;
-  target: SpriteAnimationData;
+  target?: SpriteAnimationDataForTarget;
   effects: VisualEffect[];
   chakraColor?: ChakraType;
   sound?: string;
@@ -64,8 +69,14 @@ export const characterAbilityAnimations: Record<
         phases: ["attack"],
       },
       target: {
-        sprites: [],
-        phases: ["idle", "damaged"],
+        damaged: {
+          sprites: [],
+          phases: ["idle", "damaged"],
+        },
+        recover: {
+          sprites: [],
+          phases: ["recover"],
+        },
       },
       effects: [],
     },
@@ -166,10 +177,30 @@ export function getAnimationDuration(
 export function getSpritePaths(
   characterName: string,
   abilityName: string,
-  isAttacker: boolean = true
+  isAttacker: boolean = true,
+  isDamaged: boolean = false,
+  isRecovering: boolean = false
 ): string[] {
   const animation = getAbilityAnimation(characterName, abilityName);
-  return isAttacker ? animation.attacker.sprites : animation.target.sprites;
+
+  if (isAttacker) {
+    return animation.attacker.sprites;
+  }
+
+  // Handle target animations
+  if (!animation.target) {
+    return [];
+  }
+
+  if (isDamaged) {
+    return animation.target.damaged.sprites;
+  }
+
+  if (isRecovering) {
+    return animation.target.recover.sprites;
+  }
+
+  return [];
 }
 
 // Add this utility function to generate sprite paths

@@ -1,4 +1,4 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const sasukeDefaultAnimation: AbilityAnimation = {
   attacker: {
@@ -6,8 +6,13 @@ export const sasukeDefaultAnimation: AbilityAnimation = {
     phases: ["attack"],
   },
   target: {
-    sprites: generateSpritePaths("sasuke", "damaged", 11),
-    phases: ["idle", "damaged"],
+    damaged: {
+      sprites: generateSpritePaths("sasuke", "damaged", 6),
+      phases: ["idle", "damaged"],
+    },
+    recover: {
+      sprites: generateSpritePaths("sasuke", "recover", 5),
+    },
   },
   effects: [],
 };

@@ -5,7 +5,7 @@ import {
   getAbilityAnimation,
   AbilityAnimation,
   VisualEffect,
-} from "../config/animations/animation-config";
+} from "../config/animations/animations.config";
 
 // Define the animation phases
 export type AnimationPhase =
@@ -107,8 +107,10 @@ export class AnimationController {
 
   // Get dynamic timeout based on animation data if available
   private getDynamicTimeout(phase: AnimationPhase): number {
+    const fallbackTimeout = this.phaseTimeouts[phase];
+
     if (!this.context.animationData || !this.context.attackerCharacter) {
-      return this.phaseTimeouts[phase];
+      return fallbackTimeout;
     }
 
     const frameSpeed = 150;
@@ -128,20 +130,19 @@ export class AnimationController {
 
     switch (phase) {
       case "attacking":
-        // Use sprite count to determine duration
         return (
-          animationData.attacker.sprites.length * frameSpeed ||
-          this.phaseTimeouts[phase]
+          animationData.attacker.sprites.length * frameSpeed || fallbackTimeout
         );
 
       case "impact":
-        // Use target sprite count and ensure minimum duration
-        const targetSprites = animationData.target.sprites;
-        return targetSprites.length * frameSpeed || this.phaseTimeouts[phase];
+        return animationData.target?.damaged
+          ? animationData.target.damaged.sprites.length * frameSpeed
+          : fallbackTimeout;
 
       case "recovery":
-        // For recovery, we can use a fixed time or another sprite set
-        return this.phaseTimeouts[phase];
+        return animationData.target?.recover
+          ? animationData.target.recover.sprites.length * frameSpeed
+          : fallbackTimeout;
 
       default:
         return this.phaseTimeouts[phase];

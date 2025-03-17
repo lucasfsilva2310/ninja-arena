@@ -1,11 +1,9 @@
-import { AbilityAnimation, generateSpritePaths } from "../animation-config";
+import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const sakuraInnerStrengthAnimation: AbilityAnimation = {
   attacker: {
     sprites: generateSpritePaths("sakura", "innerstrength", 9),
   },
-  target: {
-    sprites: [], // Will use default damage sprites from SpriteAnimator
-  },
+
   effects: [],
 };

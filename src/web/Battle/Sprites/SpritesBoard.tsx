@@ -71,6 +71,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
       abilityName: string;
       index: number;
       isTarget: boolean;
+      isDamaged: boolean;
+      isRecovering: boolean;
     }[]
   >([]);
 
@@ -129,6 +131,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         abilityName: "idle",
         index,
         isTarget: false,
+        isDamaged: false,
+        isRecovering: false,
       })),
       ...game.player2.characters.map((char, index) => ({
         characterName: normalizeString(char.name),
@@ -136,6 +140,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         abilityName: "idle",
         index,
         isTarget: false,
+        isDamaged: false,
+        isRecovering: false,
       })),
     ];
     setCharacterAnimations(initialAnimations);
@@ -245,6 +251,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
               ...anim,
               abilityName,
               isTarget: false,
+              isDamaged: false,
+              isRecovering: false,
             };
           })
         );
@@ -283,6 +291,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
 
           // Set animation name based on character role, phase and HP
           let abilityName = character.hp <= 0 ? "defeated" : "idle";
+          let isDamaged = false;
+          let isRecovering = false;
 
           if (isAttacker && character.hp > 0) {
             // Attacker animation only if character is alive
@@ -292,9 +302,11 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
               abilityName = "recover";
             }
           } else if (isTarget && character.hp > 0) {
-            // Target animation - keep damaged animation during impact and recovery phases
-            if (phase === "impact" || phase === "recovery") {
-              abilityName = "damaged";
+            // Target animation - handle damage and recovery phases
+            if (phase === "impact") {
+              isDamaged = true;
+            } else if (phase === "recovery") {
+              isRecovering = true;
             }
           }
 
@@ -302,6 +314,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
             ...anim,
             abilityName,
             isTarget,
+            isDamaged,
+            isRecovering,
           };
         });
       });
@@ -358,6 +372,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
         abilityName: "idle",
         index,
         isTarget: false,
+        isDamaged: false,
+        isRecovering: false,
       }
     );
   };
@@ -374,7 +390,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
                 characterName={char.name}
                 isEnemy={false}
                 abilityName={animation.abilityName}
-                isDamaged={animation.isTarget}
+                isDamaged={animation.isDamaged}
+                isRecovering={animation.isRecovering}
                 showDebug={showDebug}
               />
             );
@@ -389,7 +406,8 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
                 characterName={char.name}
                 isEnemy={true}
                 abilityName={animation.abilityName}
-                isDamaged={animation.isTarget}
+                isDamaged={animation.isDamaged}
+                isRecovering={animation.isRecovering}
                 showDebug={showDebug}
               />
             );
