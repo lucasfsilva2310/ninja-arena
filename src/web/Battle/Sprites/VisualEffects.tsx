@@ -22,6 +22,8 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
   game,
 }) => {
   const [activeEffects, setActiveEffects] = useState<VisualEffect[]>([]);
+  const [animationStartTime, setAnimationStartTime] = useState<number>(0);
+  const spritesArenaRef = useRef<HTMLDivElement>(null);
   const [effectStates, setEffectStates] = useState<
     {
       effect: VisualEffect;
@@ -149,6 +151,7 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
 
       const effects = animationController.getActiveEffects();
       setActiveEffects(effects);
+      setAnimationStartTime(Date.now());
 
       // Reset character positions when animation state changes
       characterPositionsRef.current = {
@@ -477,101 +480,193 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
     return context.attackerPlayer === game.player2;
   };
 
+  const calculateEffectPosition = (
+    effect: VisualEffect,
+    startTime: number,
+    currentTime: number
+  ) => {
+    const context = animationController.getCurrentContext();
+    if (!context) return null;
+
+    // Get start position
+    let startPos: { x: number; y: number };
+    if (typeof effect.start === "string") {
+      const isAttacker = effect.start === "attacker";
+      const character = isAttacker
+        ? context.attackerCharacter
+        : context.targetCharacter;
+      const isEnemy = isAttacker
+        ? context.attackerPlayer === game.player2
+        : context.targetPlayer === game.player2;
+
+      if (!character) return null;
+      startPos = findCharacterPosition(character.name, isEnemy) || {
+        x: 0,
+        y: 0,
+      };
+    } else {
+      startPos = effect.start;
+    }
+
+    // For aura effects, always stay at the start position
+    if (effect.type === "aura") {
+      return startPos;
+    }
+
+    // For projectiles, calculate position between start and end
+    if (effect.type === "projectile" && effect.end) {
+      let endPos: { x: number; y: number };
+      if (typeof effect.end === "string") {
+        const isAttacker = effect.end === "attacker";
+        const character = isAttacker
+          ? context.attackerCharacter
+          : context.targetCharacter;
+        const isEnemy = isAttacker
+          ? context.attackerPlayer === game.player2
+          : context.targetPlayer === game.player2;
+
+        if (!character) return null;
+        endPos = findCharacterPosition(character.name, isEnemy) || {
+          x: 0,
+          y: 0,
+        };
+      } else {
+        endPos = effect.end;
+      }
+
+      const progress = (currentTime - startTime) / effect.duration;
+      return {
+        x: startPos.x + (endPos.x - startPos.x) * progress,
+        y: startPos.y + (endPos.y - startPos.y) * progress,
+      };
+    }
+
+    return startPos;
+  };
+
+  const calculateEffectRotation = (
+    effect: VisualEffect,
+    startTime: number,
+    currentTime: number
+  ) => {
+    const context = animationController.getCurrentContext();
+    if (!context) return 0;
+
+    // For aura effects, rotate based on the attacker's team
+    if (effect.type === "aura") {
+      return context.attackerPlayer === game.player2 ? 180 : 0;
+    }
+
+    // For projectiles, calculate rotation based on movement direction
+    if (effect.type === "projectile" && effect.end) {
+      let startPos: { x: number; y: number };
+      let endPos: { x: number; y: number };
+
+      if (typeof effect.start === "string") {
+        const isAttacker = effect.start === "attacker";
+        const character = isAttacker
+          ? context.attackerCharacter
+          : context.targetCharacter;
+        const isEnemy = isAttacker
+          ? context.attackerPlayer === game.player2
+          : context.targetPlayer === game.player2;
+
+        if (!character) return 0;
+        startPos = findCharacterPosition(character.name, isEnemy) || {
+          x: 0,
+          y: 0,
+        };
+      } else {
+        startPos = effect.start;
+      }
+
+      if (typeof effect.end === "string") {
+        const isAttacker = effect.end === "attacker";
+        const character = isAttacker
+          ? context.attackerCharacter
+          : context.targetCharacter;
+        const isEnemy = isAttacker
+          ? context.attackerPlayer === game.player2
+          : context.targetPlayer === game.player2;
+
+        if (!character) return 0;
+        endPos = findCharacterPosition(character.name, isEnemy) || {
+          x: 0,
+          y: 0,
+        };
+      } else {
+        endPos = effect.end;
+      }
+
+      const angle = Math.atan2(endPos.y - startPos.y, endPos.x - startPos.x);
+      return (angle * 180) / Math.PI;
+    }
+
+    return effect.rotation || 0;
+  };
+
   return (
-    <div className="visual-effects-layer">
-      {effectStates.map((effectState, index) => {
-        const { effect, currentFrame, position, isActive } = effectState;
+    <div className="visual-effects" ref={spritesArenaRef}>
+      {activeEffects.map((effect, index) => {
+        const startTime = effect.startTime;
+        const currentTime = Date.now() - animationStartTime;
+        const elapsedTime = currentTime - startTime;
 
-        if (!isActive) return null;
+        // Skip if effect hasn't started yet or has ended
+        if (elapsedTime < 0 || elapsedTime > effect.duration) {
+          return null;
+        }
 
-        const scale = effect.scale || 1;
-        const rotation = shouldRotateEffect(effect)
-          ? 180
-          : effect.rotation || 0;
-        const effectClass = `visual-effect effect-${effect.type}`;
-        const flipStyle = shouldFlipProjectile(effect)
-          ? { transform: "scaleX(-1)" }
-          : {};
+        const position = calculateEffectPosition(
+          effect,
+          startTime,
+          currentTime
+        );
+        const rotation = calculateEffectRotation(
+          effect,
+          startTime,
+          currentTime
+        );
+
+        if (!position) return null;
+
+        // Calculate current frame for sprite sequence
+        const frameCount = effect.sprites ? effect.sprites.length : 8;
+        const currentFrame =
+          Math.floor((elapsedTime / effect.duration) * frameCount) % frameCount;
+        const spritePath = effect.sprites
+          ? effect.sprites[currentFrame]
+          : effect.path;
 
         return (
           <div
-            key={`effect-${index}-${effect.type}`}
-            className={effectClass}
+            key={`${effect.type}-${index}`}
+            className={`visual-effect ${effect.type}`}
             style={{
-              position: "absolute",
               left: `${position.x}px`,
               top: `${position.y}px`,
-              transform: `translate(-50%, -50%) scale(${scale}) rotate(${rotation}deg)`,
-              filter: effect.color
-                ? `drop-shadow(0 0 5px ${effect.color})`
-                : undefined,
-              animation: getEffectAnimation(effect),
+              transform: `translate(-50%, -50%) rotate(${rotation}deg) scale(${
+                effect.scale || 1
+              })`,
+              opacity: 1,
+              zIndex: effect.type === "aura" ? 3 : 2, // Aura effects should be on top
             }}
           >
             <img
-              src={getEffectSpritePath(effect, currentFrame)}
-              alt={`Effect ${effect.type}`}
+              src={spritePath}
+              alt={`${effect.type} effect`}
               style={{
-                maxWidth: "100px",
-                maxHeight: "100px",
-                ...flipStyle,
-              }}
-              onError={(e) => {
-                if (showDebug) {
-                  console.error(
-                    `Failed to load effect sprite: ${
-                      (e.target as HTMLImageElement).src
-                    }`
-                  );
-                }
-                // Set a fallback image or hide
-                (e.target as HTMLImageElement).style.display = "none";
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                filter: effect.color
+                  ? `drop-shadow(0 0 5px ${effect.color})`
+                  : "none",
               }}
             />
-
-            {showDebug && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "100%",
-                  left: 0,
-                  fontSize: "10px",
-                  backgroundColor: "rgba(0,0,0,0.5)",
-                  color: "white",
-                  padding: "2px",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {`${effect.type} (${currentFrame}) at ${Math.round(
-                  position.x
-                )},${Math.round(position.y)}`}
-              </div>
-            )}
           </div>
         );
       })}
-
-      {showDebug && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: "5px",
-            left: "5px",
-            fontSize: "10px",
-            backgroundColor: "rgba(0,0,0,0.7)",
-            color: "white",
-            padding: "3px",
-          }}
-        >
-          Active Effects: {activeEffects.length}
-          <br />
-          Attacker: ({Math.round(characterPositionsRef.current.attacker.x)},
-          {Math.round(characterPositionsRef.current.attacker.y)})
-          <br />
-          Target: ({Math.round(characterPositionsRef.current.target.x)},
-          {Math.round(characterPositionsRef.current.target.y)})
-        </div>
-      )}
     </div>
   );
 };
