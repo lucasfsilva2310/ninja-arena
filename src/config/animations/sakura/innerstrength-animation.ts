@@ -6,4 +6,5 @@ export const sakuraInnerStrengthAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: false,
 };

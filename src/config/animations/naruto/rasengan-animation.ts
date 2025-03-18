@@ -6,6 +6,7 @@ export const narutoRasenganAnimation = {
     sprites: generateSpritePaths("naruto", "rasengan", 12),
   },
   effects: [],
+  requiresTargetAnimation: true,
   // chakraColor: chakraTypes.Ninjutsu,
   // sound: "sounds/rasengan.mp3",
   // camera: {

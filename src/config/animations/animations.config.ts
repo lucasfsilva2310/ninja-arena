@@ -54,7 +54,7 @@ export interface AbilityAnimation {
     zoom?: number;
     duration?: number;
   };
-  requiresTargetAnimation?: boolean; // Flag to indicate if target animations are needed
+  requiresTargetAnimation: boolean;
 }
 
 // Character ability animations organized by character -> ability

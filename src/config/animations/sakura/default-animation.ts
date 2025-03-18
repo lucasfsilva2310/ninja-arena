@@ -16,4 +16,5 @@ export const sakuraDefaultAnimation: AbilityAnimation = {
     },
   },
   effects: [],
+  requiresTargetAnimation: true,
 };

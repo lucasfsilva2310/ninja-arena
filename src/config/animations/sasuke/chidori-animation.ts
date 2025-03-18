@@ -7,6 +7,7 @@ export const sasukeChidoriAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: true,
   //   chakraColor: chakraTypes.Ninjutsu,
   //   sound: "sounds/chidori.mp3",
 };

@@ -6,4 +6,5 @@ export const sasukeKawarimiAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: false,
 };

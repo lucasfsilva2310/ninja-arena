@@ -6,4 +6,5 @@ export const sasukeSharinganAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: false,
 };

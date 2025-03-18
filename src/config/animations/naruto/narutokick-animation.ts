@@ -6,4 +6,5 @@ export const narutoKickAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: true,
 };

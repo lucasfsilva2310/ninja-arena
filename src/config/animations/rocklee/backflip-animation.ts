@@ -6,4 +6,5 @@ export const rockleeBackflipAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: false,
 };

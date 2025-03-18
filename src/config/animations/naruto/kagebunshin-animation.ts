@@ -6,4 +6,5 @@ export const narutoKagebunshinAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: false,
 };

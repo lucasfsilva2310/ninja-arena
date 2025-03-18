@@ -8,4 +8,5 @@ export const rockleeKonohaSenpuAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: true,
 };

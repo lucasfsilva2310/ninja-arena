@@ -15,4 +15,5 @@ export const narutoDefaultAnimation: AbilityAnimation = {
     },
   },
   effects: [],
+  requiresTargetAnimation: true,
 };

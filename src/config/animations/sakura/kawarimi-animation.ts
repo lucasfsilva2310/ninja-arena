@@ -6,4 +6,5 @@ export const sakuraKawarimiAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: false,
 };

@@ -7,6 +7,7 @@ export const rockleeHiddenLotusAnimation: AbilityAnimation = {
   },
 
   effects: [],
+  requiresTargetAnimation: true,
   //   chakraColor: chakraTypes.Ninjutsu,
   //   sound: "sounds/fireball.mp3",
 };

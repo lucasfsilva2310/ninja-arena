@@ -19,6 +19,7 @@ export const sasukeFireballAnimation: AbilityAnimation = {
       color: "#FF5722", // Orange/fire color
     },
   ],
+  requiresTargetAnimation: true,
   chakraColor: chakraTypes.Ninjutsu,
   sound: "sounds/fireball.mp3",
 };

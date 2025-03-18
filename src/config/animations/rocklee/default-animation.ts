@@ -16,4 +16,5 @@ export const rockleeDefaultAnimation: AbilityAnimation = {
     },
   },
   effects: [],
+  requiresTargetAnimation: true,
 };
