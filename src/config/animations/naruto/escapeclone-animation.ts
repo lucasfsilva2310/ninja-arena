@@ -5,4 +5,5 @@ export const narutoEscapeCloneAnimation: AbilityAnimation = {
     sprites: generateSpritePaths("naruto", "escapeclone", 5),
   },
   effects: [],
+  requiresTargetAnimation: false,
 };

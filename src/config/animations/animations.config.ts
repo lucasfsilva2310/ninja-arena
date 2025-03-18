@@ -54,6 +54,7 @@ export interface AbilityAnimation {
     zoom?: number;
     duration?: number;
   };
+  requiresTargetAnimation?: boolean; // Flag to indicate if target animations are needed
 }
 
 // Character ability animations organized by character -> ability
@@ -79,6 +80,7 @@ export const characterAbilityAnimations: Record<
         },
       },
       effects: [],
+      requiresTargetAnimation: true, // Default to true for backward compatibility
     },
   },
 

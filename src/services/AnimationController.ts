@@ -102,6 +102,14 @@ export class AnimationController {
       return "completed";
     }
 
+    // If the ability doesn't require target animations, skip impact and recovery
+    if (!this.context.animationData?.requiresTargetAnimation) {
+      if (currentPhase === "attacking") {
+        return "completed";
+      }
+      return "completed";
+    }
+
     return sequence[currentIndex + 1];
   }
 
@@ -135,11 +143,19 @@ export class AnimationController {
         );
 
       case "impact":
+        // Skip impact phase if ability doesn't require target animations
+        if (!this.context.animationData?.requiresTargetAnimation) {
+          return 0;
+        }
         return animationData.target?.damaged
           ? animationData.target.damaged.sprites.length * frameSpeed
           : fallbackTimeout;
 
       case "recovery":
+        // Skip recovery phase if ability doesn't require target animations
+        if (!this.context.animationData?.requiresTargetAnimation) {
+          return 0;
+        }
         return animationData.target?.recover
           ? animationData.target.recover.sprites.length * frameSpeed
           : fallbackTimeout;
