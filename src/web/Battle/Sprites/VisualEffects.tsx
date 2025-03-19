@@ -508,8 +508,8 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
       startPos = effect.start;
     }
 
-    // For aura effects, always stay at the start position
-    if (effect.type === "aura") {
+    // For dispertion effects, always stay at the start position
+    if (effect.type === "dispertion") {
       return startPos;
     }
 
@@ -552,8 +552,8 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
     const context = animationController.getCurrentContext();
     if (!context) return 0;
 
-    // For aura effects, rotate based on the attacker's team
-    if (effect.type === "aura") {
+    // For dispertion effects, rotate based on the attacker's team
+    if (effect.type === "dispertion") {
       return context.attackerPlayer === game.player2 ? 180 : 0;
     }
 
@@ -649,7 +649,7 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
                 effect.scale || 1
               })`,
               opacity: 1,
-              zIndex: effect.type === "aura" ? 3 : 2, // Aura effects should be on top
+              zIndex: effect.type === "dispertion" ? 3 : 2, //Dispertion effects should be on top
             }}
           >
             <img
@@ -678,8 +678,8 @@ const getEffectAnimation = (effect: VisualEffect): string | undefined => {
       return undefined; // We're handling projectile movement with JS
     case "impact":
       return `impactPulse ${effect.duration}ms ease-out forwards`;
-    case "aura":
-      return `auraGlow ${effect.duration}ms ease-in-out infinite`;
+    case "dispertion":
+      return `dispertionGlow ${effect.duration}ms ease-in-out infinite`;
     default:
       return undefined;
   }

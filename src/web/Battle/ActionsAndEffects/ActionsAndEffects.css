@@ -16,8 +16,8 @@
 
 .effect-icon-container {
   position: relative;
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: transform var(--transition-fast);
@@ -32,7 +32,7 @@
   height: 100%;
   object-fit: cover;
   border-radius: var(--radius-md);
-  border: 2px solid #000000;
+  border: 1px solid #000000;
 }
 
 /* Unified Tooltip System */
@@ -169,4 +169,8 @@
   background-color: var(--bg-active-actions);
   border-radius: var(--radius-md);
   border: 2px solid rgba(31, 129, 227, 0.85);
+}
+
+.active-effects.enemy {
+  align-items: flex-end;
 }

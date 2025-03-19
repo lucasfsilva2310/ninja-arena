@@ -14,7 +14,12 @@ export type AnimationPhase =
   | "defeat";
 
 // Effect types that can be displayed during animations
-export type EffectType = "projectile" | "impact" | "aura" | "status";
+export type EffectType =
+  | "projectile"
+  | "impact"
+  | "aura"
+  | "status"
+  | "dispertion";
 
 // Interface for visual effect configuration
 export interface VisualEffect {

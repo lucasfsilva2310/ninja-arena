@@ -55,6 +55,7 @@
 
 .character-actions.enemy {
   align-items: flex-end;
+  width: 100%;
 }
 
 .character-info-abilities-container {
@@ -88,6 +89,7 @@
 
 .character-effects.enemy {
   align-items: flex-end;
+  width: 100%;
 }
 
 /* Player team (left side) effects and actions */

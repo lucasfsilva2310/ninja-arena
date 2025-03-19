@@ -187,7 +187,7 @@
   z-index: 20;
 }
 
-.effect-aura {
+.effect-dispertion {
   z-index: 5;
   pointer-events: none;
 }
@@ -218,8 +218,8 @@
   }
 }
 
-/* Animation for aura effects */
-@keyframes auraGlow {
+/* Animation for dispertion effects */
+@keyframes dispertionGlow {
   0% {
     opacity: 0.6;
     transform: scale(1);

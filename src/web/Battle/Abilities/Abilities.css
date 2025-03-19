@@ -11,8 +11,8 @@
 
 .ability-icon-container {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 35px;
+  height: 35px;
   border-radius: var(--radius-lg);
   overflow: visible;
 }

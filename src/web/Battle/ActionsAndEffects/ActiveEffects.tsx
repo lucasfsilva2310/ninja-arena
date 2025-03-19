@@ -21,7 +21,7 @@ export const ActiveEffects: React.FC<ActiveEffectsProps> = ({
   }, {} as Record<string, typeof character.activeEffects>);
 
   return (
-    <div className="active-effects">
+    <div className={`active-effects ${isEnemy ? "enemy" : ""}`}>
       {Object.entries(groupedEffects).map(([abilityName, effects]) => {
         // Get the longest duration among all effects for this ability
         const maxDuration = effects.reduce((max, effect) => {
