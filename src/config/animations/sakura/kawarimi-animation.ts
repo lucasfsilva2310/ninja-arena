@@ -7,7 +7,7 @@ export const sakuraKawarimiAnimation: AbilityAnimation = {
 
   effects: [
     {
-      type: "aura",
+      type: "dispertion",
       path: "smoke", // This will be appended to the effects folder path
       sprites: generateSpritePaths("sakura", "kawarimi/effects/smoke", 6), // Assuming 8 frames for the fireball effect
       start: "attacker",

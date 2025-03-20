@@ -24,12 +24,19 @@ export const innerStrength = new Ability(
   ["Random"],
   4,
   [
-    { type: "DamageReduction", value: 10, duration: 3 },
+    {
+      type: "DamageReduction",
+      damageReduction: {
+        amount: 10,
+        duration: 3,
+        description: "This character has 10 damage reduction.",
+      },
+    },
     {
       type: "Buff",
-      value: 5,
+      value: 10,
       buff: {
-        description: 'Increases attack power for "Anger Punch" by 5.',
+        description: 'Increases attack power for "Anger Punch" by 10.',
         buffedAbilites: ["Anger Punch"],
         remainingTurns: 3,
         buffType: "Damage",

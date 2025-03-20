@@ -37,8 +37,11 @@ export const sharingan = new Ability(
   [
     {
       type: "DamageReduction",
-      value: 15,
-      duration: 2,
+      damageReduction: {
+        amount: 15,
+        duration: 3,
+        description: "This character has 15 damage reduction.",
+      },
     },
     {
       type: "Buff",
@@ -46,7 +49,7 @@ export const sharingan = new Ability(
       buff: {
         buffedAbilites: ["Chidori"],
         buffType: "Damage",
-        remainingTurns: 2,
+        remainingTurns: 3,
         description: 'This character has 10 damage increase on "Chidori".',
       },
     },

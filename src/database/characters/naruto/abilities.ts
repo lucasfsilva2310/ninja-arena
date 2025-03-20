@@ -60,10 +60,10 @@ export const kagebunshin = new Ability(
       type: "Buff",
       value: 10,
       buff: {
-        buffedAbilites: ["Naruto Kick"],
+        buffedAbilites: [narutoKick.name],
         buffType: "Damage",
         remainingTurns: 3,
-        description: 'This character has 10 damage increase on "Naruto Kick".',
+        description: `This character has 10 damage increase on "${narutoKick.name}".`,
       },
     },
   ],

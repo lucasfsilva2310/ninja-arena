@@ -62,34 +62,58 @@ export class Character {
     increasedDamage: number = 0,
     gameEngine?: GameEngine
   ) {
-    let reducedDamage = damage;
-    if (gameEngine) {
-      gameEngine.addToHistory(
-        `${this.name} received ${damage} damage with ${increasedDamage} increased damage`
-      );
-    }
+    let totalDamage: number = damage + increasedDamage;
+    let damageReduction: number = 0;
 
+    // Calculate damage reduction from active effects
     this.activeEffects.forEach((effect) => {
       if (effect.damageReduction) {
         if (effect.damageReduction.isPercent) {
-          const reduction = damage * (effect.damageReduction.amount / 100);
-          reducedDamage = Math.max(0, damage - reduction);
+          // For percentage reduction, reduce the total damage
+          const reduction = Math.floor(
+            totalDamage * (effect.damageReduction.amount / 100)
+          );
+          damageReduction = Math.max(damageReduction, reduction);
         } else {
-          reducedDamage = Math.max(
-            0,
-            damage - (reducedDamage + effect.damageReduction.amount)
+          // For flat reduction, reduce the total damage
+          const reduction = Math.min(
+            totalDamage,
+            effect.damageReduction.amount
           );
-        }
-        if (gameEngine) {
-          gameEngine.addToHistory(
-            `${this.name} has ${effect.damageReduction.amount}${
-              effect.damageReduction.isPercent ? "%" : ""
-            } damage reduction. Reduced damage: ${damage - reducedDamage}`
-          );
+          damageReduction = Math.max(damageReduction, reduction);
         }
       }
     });
-    this.hp = Math.max(0, this.hp - (reducedDamage + increasedDamage));
+
+    // Apply damage reduction to total damage
+    const finalDamage = Math.max(0, totalDamage - damageReduction);
+
+    // Create history message
+    if (gameEngine) {
+      let message: string = `${this.name} received ${damage} damage`;
+
+      if (increasedDamage > 0) {
+        message += ` with ${increasedDamage} increased damage`;
+      }
+
+      if (damageReduction > 0) {
+        const reductionEffect = this.activeEffects.find(
+          (effect) => effect.damageReduction
+        );
+        if (reductionEffect?.damageReduction) {
+          const reductionType = reductionEffect.damageReduction.isPercent
+            ? "%"
+            : "";
+          message += `, reduced by ${reductionEffect.damageReduction.amount}${reductionType}`;
+        }
+      }
+
+      message += `. Final damage: ${finalDamage}`;
+      gameEngine.addToHistory(message);
+    }
+
+    // Apply final damage
+    this.hp = Math.max(0, this.hp - finalDamage);
   }
 
   heal(amount: number, gameEngine?: GameEngine) {
