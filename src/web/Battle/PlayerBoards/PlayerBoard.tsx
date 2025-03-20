@@ -10,6 +10,7 @@ import { Abilities } from "../Abilities/Abilities";
 import { ActiveEffects } from "../ActionsAndEffects/ActiveEffects";
 import { PlayerCharacterName } from "../PlayerCharacterInfo/PlayerCharacterInfo";
 import { EnemyCharacterName } from "../PlayerCharacterInfo/EnemyCharacterInfo";
+import { SelectedAbility } from "../SelectedAbility/SelectedAbility";
 
 interface PlayerBoardProps {
   game: GameEngine;
@@ -59,6 +60,11 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 possibleTargets={possibleTargets}
               />
             </div>
+            <SelectedAbility
+              character={char}
+              selectedActions={selectedActions}
+              removeSelectedAction={removeSelectedAction}
+            />
             <div className={`character-info-abilities-container player`}>
               <div className={`character-actions`}>
                 <ActionsComponent
