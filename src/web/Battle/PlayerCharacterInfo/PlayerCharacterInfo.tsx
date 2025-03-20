@@ -29,12 +29,7 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
     .join("")
     .toLowerCase()}`;
 
-  // Check if this character should use MP4
-  // TEMPORARY: Only Rocklee uses MP4
-  const isVideoCharacter = normalizedCharacterName === "rocklee";
-
   const characterImagePath = getCharacterAvatar(character);
-  const characterVideoPath = `/characters/${normalizedCharacterName}/avatar/${normalizedCharacterName}.mp4`;
   const characterDefaultImagePath = getCharacterDefaultAvatar();
   const characterDeadImagePath = getCharacterDeadAvatar();
 
@@ -54,37 +49,6 @@ export const PlayerCharacterName: React.FC<PlayerCharacterNameProps> = ({
                 ? "character-possible-target"
                 : ""
             }`}
-          />
-        ) : isVideoCharacter ? (
-          <video
-            src={characterVideoPath}
-            className={`character-image ${
-              character.hp <= 0 ? "character-dying" : ""
-            } ${
-              possibleTargets.includes(character)
-                ? "character-possible-target"
-                : ""
-            }`}
-            autoPlay
-            loop
-            muted
-            playsInline
-            onError={(e) => {
-              const imgElement = document.createElement("img");
-              imgElement.src = characterDefaultImagePath;
-              imgElement.alt = character.name;
-              imgElement.className = `character-image ${
-                character.hp <= 0 ? "character-dying" : ""
-              } ${
-                possibleTargets.includes(character)
-                  ? "character-possible-target"
-                  : ""
-              }`;
-              e.currentTarget.parentNode?.replaceChild(
-                imgElement,
-                e.currentTarget
-              );
-            }}
           />
         ) : (
           <img
