@@ -408,14 +408,14 @@ export const SpritesBoard: React.FC<SpritesBoardProps> = ({
                 abilityName={animation.abilityName}
                 isDamaged={animation.isDamaged}
                 isRecovering={animation.isRecovering}
-                showDebug={showDebug}
+                showDebug={true}
               />
             );
           })}
         </div>
 
         {/* Add visual effects layer */}
-        <VisualEffects showDebug={showDebug} game={game} />
+        <VisualEffects showDebug={true} game={game} />
       </div>
 
       {showDebug && (

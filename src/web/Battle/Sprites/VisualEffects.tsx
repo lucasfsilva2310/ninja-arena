@@ -74,42 +74,87 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
           return { x: isAttacker ? 200 : 500, y: 150, found: false };
         }
 
-        // Try finding sprite element by alt attribute first (most reliable)
-        const sprites = document.querySelectorAll(
-          `.sprite-image`
-        ) as NodeListOf<HTMLImageElement>;
-        let characterElement: HTMLElement | null = null;
+        // Determine which player is relevant based on whether we're looking for attacker or target
+        const relevantPlayer = isAttacker
+          ? context.attackerPlayer
+          : context.targetPlayer;
 
-        // Find the element with alt text containing the character name
+        // Is the relevant player the enemy (player2)?
+        const isRelevantPlayerEnemy = relevantPlayer === game.player2;
+
+        // Normalize the character name for comparison
+        const normalizedCharName = characterName
+          .toLowerCase()
+          .replace(/\s+/g, "");
+
+        debugLog(
+          `Looking for ${
+            isAttacker ? "attacker" : "target"
+          } character: ${normalizedCharName}`
+        );
+        debugLog(
+          `Relevant player is ${
+            isRelevantPlayerEnemy ? "ENEMY (player2)" : "PLAYER (player1)"
+          }`
+        );
+
+        // Get all sprite images
+        const sprites = document.querySelectorAll(
+          ".sprite-image"
+        ) as NodeListOf<HTMLImageElement>;
+        debugLog(`Found ${sprites.length} sprites in the DOM`);
+
+        // Print information about each sprite for debugging
         for (let i = 0; i < sprites.length; i++) {
           const alt = sprites[i].alt.toLowerCase();
-          if (alt.includes(characterName.toLowerCase())) {
-            // Get the enemy state from the sprite class
-            const isEnemy = sprites[i].classList.contains("sprite-enemy");
+          const isEnemySprite = sprites[i].classList.contains("sprite-enemy");
+          debugLog(`Sprite ${i}: alt="${alt}", isEnemy=${isEnemySprite}`);
+        }
 
-            // Determine if this is the correct character based on the animation context
-            // For attacker:
-            // - If attacker is player1, we want a non-enemy sprite
-            // - If attacker is player2, we want an enemy sprite
-            // For target:
-            // - If target is player1, we want a non-enemy sprite
-            // - If target is player2, we want an enemy sprite
-            const isCorrectElement = isAttacker
-              ? (isEnemy && context.attackerPlayer === game.player2) || // Enemy (player2) attacking
-                (!isEnemy && context.attackerPlayer === game.player1) // Player (player1) attacking
-              : (isEnemy && context.targetPlayer === game.player2) || // Enemy (player2) being targeted
-                (!isEnemy && context.targetPlayer === game.player1); // Player (player1) being targeted
+        // Find the element that matches both the character name and the correct team
+        let characterElement: HTMLElement | null = null;
 
-            if (isCorrectElement) {
+        for (let i = 0; i < sprites.length; i++) {
+          const alt = sprites[i].alt.toLowerCase();
+          const isEnemySprite = sprites[i].classList.contains("sprite-enemy");
+
+          if (alt.includes(normalizedCharName)) {
+            debugLog(
+              `Found sprite with matching name: ${normalizedCharName}, isEnemy=${isEnemySprite}`
+            );
+
+            // Check if this sprite is on the correct team (enemy or ally)
+            // If relevant player is enemy (player2), we want an enemy sprite
+            // If relevant player is player1, we want a non-enemy sprite
+            if (isRelevantPlayerEnemy === isEnemySprite) {
+              debugLog(
+                `✅ Team match: isRelevantPlayerEnemy=${isRelevantPlayerEnemy}, isEnemySprite=${isEnemySprite}`
+              );
               characterElement = sprites[i];
               break;
+            } else {
+              debugLog(
+                `❌ Team mismatch: isRelevantPlayerEnemy=${isRelevantPlayerEnemy}, isEnemySprite=${isEnemySprite}`
+              );
             }
           }
         }
 
         if (!characterElement) {
-          debugLog(`Character element not found for ${characterName}`);
-          return { x: isAttacker ? 200 : 500, y: 150, found: false };
+          debugLog(
+            `Character element not found for ${characterName}. Using default position.`
+          );
+          return {
+            x: isAttacker
+              ? isRelevantPlayerEnemy
+                ? 500
+                : 200 // Different defaults based on team
+              : isRelevantPlayerEnemy
+              ? 500
+              : 200,
+            y: 150,
+            found: false,
+          };
         }
 
         // Get position relative to the arena
@@ -495,12 +540,9 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
       const character = isAttacker
         ? context.attackerCharacter
         : context.targetCharacter;
-      const isEnemy = isAttacker
-        ? context.attackerPlayer === game.player2
-        : context.targetPlayer === game.player2;
 
       if (!character) return null;
-      startPos = findCharacterPosition(character.name, isEnemy) || {
+      startPos = findCharacterPosition(character.name, isAttacker) || {
         x: 0,
         y: 0,
       };
@@ -521,12 +563,9 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
         const character = isAttacker
           ? context.attackerCharacter
           : context.targetCharacter;
-        const isEnemy = isAttacker
-          ? context.attackerPlayer === game.player2
-          : context.targetPlayer === game.player2;
 
         if (!character) return null;
-        endPos = findCharacterPosition(character.name, isEnemy) || {
+        endPos = findCharacterPosition(character.name, isAttacker) || {
           x: 0,
           y: 0,
         };
@@ -567,12 +606,9 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
         const character = isAttacker
           ? context.attackerCharacter
           : context.targetCharacter;
-        const isEnemy = isAttacker
-          ? context.attackerPlayer === game.player2
-          : context.targetPlayer === game.player2;
 
         if (!character) return 0;
-        startPos = findCharacterPosition(character.name, isEnemy) || {
+        startPos = findCharacterPosition(character.name, isAttacker) || {
           x: 0,
           y: 0,
         };
@@ -585,12 +621,9 @@ const VisualEffects: React.FC<VisualEffectsProps> = ({
         const character = isAttacker
           ? context.attackerCharacter
           : context.targetCharacter;
-        const isEnemy = isAttacker
-          ? context.attackerPlayer === game.player2
-          : context.targetPlayer === game.player2;
 
         if (!character) return 0;
-        endPos = findCharacterPosition(character.name, isEnemy) || {
+        endPos = findCharacterPosition(character.name, isAttacker) || {
           x: 0,
           y: 0,
         };

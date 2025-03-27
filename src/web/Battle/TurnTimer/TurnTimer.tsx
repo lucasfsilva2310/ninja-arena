@@ -11,7 +11,7 @@ interface TurnTimerProps {
 export const TurnTimer: React.FC<TurnTimerProps> = ({
   isPlayerTurn,
   onTimeEnd,
-  totalTime = 102312123,
+  totalTime = 60,
   turnCount,
 }) => {
   const [timeLeft, setTimeLeft] = useState(totalTime);
