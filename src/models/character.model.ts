@@ -23,6 +23,11 @@ export type EffectType = {
     remainingTurns: number;
     applied?: boolean;
   };
+  enabledAbilities?: {
+    abilityNames: string[];
+    remainingTurns: number;
+    applied?: boolean;
+  };
 };
 
 export class Character {
@@ -230,6 +235,30 @@ export class Character {
       name: ability.name,
       description: buff.description,
       buff: { ...buff, value },
+    });
+  }
+
+  applyEnableAbility(
+    ability: Ability,
+    abilityNames: string[],
+    duration: number,
+    gameEngine?: GameEngine
+  ) {
+    if (gameEngine) {
+      gameEngine.addToHistory(
+        `${this.name} now enables abilities: ${abilityNames.join(
+          ", "
+        )} for ${duration} turns`
+      );
+    }
+
+    this.activeEffects.push({
+      name: ability.name,
+      description: `This character can now use ${abilityNames.join(", ")}`,
+      enabledAbilities: {
+        abilityNames,
+        remainingTurns: duration,
+      },
     });
   }
 

@@ -6,6 +6,7 @@ export type EffectType =
   | "Damage"
   | "Heal"
   | "DamageReduction"
+  | "EnableAbility"
   | "Transform"
   | "Persistent"
   | "Stacking"
@@ -31,6 +32,12 @@ export interface AbilityEffect {
 
   // Buff
   buff?: BuffEffect;
+
+  // Enable Ability
+  enabledAbilities?: string[];
+
+  // For abilities that need an enabler
+  needsEnabler?: string;
 }
 
 export interface DamageReductionEffect {
@@ -70,6 +77,23 @@ export class Ability {
   canUse(char: Character, chakras: ChakraType[]): boolean {
     if (this.isOnCooldown()) return false;
     if (!char.isAlive()) return false;
+
+    // Check if this ability needs an enabler
+    const needsEnablerEffect = this.effects.find(
+      (effect) => effect.needsEnabler
+    );
+    if (needsEnablerEffect) {
+      const enablerName = needsEnablerEffect.needsEnabler;
+      // Check if the character has an active effect that enables this ability
+      const isEnabled = char.activeEffects.some(
+        (effect) =>
+          effect.name === enablerName ||
+          (effect.enabledAbilities &&
+            effect.enabledAbilities.abilityNames.includes(this.name))
+      );
+
+      if (!isEnabled) return false;
+    }
 
     // Map with availableChakras
     const availableChakras: Record<ChakraType, number> = chakras.reduce(
@@ -150,6 +174,16 @@ export class Ability {
           break;
         case "Buff":
           character.applyBuff(ability, effect.buff!, effect.value!, gameEngine);
+          break;
+        case "EnableAbility":
+          if (effect.enabledAbilities && effect.duration) {
+            character.applyEnableAbility(
+              ability,
+              effect.enabledAbilities,
+              effect.duration,
+              gameEngine
+            );
+          }
           break;
       }
 

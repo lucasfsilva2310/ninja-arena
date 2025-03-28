@@ -107,6 +107,30 @@ export class GameEngine {
     const action = this.actionQueue[actionIndex];
 
     if (action.attackerCharacter.isAlive()) {
+      // Check if the ability has any effects that need an enabler
+      const needsEnablerEffect = action.attackerAbility.effects.find(
+        (effect) => effect.needsEnabler
+      );
+      if (needsEnablerEffect) {
+        const enablerName = needsEnablerEffect.needsEnabler;
+        // Check if the character has an active effect that enables this ability
+        const isEnabled = action.attackerCharacter.activeEffects.some(
+          (effect) =>
+            effect.name === enablerName ||
+            (effect.enabledAbilities &&
+              effect.enabledAbilities.abilityNames.includes(
+                action.attackerAbility.name
+              ))
+        );
+
+        if (!isEnabled) {
+          this.addToHistory(
+            `${action.attackerCharacter.name} tried to use ${action.attackerAbility.name} but it requires ${enablerName} to be active.`
+          );
+          return false;
+        }
+      }
+
       this.addToHistory(
         `${action.attackerCharacter.name} used ${action.attackerAbility.name} on ${action.targetCharacter.name}!`
       );

@@ -288,9 +288,14 @@ export default function Battle({ game, onGameOver }: BattleProps) {
 
   // Function to get all usable abilities for a character
   const getUsableAbilities = (character: Character): Ability[] => {
-    return character.abilities.filter((ability) =>
+    // First get abilities that have enough chakra available
+    const abilitiesWithEnoughChakra = character.abilities.filter((ability) =>
       hasEnoughChakrasForAbility(ability)
     );
+
+    // Don't exclude abilities that need enablers (they will be visually locked in UI)
+    // but do filter by available chakra
+    return abilitiesWithEnoughChakra;
   };
 
   // Handle user interactions

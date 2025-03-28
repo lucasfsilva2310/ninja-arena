@@ -131,6 +131,24 @@ export class Player {
           return effect.buff.remainingTurns > 0;
         }
 
+        if (effect.enabledAbilities) {
+          if (!effect.enabledAbilities.applied) {
+            effect.enabledAbilities.applied = true;
+            return true;
+          }
+          effect.enabledAbilities.remainingTurns--;
+          if (gameEngine) {
+            gameEngine.addToHistory(
+              `${
+                character.name
+              }'s enabling effect for ${effect.enabledAbilities.abilityNames.join(
+                ", "
+              )} has ${effect.enabledAbilities.remainingTurns} turns remaining`
+            );
+          }
+          return effect.enabledAbilities.remainingTurns > 0;
+        }
+
         return true;
       });
     });

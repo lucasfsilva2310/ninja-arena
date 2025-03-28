@@ -26,6 +26,29 @@ export const Abilities: React.FC<AbilitiesProps> = ({
   usableAbilities,
   isEnemy = false,
 }) => {
+  // Helper function to check if an ability needs an enabler that isn't active
+  const needsInactiveEnabler = (ability: Ability): boolean => {
+    // Check if any effect has a needsEnabler property
+    const needsEnablerEffect = ability.effects.find(
+      (effect) => effect.needsEnabler
+    );
+
+    if (needsEnablerEffect) {
+      const enablerName = needsEnablerEffect.needsEnabler;
+      // Check if the character has an active effect that enables this ability
+      const isEnabled = character.activeEffects.some(
+        (effect) =>
+          effect.name === enablerName ||
+          (effect.enabledAbilities &&
+            effect.enabledAbilities.abilityNames.includes(ability.name))
+      );
+
+      return !isEnabled;
+    }
+
+    return false;
+  };
+
   return (
     <div className="abilities-container">
       {character.abilities.map((ability) => {
@@ -40,6 +63,8 @@ export const Abilities: React.FC<AbilitiesProps> = ({
           ) ||
           ability.isOnCooldown() ||
           !isInUsableAbilities;
+
+        const isLocked = needsInactiveEnabler(ability);
 
         return (
           <div
@@ -62,6 +87,23 @@ export const Abilities: React.FC<AbilitiesProps> = ({
             {ability.currentCooldown > 0 && (
               <div className="ability-cooldown-overlay">
                 {ability.currentCooldown}
+              </div>
+            )}
+            {isLocked && (
+              <div className="ability-cooldown-overlay">
+                <img
+                  src="/assets/lock-icon.png"
+                  alt="Locked"
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    objectFit: "contain",
+                  }}
+                  onError={(e) => {
+                    // If lock icon not found, display a text lock symbol
+                    e.currentTarget.outerHTML = "🔒";
+                  }}
+                />
               </div>
             )}
           </div>

@@ -18,6 +18,7 @@ export const rasengan = new Ability(
     {
       type: "Damage",
       value: 35,
+      needsEnabler: "Kage Bunshin", //TODO: find way to add kagebunshin.name
     },
   ],
   "Enemy"
@@ -43,7 +44,7 @@ export const escapeClone = new Ability(
 
 export const kagebunshin = new Ability(
   "Kage Bunshin",
-  "Naruto creates clones, gaining 15% damage reduction for three turns. Naruto Kick now deals 30 damage. Rasengan now can be used(add enable logic).",
+  "Naruto creates clones, gaining 15% damage reduction for three turns. Naruto Kick now deals 30 damage. Rasengan now can be used.",
   ["Random"],
   5,
   [
@@ -65,6 +66,12 @@ export const kagebunshin = new Ability(
         remainingTurns: 3,
         description: `This character has 10 damage increase on "${narutoKick.name}".`,
       },
+    },
+    {
+      type: "EnableAbility",
+      enabledAbilities: [rasengan.name],
+      duration: 3,
+      description: "This character can now use Rasengan.",
     },
   ],
   "Self"
