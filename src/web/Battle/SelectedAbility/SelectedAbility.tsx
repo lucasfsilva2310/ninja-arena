@@ -46,13 +46,6 @@ export const SelectedAbility: React.FC<SelectedAbilityProps> = ({
               e.currentTarget.src = getCharacterDefaultAbility();
             }}
           />
-          <div className="selected-ability-tooltip">
-            <h4>{characterAction.attackerAbility.name}</h4>
-            <p>{characterAction.attackerAbility.description}</p>
-            <div className="selected-ability-duration">
-              <span>Will be applied this turn</span>
-            </div>
-          </div>
         </div>
       ) : (
         <div className="selected-ability-empty" />

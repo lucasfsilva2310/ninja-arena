@@ -720,6 +720,7 @@ export default function Battle({ game, onGameOver }: BattleProps) {
                 isPlayerTurn={isPlayerTurn}
                 onTimeEnd={handleTimeEnd}
                 turnCount={turnCount}
+                isExecutingTurn={isExecutingTurn}
               />
             </div>
 
@@ -755,9 +756,9 @@ export default function Battle({ game, onGameOver }: BattleProps) {
               <button
                 onClick={executeTurn}
                 className="end-turn-button"
-                disabled={!isPlayerTurn}
+                disabled={!isPlayerTurn || isExecutingTurn}
               >
-                End Turn
+                {isExecutingTurn ? "Executing actions..." : "End Turn"}
               </button>
               <SpritesBoard
                 game={game}

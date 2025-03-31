@@ -113,7 +113,7 @@
 /* Adjust enemy card to mirror the scroll if needed */
 .character-card.enemy-card {
   transform: scaleX(-1);
-  width: 55%;
+  width: 100%;
   padding-left: 1.1rem;
   padding-right: 1.1rem;
 }

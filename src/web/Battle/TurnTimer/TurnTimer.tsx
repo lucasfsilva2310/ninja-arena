@@ -6,6 +6,7 @@ interface TurnTimerProps {
   onTimeEnd: () => void;
   totalTime?: number;
   turnCount: number;
+  isExecutingTurn: boolean;
 }
 
 export const TurnTimer: React.FC<TurnTimerProps> = ({
@@ -13,6 +14,7 @@ export const TurnTimer: React.FC<TurnTimerProps> = ({
   onTimeEnd,
   totalTime = 60,
   turnCount,
+  isExecutingTurn,
 }) => {
   const [timeLeft, setTimeLeft] = useState(totalTime);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -67,7 +69,11 @@ export const TurnTimer: React.FC<TurnTimerProps> = ({
   return (
     <div className="turn-timer-container">
       <div className="turn-indicator">
-        {isPlayerTurn ? "Your turn..." : "Opponent's turn..."}
+        {isExecutingTurn
+          ? "Executing actions..."
+          : isPlayerTurn
+          ? "Your turn..."
+          : "Opponent's turn..."}
       </div>
       <div className="timer-bar-container">
         <div

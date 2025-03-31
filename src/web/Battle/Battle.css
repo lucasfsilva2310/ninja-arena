@@ -181,9 +181,9 @@
 }
 
 .end-turn-button {
-  width: 120px;
+  width: 200px;
   height: 42px;
-  padding: 0.6rem;
+  padding: 0.5rem;
   background-color: rgb(190, 34, 20);
   color: white;
   border: none;
@@ -192,6 +192,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-family: var(--font-family-title);
+  font-size: var(--font-xs);
   margin-top: 0.5rem;
 }
 
@@ -302,15 +303,6 @@
   overflow: visible; /* Allow tooltips to overflow */
 }
 
-.center-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.5rem;
-  width: 400px; /* Increased width to accommodate sprites */
-}
-
 /* Footer Section */
 .battle-footer {
   display: flex;
@@ -359,42 +351,16 @@
 }
 
 .board-section.enemy {
-  max-width: 460px;
+  max-width: 205px;
 }
 
 .center-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   padding: 0.5rem;
-  width: 300px; /* Adjust as needed */
-}
-
-/* End Turn Button */
-.end-turn-button {
-  width: 120px;
-  height: 42px;
-  padding: 0.6rem;
-  background-color: rgb(190, 34, 20);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: var(--font-family-title);
-  margin-top: 0.5rem;
-}
-
-.end-turn-button:hover:not(:disabled) {
-  background-color: #059669;
-}
-
-.end-turn-button:disabled {
-  background-color: #94a3b8;
-  cursor: not-allowed;
-  opacity: 0.7;
+  width: 300px;
 }
 
 /* Footer Section */
