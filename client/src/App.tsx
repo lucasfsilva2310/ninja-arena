@@ -7,8 +7,8 @@ import { Character } from "./models/character.model";
 import { Player } from "./models/player.model";
 import { AICharacters } from "./database/ai-characters";
 
-import CharacterSelection from "./web/CharacterSelection/CharacterSelection";
-import Battle from "./web/Battle/Battle";
+import CharacterSelection from "./components/CharacterSelection/CharacterSelection";
+import Battle from "./components/Battle/Battle";
 
 function App() {
   const [selectedCharacters, setSelectedCharacters] = useState<Character[]>([]);
