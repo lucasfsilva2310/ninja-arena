@@ -131,6 +131,18 @@ export class GameEngine {
         }
       }
 
+      const isHealAbility = action.attackerAbility.effects.some(
+        (effect) => effect.type === "Heal"
+      );
+
+      if (isHealAbility) {
+        const target = action.targetCharacter;
+        if (target.isAtMaxHp()) {
+          this.addToHistory(`${target.name} is already at max HP.`);
+          return false;
+        }
+      }
+
       this.addToHistory(
         `${action.attackerCharacter.name} used ${action.attackerAbility.name} on ${action.targetCharacter.name}!`
       );

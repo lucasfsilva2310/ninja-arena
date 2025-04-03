@@ -31,7 +31,8 @@ export type EffectType = {
 };
 
 export class Character {
-  hp: number = 100;
+  MAX_HP: number = 100;
+  hp: number = this.MAX_HP;
   public abilities: Ability[] = [];
   activeEffects: EffectType[] = [];
 
@@ -54,6 +55,22 @@ export class Character {
 
   isAlive(): boolean {
     return this.hp > 0;
+  }
+
+  getHp(): number {
+    return this.hp;
+  }
+
+  getMaxHp(): number {
+    return this.MAX_HP;
+  }
+
+  isAtMaxHp(): boolean {
+    return this.hp === this.MAX_HP;
+  }
+
+  private setHp(newHp: number) {
+    this.hp = Math.min(this.getMaxHp(), newHp);
   }
 
   isInvulnerable(): boolean {
@@ -118,17 +135,17 @@ export class Character {
     }
 
     // Apply final damage
-    this.hp = Math.max(0, this.hp - finalDamage);
+    this.setHp(Math.max(0, this.hp - finalDamage));
   }
 
   heal(amount: number, gameEngine?: GameEngine) {
-    const newHp = Math.min(100, this.hp + amount);
+    const newHp = Math.min(this.MAX_HP, this.hp + amount);
     if (gameEngine) {
       gameEngine.addToHistory(
         `${this.name} was healed for ${amount}. Current HP: ${newHp}`
       );
     }
-    this.hp = newHp;
+    this.setHp(newHp);
   }
 
   addDamageReduction(

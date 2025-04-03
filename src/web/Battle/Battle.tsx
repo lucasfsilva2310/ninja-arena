@@ -309,6 +309,10 @@ export default function Battle({ game, onGameOver }: BattleProps) {
     setAbilityTargetCharacter(character);
     setSelectedAbility(ability);
 
+    const isHealAbility = ability.effects.some(
+      (effect) => effect.type === "Heal"
+    );
+
     let targets: Character[] = [];
     switch (ability.target) {
       case "Enemy":
@@ -322,13 +326,19 @@ export default function Battle({ game, onGameOver }: BattleProps) {
         );
         break;
       case "Ally":
-        targets = game.player1.characters.filter((char) => char.isAlive());
+        targets = game.player1.characters.filter(
+          (char) => char.isAlive() && (!isHealAbility || !char.isAtMaxHp())
+        );
         break;
       case "AllAllies":
-        targets = game.player1.characters.filter((char) => char.isAlive());
+        targets = game.player1.characters.filter(
+          (char) => char.isAlive() && (!isHealAbility || !char.isAtMaxHp())
+        );
         break;
       case "Self":
-        targets = [character];
+        targets = [character].filter(
+          (char) => !isHealAbility || !char.isAtMaxHp()
+        );
         break;
     }
 
