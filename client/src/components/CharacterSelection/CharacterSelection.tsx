@@ -5,7 +5,7 @@ import { Character } from "../../models/character.model";
 import { Ability } from "../../models/ability.model";
 import { availableCharacters } from "../../database/available-characters";
 
-import AbilityDescriptionFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
+import AbilityDescriptionFooter from "../AbilityDescriptionFooter/AbilityDescriptionFooter";
 import { getCharacterAvatar } from "../../utils/getCharacterAvatar";
 import { getCharacterDefaultAvatar } from "../../utils/getCharacterDefaultAvatar";
 

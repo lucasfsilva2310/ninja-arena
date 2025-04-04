@@ -12,7 +12,7 @@ import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal"
 import SurrenderConfirmationModal from "./Modals/SurrenderConfirmation/SurrenderConfirmationModal";
 import BattleHistoryModal from "./Modals/BattleHistory/BattleHistoryModal";
 
-import AbilityFooter from "../components/AbilityDescriptionFooter/AbilityDescriptionFooter";
+import AbilityFooter from "../AbilityDescriptionFooter/AbilityDescriptionFooter";
 import { AvailableChakra } from "./AvailableChakra/AvailableChakra";
 import { PlayerBoard } from "./PlayerBoards/PlayerBoard";
 import { PlayerInfo } from "./PlayerInfo/PlayerInfo";

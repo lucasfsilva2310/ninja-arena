@@ -2,12 +2,12 @@ import "./AbilityDescriptionFooter.css";
 
 import React, { useEffect, useState } from "react";
 
-import { Ability } from "../../../models/ability.model";
-import { Character } from "../../../models/character.model";
-import { chakraTypes } from "../../../models/chakra.model";
-import { chakraColors } from "../../../constants/chakra-colors";
-import { getCharacterAbility } from "../../../utils/getCharacterAbility";
-import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";
+import { Ability } from "../../models/ability.model";
+import { Character } from "../../models/character.model";
+import { chakraTypes } from "../../models/chakra.model";
+import { chakraColors } from "../../constants/chakra-colors";
+import { getCharacterAbility } from "../../utils/getCharacterAbility";
+import { getCharacterDefaultAbility } from "../../utils/getCharacterDefaultAbility";
 
 interface AbilityFooterProps {
   selectedCharacter: Character | null;
