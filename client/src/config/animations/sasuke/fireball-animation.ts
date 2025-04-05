@@ -1,4 +1,4 @@
-import { chakraTypes } from "../../../models/chakra.model";
+import { chakraTypes } from "../../../models/chakra/chakra.model";
 import { AbilityAnimation, generateSpritePaths } from "../animations.config";
 
 export const sasukeFireballAnimation: AbilityAnimation = {

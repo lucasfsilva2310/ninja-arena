@@ -1,4 +1,4 @@
-import { Character } from "../../../models/character.model";
+import { Character } from "../../../models/character/character.model";
 import { escapeClone, rasengan } from "./abilities";
 import { narutoKick } from "./abilities";
 import { kagebunshin } from "./abilities";

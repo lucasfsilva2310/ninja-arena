@@ -1,58 +1,8 @@
-import { Character } from "./character.model";
-import { ChakraType } from "./chakra.model";
-import { GameEngine } from "./game-engine";
-
-export type EffectType =
-  | "Damage"
-  | "Heal"
-  | "DamageReduction"
-  | "EnableAbility"
-  | "Transform"
-  | "Persistent"
-  | "Stacking"
-  | "Buff";
-
-export interface AbilityEffect {
-  name?: string;
-  description?: string;
-  type: EffectType;
-  value?: number;
-
-  // Specific Effects
-  duration?: number;
-
-  // Stacking
-  increment?: number;
-
-  // Transform
-  transformation?: Ability;
-
-  // Damage Reduction
-  damageReduction?: DamageReductionEffect;
-
-  // Buff
-  buff?: BuffEffect;
-
-  // Enable Ability
-  enabledAbilities?: string[];
-
-  // For abilities that need an enabler
-  needsEnabler?: string;
-}
-
-export interface DamageReductionEffect {
-  description: string;
-  amount: number;
-  duration: number;
-  isPercent?: boolean;
-}
-
-export interface BuffEffect {
-  description: string;
-  buffedAbilites: string[];
-  remainingTurns: number;
-  buffType: "Damage" | "Heal";
-}
+import { ChakraType } from "../chakra/chakra.types";
+import { Character } from "../character/character.model";
+import { GameEngine } from "../game-engine";
+import { AbilityEffect, TargetType } from "./ability.types";
+import { EnableAbilityCharacterEffect } from "../character/character.types";
 
 export class Ability {
   public currentCooldown: number = 0;
@@ -63,11 +13,11 @@ export class Ability {
     public requiredChakra: ChakraType[],
     public defaultCooldown: number,
     public effects: AbilityEffect[],
-    public target: "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies",
+    public target: TargetType,
     public isPermanent: boolean = false,
     public isStacking: boolean = false
   ) {
-    this.effects.map((effect) => ({
+    this.effects = this.effects.map((effect) => ({
       ...effect,
       name: effect.name || this.name,
       description: effect.description || this.description,
@@ -80,15 +30,18 @@ export class Ability {
 
     // Check if this ability needs an enabler
     const needsEnablerEffect = this.effects.find(
-      (effect) => effect.needsEnabler
+      (
+        effect
+      ): effect is AbilityEffect & { type: "Damage"; needsEnabler: string } =>
+        effect.type === "Damage" && effect.needsEnabler !== undefined
     );
     if (needsEnablerEffect) {
       const enablerName = needsEnablerEffect.needsEnabler;
       // Check if the character has an active effect that enables this ability
       const isEnabled = char.activeEffects.some(
-        (effect) =>
-          effect.name === enablerName ||
-          (effect.enabledAbilities &&
+        (effect): effect is EnableAbilityCharacterEffect =>
+          "enabledAbilities" in effect &&
+          (effect.name === enablerName ||
             effect.enabledAbilities.abilityNames.includes(this.name))
       );
 
@@ -133,50 +86,53 @@ export class Ability {
     gameEngine?: GameEngine
   ) {
     this.effects.forEach((effect) => {
-      let increasedDamage: number = 0;
       switch (effect.type) {
-        case "Damage":
-          character.activeEffects.forEach((effect) => {
+        case "Damage": {
+          let increasedDamage = 0;
+          character.activeEffects.forEach((activeEffect) => {
             if (
-              effect.buff &&
-              effect.buff.buffedAbilites.includes(ability.name)
+              "buff" in activeEffect &&
+              activeEffect.buff.buffedAbilites.includes(ability.name)
             ) {
-              increasedDamage += effect.buff.value;
+              increasedDamage += activeEffect.buff.value;
             }
           });
-          target.takeDamage(effect.value!, increasedDamage, gameEngine);
+          target.takeDamage(effect.value, increasedDamage, gameEngine);
           break;
-        case "Heal":
-          target.heal(effect.value!, gameEngine);
+        }
+        case "Heal": {
+          target.heal(effect.value, gameEngine);
           break;
-        case "DamageReduction":
-          if (effect.damageReduction) {
-            target.addDamageReduction(
-              ability,
-              effect.damageReduction.description,
-              effect.damageReduction.amount,
-              effect.damageReduction.duration || 1,
-              effect.damageReduction.isPercent || false,
-              gameEngine
-            );
-          }
+        }
+        case "DamageReduction": {
+          target.addDamageReduction(
+            ability,
+            effect.damageReduction.description,
+            effect.damageReduction.reducedAmount,
+            effect.damageReduction.duration,
+            effect.damageReduction.isPercent || false,
+            gameEngine
+          );
           break;
-        case "Transform":
-          if (effect.value! > 0) {
-            target.takeDamage(effect.value!, 0, gameEngine);
+        }
+        case "Transform": {
+          if (effect.value && effect.value > 0) {
+            target.takeDamage(effect.value, 0, gameEngine);
           }
           character.applyTransformation(
             ability,
-            effect.transformation!,
+            effect.transformation,
             effect.duration || 1,
             gameEngine
           );
           break;
-        case "Buff":
-          character.applyBuff(ability, effect.buff!, effect.value!, gameEngine);
+        }
+        case "Buff": {
+          character.applyBuff(ability, effect.buff, effect.value, gameEngine);
           break;
-        case "EnableAbility":
-          if (effect.enabledAbilities && effect.duration) {
+        }
+        case "EnableAbility": {
+          if (effect.duration) {
             character.applyEnableAbility(
               ability,
               effect.enabledAbilities,
@@ -185,6 +141,7 @@ export class Ability {
             );
           }
           break;
+        }
       }
 
       if (!this.isOnCooldown()) {

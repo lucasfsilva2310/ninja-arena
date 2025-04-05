@@ -1,6 +1,6 @@
 import "./ActionsAndEffects.css";
 import React from "react";
-import { Character } from "../../../models/character.model";
+import { Character } from "../../../models/character/character.model";
 import { SelectedAction } from "../../../models/game-engine";
 import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";
 import { getCharacterAbility } from "../../../utils/getCharacterAbility";

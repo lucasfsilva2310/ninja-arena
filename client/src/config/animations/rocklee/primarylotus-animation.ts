@@ -1,4 +1,4 @@
-import { chakraTypes } from "../../../models/chakra.model";
+import { chakraTypes } from "../../../models/chakra/chakra.model";
 import { generateSpritePaths } from "../animations.config";
 
 export const rockleePrimaryLotusAnimation = {

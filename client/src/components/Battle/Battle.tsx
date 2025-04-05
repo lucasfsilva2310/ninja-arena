@@ -3,9 +3,9 @@ import "./BattleFooter.css";
 
 import React, { useState, useEffect } from "react";
 import { GameEngine, SelectedAction } from "../../models/game-engine";
-import { Ability } from "../../models/ability.model";
-import { Character } from "../../models/character.model";
-import { ChakraType } from "../../models/chakra.model";
+import { Ability } from "../../models/ability/ability.model";
+import { Character } from "../../models/character/character.model";
+import { ChakraType } from "../../models/chakra/chakra.model";
 import { Player } from "../../models/player.model";
 import ExchangeRandomChakraFinalTurnModal from "./Modals/ExchangeRandomChakraFinalTurn/ExchangeRandomChakraFinalTurnModal";
 import ChakraTransformModal from "./Modals/ChakraTransform/ChakraTransformModal";

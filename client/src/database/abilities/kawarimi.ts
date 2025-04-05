@@ -1,4 +1,4 @@
-import { Ability } from "../../models/ability.model";
+import { Ability } from "../../models/ability/ability.model";
 
 export const kawarimi = new Ability(
   "Kawarimi",
@@ -10,7 +10,7 @@ export const kawarimi = new Ability(
       type: "DamageReduction",
       damageReduction: {
         description: "This character is invunerable.",
-        amount: Infinity,
+        reducedAmount: Infinity,
         duration: 1,
       },
     },

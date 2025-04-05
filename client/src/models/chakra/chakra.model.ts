@@ -1,4 +1,4 @@
-import { getRandomIndex } from "../utils/getRandomIndex";
+import { getRandomIndex } from "../../utils/getRandomIndex";
 
 export const chakraTypes = {
   Ninjutsu: "Ninjutsu",

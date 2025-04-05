@@ -1,6 +1,6 @@
 import "./CharacterInfo.css";
 import React, { useState, useEffect } from "react";
-import { Character } from "../../../models/character.model";
+import { Character } from "../../../models/character/character.model";
 import { HealthBar } from "../HealthBar/HealthBar";
 import { getCharacterAvatar } from "../../../utils/getCharacterAvatar";
 import { getCharacterDefaultAvatar } from "../../../utils/getCharacterDefaultAvatar";

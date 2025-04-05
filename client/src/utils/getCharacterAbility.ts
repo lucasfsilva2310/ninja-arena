@@ -1,5 +1,5 @@
-import { Ability } from "../models/ability.model";
-import { Character } from "../models/character.model";
+import { Ability } from "../models/ability/ability.model";
+import { Character } from "../models/character/character.model";
 
 export const getCharacterAbility = ({
   character,

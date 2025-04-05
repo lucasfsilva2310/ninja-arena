@@ -1,5 +1,5 @@
-import { Character } from "../models/character.model";
-import { Ability } from "../models/ability.model";
+import { Character } from "../models/character/character.model";
+import { Ability } from "../models/ability/ability.model";
 import { Player } from "../models/player.model";
 import {
   getAbilityAnimation,

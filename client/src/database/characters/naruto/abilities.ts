@@ -1,4 +1,4 @@
-import { Ability } from "../../../models/ability.model";
+import { Ability } from "../../../models/ability/ability.model";
 
 export const narutoKick = new Ability(
   "Naruto Kick",
@@ -34,7 +34,7 @@ export const escapeClone = new Ability(
       type: "DamageReduction",
       damageReduction: {
         description: "This character is invunerable.",
-        amount: Infinity,
+        reducedAmount: Infinity,
         duration: 1,
       },
     },
@@ -51,7 +51,7 @@ export const kagebunshin = new Ability(
     {
       type: "DamageReduction",
       damageReduction: {
-        amount: 15,
+        reducedAmount: 15,
         duration: 3,
         isPercent: true,
         description: "This character has 15% damage reduction.",

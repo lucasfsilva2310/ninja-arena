@@ -1,7 +1,7 @@
 import "./PlayerBoard.css";
-import { Ability } from "../../../models/ability.model";
-import { ChakraType } from "../../../models/chakra.model";
-import { Character } from "../../../models/character.model";
+import { Ability } from "../../../models/ability/ability.model";
+import { ChakraType } from "../../../models/chakra/chakra.model";
+import { Character } from "../../../models/character/character.model";
 import { GameEngine, SelectedAction } from "../../../models/game-engine";
 import { Player } from "../../../models/player.model";
 import { CurrentActions } from "../ActionsAndEffects/CurrentActions";

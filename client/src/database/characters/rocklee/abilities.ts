@@ -1,4 +1,4 @@
-import { Ability } from "../../../models/ability.model";
+import { Ability } from "../../../models/ability/ability.model";
 
 export const hiddenLotus = new Ability(
   "Hidden Lotus",
@@ -26,15 +26,17 @@ export const primaryLotus = new Ability(
 
 export const releaseWeights = new Ability(
   "Release Weights",
-  "Rock Lee release his weights, becoming faster and doing more damage. Now Rock lee has 20% chance of dodging all receiving attacks.",
+  "Rock Lee release his weights, becoming faster and doing more damage. Now Rock lee has 10 damage reduction for the next two turns.",
   ["Taijutsu"],
   1,
   [
     {
       type: "DamageReduction",
-      value: Infinity,
-      duration: 1,
-      description: "This character is invunerable.",
+      damageReduction: {
+        description: "This character is invunerable.",
+        reducedAmount: Infinity,
+        duration: 2,
+      },
     },
   ],
   "Self"
@@ -57,9 +59,11 @@ export const backflip = new Ability(
   [
     {
       type: "DamageReduction",
-      value: Infinity,
-      duration: 1,
-      description: "This character is invunerable.",
+      damageReduction: {
+        description: "This character is invunerable.",
+        reducedAmount: Infinity,
+        duration: 1,
+      },
     },
   ],
   "Self"

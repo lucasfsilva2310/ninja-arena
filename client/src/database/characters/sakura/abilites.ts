@@ -1,4 +1,4 @@
-import { Ability } from "../../../models/ability.model";
+import { Ability } from "../../../models/ability/ability.model";
 
 export const angerPunch = new Ability(
   "Anger Punch",
@@ -27,7 +27,7 @@ export const innerStrength = new Ability(
     {
       type: "DamageReduction",
       damageReduction: {
-        amount: 10,
+        reducedAmount: 10,
         duration: 3,
         description: "This character has 10 damage reduction.",
       },

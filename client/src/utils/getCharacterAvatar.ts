@@ -1,4 +1,4 @@
-import { Character } from "../models/character.model";
+import { Character } from "../models/character/character.model";
 
 export const getCharacterAvatar = (character: Character) => {
   return `/characters/${character.name

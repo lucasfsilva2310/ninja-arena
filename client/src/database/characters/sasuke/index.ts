@@ -1,4 +1,4 @@
-import { Character } from "../../../models/character.model";
+import { Character } from "../../../models/character/character.model";
 import { kawarimi } from "../../abilities/kawarimi";
 import { chidori, fireball, sharingan } from "./abilities";
 

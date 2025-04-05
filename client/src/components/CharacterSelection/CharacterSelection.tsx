@@ -1,8 +1,8 @@
 import "./CharacterSelection.css";
 
 import { useState, DragEvent, useEffect } from "react";
-import { Character } from "../../models/character.model";
-import { Ability } from "../../models/ability.model";
+import { Character } from "../../models/character/character.model";
+import { Ability } from "../../models/ability/ability.model";
 import { availableCharacters } from "../../database/available-characters";
 
 import AbilityDescriptionFooter from "../AbilityDescriptionFooter/AbilityDescriptionFooter";

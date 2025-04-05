@@ -1,40 +1,19 @@
-import { Ability, AbilityEffect, BuffEffect } from "./ability.model";
-import { GameEngine } from "./game-engine";
-
-export type EffectType = {
-  name: string;
-  description: string;
-  damageReduction?: {
-    amount: number;
-    remainingTurns: number;
-    isPercent?: boolean;
-    applied?: boolean;
-  };
-  transformation?: {
-    originalAbility: Ability;
-    newAbility: Ability;
-    remainingTurns: number;
-    applied?: boolean;
-  };
-  buff?: {
-    buffedAbilites: string[];
-    buffType: "Damage" | "Heal" | "CooldownReduction";
-    value: number;
-    remainingTurns: number;
-    applied?: boolean;
-  };
-  enabledAbilities?: {
-    abilityNames: string[];
-    remainingTurns: number;
-    applied?: boolean;
-  };
-};
+import { Ability } from "../ability/ability.model";
+import { AbilityEffect, BuffEffectType } from "../ability/ability.types";
+import { GameEngine } from "../game-engine";
+import {
+  CharacterEffect,
+  DamageReductionCharacterEffect,
+  TransformationCharacterEffect,
+  BuffCharacterEffect,
+  EnableAbilityCharacterEffect,
+} from "./character.types";
 
 export class Character {
   MAX_HP: number = 100;
   hp: number = this.MAX_HP;
   public abilities: Ability[] = [];
-  activeEffects: EffectType[] = [];
+  activeEffects: CharacterEffect[] = [];
 
   constructor(public name: string, public baseAbilities: Ability[]) {
     // Creating ability in memory so it wont conflict with the one in the database
@@ -75,7 +54,9 @@ export class Character {
 
   isInvulnerable(): boolean {
     return this.activeEffects.some(
-      (effect) => effect.damageReduction?.amount === Infinity
+      (effect): effect is DamageReductionCharacterEffect =>
+        "damageReduction" in effect &&
+        effect.damageReduction.reducedAmount === Infinity
     );
   }
 
@@ -89,18 +70,20 @@ export class Character {
 
     // Calculate damage reduction from active effects
     this.activeEffects.forEach((effect) => {
-      if (effect.damageReduction) {
-        if (effect.damageReduction.isPercent) {
+      if ("damageReduction" in effect) {
+        const damageReductionEffect = effect as DamageReductionCharacterEffect;
+        if (damageReductionEffect.damageReduction.isPercent) {
           // For percentage reduction, reduce the total damage
           const reduction = Math.floor(
-            totalDamage * (effect.damageReduction.amount / 100)
+            totalDamage *
+              (damageReductionEffect.damageReduction.reducedAmount / 100)
           );
           damageReduction = Math.max(damageReduction, reduction);
         } else {
           // For flat reduction, reduce the total damage
           const reduction = Math.min(
             totalDamage,
-            effect.damageReduction.amount
+            damageReductionEffect.damageReduction.reducedAmount
           );
           damageReduction = Math.max(damageReduction, reduction);
         }
@@ -120,13 +103,14 @@ export class Character {
 
       if (damageReduction > 0) {
         const reductionEffect = this.activeEffects.find(
-          (effect) => effect.damageReduction
+          (effect): effect is DamageReductionCharacterEffect =>
+            "damageReduction" in effect
         );
-        if (reductionEffect?.damageReduction) {
+        if (reductionEffect) {
           const reductionType = reductionEffect.damageReduction.isPercent
             ? "%"
             : "";
-          message += `, reduced by ${reductionEffect.damageReduction.amount}${reductionType}`;
+          message += `, reduced by ${reductionEffect.damageReduction.reducedAmount}${reductionType}`;
         }
       }
 
@@ -164,15 +148,17 @@ export class Character {
       );
     }
 
-    this.activeEffects.push({
+    const effect: DamageReductionCharacterEffect = {
       name: ability.name,
       description,
       damageReduction: {
-        amount,
+        reducedAmount: amount,
         remainingTurns,
         isPercent,
       },
-    });
+    };
+
+    this.activeEffects.push(effect);
   }
 
   applyTransformation(
@@ -189,20 +175,27 @@ export class Character {
 
     this.replaceAbility(originalAbility, newAbility);
 
-    this.activeEffects.push({
+    const effect: TransformationCharacterEffect = {
       name: originalAbility.name,
       description: originalAbility.description,
-      transformation: { originalAbility, newAbility, remainingTurns: duration },
-    });
+      transformation: {
+        originalAbility,
+        newAbility,
+        remainingTurns: duration,
+      },
+    };
+
+    this.activeEffects.push(effect);
   }
 
   revertTransformation(newAbility: Ability, gameEngine?: GameEngine) {
     const transformationEffect = this.activeEffects.find(
-      (effect) =>
-        effect.transformation && effect.transformation.newAbility === newAbility
+      (effect): effect is TransformationCharacterEffect =>
+        "transformation" in effect &&
+        effect.transformation.newAbility === newAbility
     );
 
-    if (transformationEffect && transformationEffect.transformation) {
+    if (transformationEffect) {
       this.replaceAbility(
         transformationEffect.transformation.newAbility,
         transformationEffect.transformation.originalAbility
@@ -240,7 +233,7 @@ export class Character {
 
   applyBuff(
     ability: Ability,
-    buff: BuffEffect,
+    buff: BuffEffectType,
     value: number,
     gameEngine?: GameEngine
   ) {
@@ -248,11 +241,17 @@ export class Character {
       gameEngine.addToHistory(`${this.name} applied ${buff.buffType} buff`);
     }
 
-    this.activeEffects.push({
+    const effect: BuffCharacterEffect = {
       name: ability.name,
       description: buff.description,
-      buff: { ...buff, value },
-    });
+      buff: {
+        ...buff,
+        value,
+        remainingTurns: buff.remainingTurns,
+      },
+    };
+
+    this.activeEffects.push(effect);
   }
 
   applyEnableAbility(
@@ -269,14 +268,16 @@ export class Character {
       );
     }
 
-    this.activeEffects.push({
+    const effect: EnableAbilityCharacterEffect = {
       name: ability.name,
       description: `This character can now use ${abilityNames.join(", ")}`,
       enabledAbilities: {
         abilityNames,
         remainingTurns: duration,
       },
-    });
+    };
+
+    this.activeEffects.push(effect);
   }
 
   removeActiveEffect(currentEffect: AbilityEffect) {

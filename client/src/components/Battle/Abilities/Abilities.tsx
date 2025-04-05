@@ -1,8 +1,8 @@
 import "./Abilities.css";
 import React from "react";
-import { Character } from "../../../models/character.model";
-import { Ability } from "../../../models/ability.model";
-import { ChakraType } from "../../../models/chakra.model";
+import { Character } from "../../../models/character/character.model";
+import { Ability } from "../../../models/ability/ability.model";
+import { ChakraType } from "../../../models/chakra/chakra.model";
 import { SelectedAction } from "../../../models/game-engine";
 import { getCharacterAbility } from "../../../utils/getCharacterAbility";
 import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";

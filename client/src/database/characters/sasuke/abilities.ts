@@ -1,4 +1,4 @@
-import { Ability } from "../../../models/ability.model";
+import { Ability } from "../../../models/ability/ability.model";
 
 export const fireball = new Ability(
   "Fireball",
@@ -38,7 +38,7 @@ export const sharingan = new Ability(
     {
       type: "DamageReduction",
       damageReduction: {
-        amount: 15,
+        reducedAmount: 15,
         duration: 3,
         description: "This character has 15 damage reduction.",
       },

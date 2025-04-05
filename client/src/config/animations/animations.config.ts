@@ -1,4 +1,4 @@
-import { ChakraType } from "../../models/chakra.model";
+import { ChakraType } from "../../models/chakra/chakra.model";
 import { narutoAnimations } from "./naruto";
 import { rockleeAnimations } from "./rocklee";
 import { sakuraAnimations } from "./sakura";

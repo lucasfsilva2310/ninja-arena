@@ -1,12 +1,15 @@
-import { Ability } from "./ability.model";
-import {
-  Chakra,
-  ChakraType,
-  chakraTypes,
-  InitialChakraObjType,
-} from "./chakra.model";
-import { Character } from "./character.model";
+import { Ability } from "./ability/ability.model";
+import { ChakraType } from "./chakra/chakra.types";
+import { Character } from "./character/character.model";
 import { GameEngine } from "./game-engine";
+import {
+  CharacterEffect,
+  DamageReductionCharacterEffect,
+  TransformationCharacterEffect,
+  BuffCharacterEffect,
+  EnableAbilityCharacterEffect,
+} from "./character/character.types";
+import { Chakra } from "./chakra/chakra.model";
 
 export class Player {
   chakras: ChakraType[] = [];
@@ -61,23 +64,22 @@ export class Player {
     return this.chakras.reduce(
       (acc, chakra: string) => {
         const key = chakra as ChakraType;
-
         acc[key] = (acc[key] || 0) + 1;
         return acc;
       },
       {
-        [chakraTypes.Ninjutsu]: 0,
-        [chakraTypes.Taijutsu]: 0,
-        [chakraTypes.Genjutsu]: 0,
-        [chakraTypes.Bloodline]: 0,
-      } as InitialChakraObjType
+        Ninjutsu: 0,
+        Taijutsu: 0,
+        Genjutsu: 0,
+        Bloodline: 0,
+      } as Record<ChakraType, number>
     );
   }
 
   processActiveEffects(gameEngine?: GameEngine) {
     this.characters.forEach((character) => {
       character.activeEffects = character.activeEffects.filter((effect) => {
-        if (effect.damageReduction) {
+        if (isDamageReductionEffect(effect)) {
           if (!effect.damageReduction.applied) {
             effect.damageReduction.applied = true;
             return true;
@@ -90,7 +92,7 @@ export class Player {
           }
           return effect.damageReduction.remainingTurns > 0;
         }
-        if (effect.transformation) {
+        if (isTransformationEffect(effect)) {
           if (!effect.transformation.applied) {
             character.applyTransformation(
               effect.transformation.originalAbility,
@@ -116,8 +118,7 @@ export class Player {
           }
           return true;
         }
-
-        if (effect.buff) {
+        if (isBuffEffect(effect)) {
           if (!effect.buff.applied) {
             effect.buff.applied = true;
             return true;
@@ -130,8 +131,7 @@ export class Player {
           }
           return effect.buff.remainingTurns > 0;
         }
-
-        if (effect.enabledAbilities) {
+        if (isEnableAbilityEffect(effect)) {
           if (!effect.enabledAbilities.applied) {
             effect.enabledAbilities.applied = true;
             return true;
@@ -180,4 +180,27 @@ export class Player {
   isDefeated(): boolean {
     return this.characters.every((character) => !character.isAlive());
   }
+}
+
+// Type guard functions
+function isDamageReductionEffect(
+  effect: CharacterEffect
+): effect is DamageReductionCharacterEffect {
+  return "damageReduction" in effect;
+}
+
+function isTransformationEffect(
+  effect: CharacterEffect
+): effect is TransformationCharacterEffect {
+  return "transformation" in effect;
+}
+
+function isBuffEffect(effect: CharacterEffect): effect is BuffCharacterEffect {
+  return "buff" in effect;
+}
+
+function isEnableAbilityEffect(
+  effect: CharacterEffect
+): effect is EnableAbilityCharacterEffect {
+  return "enabledAbilities" in effect;
 }

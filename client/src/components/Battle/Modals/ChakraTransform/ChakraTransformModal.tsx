@@ -3,7 +3,7 @@ import {
   ChakraType,
   chakraTypesWithoutRandom,
   initialChakraObj,
-} from "../../../../models/chakra.model";
+} from "../../../../models/chakra/chakra.model";
 import "./ChakraTransformModal.css";
 import { getChakraColor } from "../../../../utils/getChakraColor";
 

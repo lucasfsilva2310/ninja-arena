@@ -1,5 +1,5 @@
 import "./AvailableChakra.css";
-import { ChakraType, chakraTypes } from "../../../models/chakra.model";
+import { ChakraType, chakraTypes } from "../../../models/chakra/chakra.model";
 import { getChakraColor } from "../../../utils/getChakraColor";
 import { getDefaultChakra } from "../../../utils/getDefaultChakra";
 import { getChakraImage } from "../../../utils/getChakraImage";

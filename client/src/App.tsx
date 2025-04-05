@@ -3,7 +3,7 @@ import "./App.css";
 
 import { useState, useEffect, useCallback } from "react";
 import { GameEngine } from "./models/game-engine";
-import { Character } from "./models/character.model";
+import { Character } from "./models/character/character.model";
 import { Player } from "./models/player.model";
 import { AICharacters } from "./database/ai-characters";
 

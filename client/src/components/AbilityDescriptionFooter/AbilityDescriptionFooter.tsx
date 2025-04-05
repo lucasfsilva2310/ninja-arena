@@ -2,9 +2,9 @@ import "./AbilityDescriptionFooter.css";
 
 import React, { useEffect, useState } from "react";
 
-import { Ability } from "../../models/ability.model";
-import { Character } from "../../models/character.model";
-import { chakraTypes } from "../../models/chakra.model";
+import { Ability } from "../../models/ability/ability.model";
+import { Character } from "../../models/character/character.model";
+import { chakraTypes } from "../../models/chakra/chakra.model";
 import { chakraColors } from "../../constants/chakra-colors";
 import { getCharacterAbility } from "../../utils/getCharacterAbility";
 import { getCharacterDefaultAbility } from "../../utils/getCharacterDefaultAbility";

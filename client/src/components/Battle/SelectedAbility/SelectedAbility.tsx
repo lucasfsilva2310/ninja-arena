@@ -1,5 +1,5 @@
 import React from "react";
-import { Character } from "../../../models/character.model";
+import { Character } from "../../../models/character/character.model";
 import { SelectedAction } from "../../../models/game-engine";
 import { getCharacterAbility } from "../../../utils/getCharacterAbility";
 import { getCharacterDefaultAbility } from "../../../utils/getCharacterDefaultAbility";

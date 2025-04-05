@@ -1,7 +1,8 @@
-import { Ability } from "./ability.model";
-import { Character } from "./character.model";
-import { ChakraType, chakraTypes } from "./chakra.model";
+import { Ability } from "./ability/ability.model";
+import { ChakraType } from "./chakra/chakra.types";
+import { Character } from "./character/character.model";
 import { Player } from "./player.model";
+import { EnableAbilityCharacterEffect } from "./character/character.types";
 
 // Define the new SelectedAction interface in the GameEngine file
 export interface SelectedAction {
@@ -109,15 +110,15 @@ export class GameEngine {
     if (action.attackerCharacter.isAlive()) {
       // Check if the ability has any effects that need an enabler
       const needsEnablerEffect = action.attackerAbility.effects.find(
-        (effect) => effect.needsEnabler
+        (effect) => effect.type === "Damage" && effect.needsEnabler
       );
-      if (needsEnablerEffect) {
+      if (needsEnablerEffect && needsEnablerEffect.type === "Damage") {
         const enablerName = needsEnablerEffect.needsEnabler;
         // Check if the character has an active effect that enables this ability
         const isEnabled = action.attackerCharacter.activeEffects.some(
-          (effect) =>
-            effect.name === enablerName ||
-            (effect.enabledAbilities &&
+          (effect): effect is EnableAbilityCharacterEffect =>
+            "enabledAbilities" in effect &&
+            (effect.name === enablerName ||
               effect.enabledAbilities.abilityNames.includes(
                 action.attackerAbility.name
               ))
@@ -268,7 +269,9 @@ export class GameEngine {
           // Skip defensive/invulnerability abilities for AI to make game more challenging
           if (
             ability.effects.find(
-              (effect) => effect.damageReduction?.amount === Infinity
+              (effect) =>
+                effect.type === "DamageReduction" &&
+                effect.damageReduction?.reducedAmount === Infinity
             )
           ) {
             return false;
