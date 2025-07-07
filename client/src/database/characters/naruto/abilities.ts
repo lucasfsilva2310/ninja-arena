@@ -18,7 +18,13 @@ export const rasengan = new Ability(
     {
       type: "Damage",
       value: 35,
-      needsEnabler: "Kage Bunshin", //TODO: find way to add kagebunshin.name
+      needsEnabler: "Kage Bunshin",
+      description: "This character can now use Rasengan.",
+    },
+    {
+      type: "Stun",
+      duration: 1,
+      description: "This character is stunned for the next turn(s).",
     },
   ],
   "Enemy"

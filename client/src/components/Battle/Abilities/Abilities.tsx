@@ -37,10 +37,10 @@ export const Abilities: React.FC<AbilitiesProps> = ({
       const enablerName = needsEnablerEffect.needsEnabler;
       // Check if the character has an active effect that enables this ability
       const isEnabled = character.activeEffects.some(
-        (effect) =>
-          effect.name === enablerName ||
-          (effect.enabledAbilities &&
-            effect.enabledAbilities.abilityNames.includes(ability.name))
+        (effect) => effect.name === enablerName
+        // ||
+        // (effect.enabledAbilities &&
+        // effect.enabledAbilities.abilityNames.includes(ability.name))
       );
 
       return !isEnabled;
@@ -57,6 +57,7 @@ export const Abilities: React.FC<AbilitiesProps> = ({
 
         const isAbilityDisabled =
           !isPlayerTurn ||
+          character.isStunned() ||
           !ability.canUse(character, activeChakras) ||
           selectedActions.some(
             (action) => action.attackerCharacter === character

@@ -142,6 +142,10 @@ export class Ability {
           }
           break;
         }
+        case "Stun": {
+          target.addStun(ability, effect.duration, gameEngine);
+          break;
+        }
       }
 
       if (!this.isOnCooldown()) {

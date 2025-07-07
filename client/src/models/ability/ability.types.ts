@@ -9,7 +9,8 @@ export type EffectType =
   | "Transform"
   | "Persistent"
   | "Stacking"
-  | "Buff";
+  | "Buff"
+  | "Stun";
 
 export type TargetType = "Self" | "Ally" | "Enemy" | "AllEnemies" | "AllAllies";
 
@@ -63,13 +64,19 @@ interface EnableAbilityEffect extends BaseEffect {
   enabledAbilities: string[];
 }
 
+interface StunEffect extends BaseEffect {
+  type: "Stun";
+  duration: number;
+}
+
 export type AbilityEffect =
   | DamageEffect
   | HealEffect
   | DamageReductionEffect
   | TransformEffect
   | BuffEffect
-  | EnableAbilityEffect;
+  | EnableAbilityEffect
+  | StunEffect;
 
 // Extract the buff type from BuffEffect
 export type BuffEffectType = Extract<AbilityEffect, { type: "Buff" }>["buff"];

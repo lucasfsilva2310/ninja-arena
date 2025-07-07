@@ -45,9 +45,17 @@ export interface EnableAbilityCharacterEffect extends BaseCharacterEffect {
   };
 }
 
+export interface StunCharacterEffect extends BaseCharacterEffect {
+  stun: {
+    remainingTurns: number;
+    applied?: boolean;
+  };
+}
+
 // Union type for all character effects
 export type CharacterEffect =
   | DamageReductionCharacterEffect
   | TransformationCharacterEffect
   | BuffCharacterEffect
-  | EnableAbilityCharacterEffect;
+  | EnableAbilityCharacterEffect
+  | StunCharacterEffect;

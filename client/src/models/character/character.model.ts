@@ -1,12 +1,14 @@
 import { Ability } from "../ability/ability.model";
 import { AbilityEffect, BuffEffectType } from "../ability/ability.types";
 import { GameEngine } from "../game-engine";
+import { ChakraType } from "../chakra/chakra.types";
 import {
   CharacterEffect,
   DamageReductionCharacterEffect,
   TransformationCharacterEffect,
   BuffCharacterEffect,
   EnableAbilityCharacterEffect,
+  StunCharacterEffect,
 } from "./character.types";
 
 export class Character {
@@ -284,5 +286,30 @@ export class Character {
     this.activeEffects = this.activeEffects.filter(
       (effect) => effect.name !== currentEffect.name
     );
+  }
+
+  addStun(ability: Ability, duration: number, gameEngine?: GameEngine) {
+    const stunEffect: StunCharacterEffect = {
+      name: ability.name,
+      description: `This character is stunned and cannot use abilities for ${duration} turn(s).`,
+      stun: {
+        remainingTurns: duration,
+        applied: true,
+      },
+    };
+
+    this.activeEffects.push(stunEffect);
+  }
+
+  isStunned(): boolean {
+    return this.activeEffects.some(
+      (effect): effect is StunCharacterEffect =>
+        "stun" in effect && effect.stun.remainingTurns > 0
+    );
+  }
+
+  canUseAbility(ability: Ability, chakras: ChakraType[]): boolean {
+    if (this.isStunned()) return false;
+    return ability.canUse(this, chakras);
   }
 }

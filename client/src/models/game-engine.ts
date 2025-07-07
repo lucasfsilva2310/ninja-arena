@@ -260,7 +260,11 @@ export class GameEngine {
       // Try each character that hasn't acted yet
       for (const char of this.player2.characters) {
         // Skip characters that are dead or already acted
-        if (!char.isAlive() || actedCharacters.includes(char)) {
+        if (
+          !char.isAlive() ||
+          actedCharacters.includes(char) ||
+          char.isStunned()
+        ) {
           continue;
         }
 
