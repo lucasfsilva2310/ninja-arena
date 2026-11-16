@@ -2,6 +2,7 @@ class_name AbilityButton
 extends VBoxContainer
 
 signal hovered(state: AbilityState)
+signal activated(state: AbilityState)
 
 const ICON_SIZE: int = 52
 
@@ -10,6 +11,7 @@ var button: Button
 var cooldown_label: Label
 var cost_row: CostRow
 var lock_reason: String = ""
+var selected: bool = false
 
 
 func _init() -> void:
@@ -20,6 +22,7 @@ func _init() -> void:
 	button.expand_icon = true
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.mouse_entered.connect(_on_hover)
+	button.pressed.connect(_on_pressed)
 	add_child(button)
 
 	cooldown_label = Label.new()
@@ -55,9 +58,21 @@ func refresh(new_lock_reason: String) -> void:
 	button.tooltip_text = tip
 
 
+func set_selected(value: bool) -> void:
+	selected = value
+	if selected:
+		button.add_theme_stylebox_override("normal", GameTheme.box(Color(1, 0.9, 0.3, 0.25), Color("fbbf24"), 4, 6, 0))
+	else:
+		button.remove_theme_stylebox_override("normal")
+
+
 func is_locked() -> bool:
 	return lock_reason != ""
 
 
 func _on_hover() -> void:
 	hovered.emit(state)
+
+
+func _on_pressed() -> void:
+	activated.emit(state)

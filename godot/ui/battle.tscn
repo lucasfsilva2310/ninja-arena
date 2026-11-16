@@ -194,9 +194,34 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
 
-[node name="ArenaGap" type="Control" parent="Margin/Layout/Body/Center/ArenaPanel/Row"]
-custom_minimum_size = Vector2(24, 0)
+[node name="Middle" type="VBoxContainer" parent="Margin/Layout/Body/Center/ArenaPanel/Row"]
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="QueueTitle" type="Label" parent="Margin/Layout/Body/Center/ArenaPanel/Row/Middle"]
+layout_mode = 2
+theme_type_variation = &"LightLabel"
+horizontal_alignment = 1
+text = "Queued actions"
+
+[node name="QueueList" type="VBoxContainer" parent="Margin/Layout/Body/Center/ArenaPanel/Row/Middle"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="LogTitle" type="Label" parent="Margin/Layout/Body/Center/ArenaPanel/Row/Middle"]
+layout_mode = 2
+theme_type_variation = &"LightLabel"
+horizontal_alignment = 1
+text = "Battle log"
+
+[node name="LogText" type="RichTextLabel" parent="Margin/Layout/Body/Center/ArenaPanel/Row/Middle"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+scroll_following = true
 
 [node name="ArenaEnemy" type="VBoxContainer" parent="Margin/Layout/Body/Center/ArenaPanel/Row"]
 unique_name_in_owner = true

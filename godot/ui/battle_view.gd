@@ -1,6 +1,9 @@
 class_name BattleView
 extends Control
 
+signal exit_requested
+signal game_over(result: BattleResult)
+
 const TURN_SECONDS: int = 60
 const HINT_TEXT: String = "Hover an ability to read its description."
 
@@ -10,8 +13,24 @@ var background_name: String = ""
 var panels: Dictionary = {}
 var sprites: Dictionary = {}
 var chakra_labels: Dictionary = {}
+var queue: ActionQueue
+var turn_player: TurnPlayer = TurnPlayer.new()
+var ai: AiPlayer = AiPlayer.new()
+var ai_rng: Rng = Rng.new(1)
+var turn_length: float = TURN_SECONDS
+var time_left: float = TURN_SECONDS
+var selected_fighter: Fighter
+var selected_state: AbilityState
+var targets: Array[Fighter] = []
+var resolving: bool = false
+var log_lines: Array[String] = []
+var queue_remove_buttons: Array[Button] = []
+var game_over_panel: PanelContainer
+var result_label: Label
+var back_button: Button
 
 var _built: bool = false
+var _pending_next: Callable
 
 @onready var background: TextureRect = %Background
 @onready var player_avatar: TextureRect = %PlayerAvatar
@@ -34,6 +53,8 @@ var _built: bool = false
 @onready var desc_costs: CostRow = %DescCosts
 @onready var desc_meta: Label = %DescMeta
 @onready var desc_text: Label = %DescText
+@onready var queue_list: VBoxContainer = %QueueList
+@onready var log_text: RichTextLabel = %LogText
 
 
 func bind(new_battle: Battle, team_idx: int = 0) -> void:
@@ -44,6 +65,15 @@ func bind(new_battle: Battle, team_idx: int = 0) -> void:
 	battle.fighter_died.connect(_on_fighter_died)
 	battle.chakra_changed.connect(_on_chakra_changed)
 	battle.turn_started.connect(_on_turn_started)
+	queue = ActionQueue.new(battle, team_idx)
+	queue.changed.connect(_on_queue_changed)
+	resolving = false
+	selected_fighter = null
+	selected_state = null
+	targets = []
+	log_lines.clear()
+	time_left = turn_length
+	_connect_turn_player()
 	if is_node_ready():
 		_build()
 
@@ -56,6 +86,30 @@ func _ready() -> void:
 		_build()
 
 
+func set_turn_player(player: TurnPlayer) -> void:
+	if turn_player.event_played.is_connected(_on_event_played):
+		turn_player.event_played.disconnect(_on_event_played)
+		turn_player.finished.disconnect(_on_play_finished)
+	turn_player = player
+	_connect_turn_player()
+
+
+func _connect_turn_player() -> void:
+	if not turn_player.event_played.is_connected(_on_event_played):
+		turn_player.event_played.connect(_on_event_played)
+		turn_player.finished.connect(_on_play_finished)
+
+
+func set_turn_length(seconds: float) -> void:
+	turn_length = seconds
+	time_left = seconds
+	_refresh_timer()
+
+
+func can_act() -> bool:
+	return _built and not resolving and not battle.result.ended and battle.current_team == player_team
+
+
 func lock_reason(fighter: Fighter, state: AbilityState) -> String:
 	if not fighter.is_alive():
 		return "Down"
@@ -65,9 +119,188 @@ func lock_reason(fighter: Fighter, state: AbilityState) -> String:
 		return "Cooldown: %d" % state.cooldown
 	if not fighter.can_use_ability(state.data):
 		return "Not available yet"
-	if not battle.teams[player_team].pool.can_pay(state.data.cost):
+	if resolving:
+		return "Turn resolving"
+	if battle.result.ended or battle.current_team != player_team:
+		return "Not your turn"
+	if queue.has_action_for(fighter):
+		return "Action queued"
+	if battle.valid_targets(player_team, fighter, state).is_empty():
+		return "No valid target"
+	if not queue.would_afford(fighter, state):
 		return "Not enough chakra"
 	return ""
+
+
+func select_ability(fighter: Fighter, state: AbilityState) -> void:
+	if not can_act() or lock_reason(fighter, state) != "":
+		return
+	if selected_state == state and selected_fighter == fighter:
+		clear_selection()
+		return
+	selected_fighter = fighter
+	selected_state = state
+	targets = battle.valid_targets(player_team, fighter, state)
+	show_ability(state)
+	_refresh_selection()
+
+
+func click_target(fighter: Fighter) -> void:
+	if not can_act() or selected_state == null:
+		return
+	if not targets.has(fighter):
+		clear_selection()
+		return
+	var action: Action = Action.new(selected_fighter, selected_state, fighter)
+	var error: String = queue.try_add(action)
+	if error != "":
+		_say("Cannot queue: %s." % error)
+	clear_selection()
+
+
+func clear_selection() -> void:
+	selected_fighter = null
+	selected_state = null
+	targets = []
+	_refresh_selection()
+
+
+func remove_action(index: int) -> void:
+	if not can_act():
+		return
+	queue.remove_at(index)
+
+
+func end_turn() -> void:
+	if not can_act():
+		return
+	var plan: TurnPlan = queue.to_plan()
+	clear_selection()
+	resolving = true
+	var events: Array[BattleEvent] = battle.submit_turn(player_team, plan.actions, plan.random_payment)
+	if not events.is_empty() and events[0].type == BattleEvent.Type.REJECTED:
+		_say(EventText.describe(events[0]))
+		resolving = false
+		queue.clear()
+		_refresh_controls()
+		return
+	queue.clear()
+	_refresh_controls()
+	_play(events, _after_player_events)
+
+
+func advance_timer(delta: float) -> void:
+	if not _built or not can_act():
+		return
+	time_left -= delta
+	_refresh_timer()
+	if time_left <= 0.0:
+		end_turn()
+
+
+func _process(delta: float) -> void:
+	advance_timer(delta)
+
+
+func _play(events: Array[BattleEvent], next: Callable) -> void:
+	resolving = true
+	_pending_next = next
+	turn_player.play(events)
+
+
+func _on_play_finished() -> void:
+	var next: Callable = _pending_next
+	_pending_next = Callable()
+	if next.is_valid():
+		next.call()
+
+
+func _after_player_events() -> void:
+	if _finish_if_over():
+		return
+	if battle.current_team != player_team:
+		var enemy_team: int = battle.current_team
+		var plan: TurnPlan = ai.plan_turn(battle, enemy_team, ai_rng)
+		var events: Array[BattleEvent] = battle.submit_turn(enemy_team, plan.actions, plan.random_payment)
+		_play(events, _after_enemy_events)
+		return
+	_unlock()
+
+
+func _after_enemy_events() -> void:
+	if _finish_if_over():
+		return
+	_unlock()
+
+
+func _unlock() -> void:
+	resolving = false
+	time_left = turn_length
+	refresh_all()
+
+
+func _finish_if_over() -> bool:
+	if not battle.result.ended:
+		return false
+	resolving = true
+	refresh_all()
+	show_game_over(battle.result)
+	game_over.emit(battle.result)
+	return true
+
+
+func show_game_over(result: BattleResult) -> void:
+	if game_over_panel == null:
+		_build_game_over()
+	if result.draw:
+		result_label.text = "Draw"
+	elif result.winner == player_team:
+		result_label.text = "Victory"
+	else:
+		result_label.text = "Defeat"
+	game_over_panel.visible = true
+
+
+func _build_game_over() -> void:
+	game_over_panel = PanelContainer.new()
+	game_over_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	game_over_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	game_over_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	game_over_panel.custom_minimum_size = Vector2(360, 200)
+	var column: VBoxContainer = VBoxContainer.new()
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_theme_constant_override("separation", 18)
+	game_over_panel.add_child(column)
+	result_label = Label.new()
+	result_label.theme_type_variation = "TitleLabel"
+	result_label.add_theme_font_size_override("font_size", 48)
+	result_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(result_label)
+	back_button = Button.new()
+	back_button.text = "Back to select"
+	back_button.custom_minimum_size = Vector2(0, 44)
+	back_button.pressed.connect(func() -> void: exit_requested.emit())
+	column.add_child(back_button)
+	add_child(game_over_panel)
+
+
+func _say(text: String) -> void:
+	log_lines.append(text)
+	log_text.text = "\n".join(log_lines)
+
+
+func _on_event_played(event: BattleEvent) -> void:
+	var text: String = EventText.describe(event)
+	if text != "":
+		_say(text)
+	refresh_all()
+
+
+func _on_queue_changed() -> void:
+	if _built:
+		_refresh_queue()
+		_refresh_chakra()
+		_refresh_controls()
 
 
 func show_ability(state: AbilityState) -> void:
@@ -83,10 +316,13 @@ func refresh_all() -> void:
 	if not _built:
 		return
 	turn_label.text = "Turn %d" % battle.turn
-	timer_label.text = "%02d" % TURN_SECONDS
+	_refresh_timer()
 	for fighter: Fighter in panels:
 		_refresh_fighter(fighter)
 	_refresh_chakra()
+	_refresh_queue()
+	_refresh_controls()
+	_refresh_selection()
 
 
 func _build() -> void:
@@ -101,6 +337,8 @@ func _build() -> void:
 	player_avatar.texture = Art.default_avatar()
 	enemy_avatar.texture = Art.default_avatar()
 	end_turn_button.disabled = true
+	if not end_turn_button.pressed.is_connected(end_turn):
+		end_turn_button.pressed.connect(end_turn)
 	exchange_button.disabled = true
 	surrender_button.disabled = true
 	history_button.disabled = true
@@ -109,6 +347,12 @@ func _build() -> void:
 	_build_team(player_team, false, player_board, arena_player)
 	_build_team(1 - player_team, true, enemy_board, arena_enemy)
 	_reset_description()
+	log_text.add_theme_color_override("default_color", Color.WHITE)
+	log_text.add_theme_font_size_override("normal_font_size", 14)
+	log_text.text = ""
+	if game_over_panel != null:
+		game_over_panel.visible = false
+	time_left = turn_length
 	refresh_all()
 
 
@@ -116,6 +360,8 @@ func _build_team(team_idx: int, enemy: bool, board: VBoxContainer, arena: VBoxCo
 	for fighter: Fighter in battle.teams[team_idx].fighters:
 		var panel: FighterPanel = FighterPanel.new(fighter, enemy)
 		panel.ability_hovered.connect(show_ability)
+		panel.ability_pressed.connect(select_ability)
+		panel.clicked.connect(click_target)
 		board.add_child(panel)
 		panels[fighter] = panel
 		var sprite: PlaceholderSprite = PlaceholderSprite.new(fighter)
@@ -168,10 +414,66 @@ func _refresh_fighter(fighter: Fighter) -> void:
 
 func _refresh_chakra() -> void:
 	var pool: ChakraPool = battle.teams[player_team].pool
+	var reserved: Array[ChakraType.Type] = queue.reserved_cost()
 	for type: ChakraType.Type in chakra_labels:
 		var label: Label = chakra_labels[type]
-		label.text = "x%d" % pool.count(type)
-	chakra_total.text = "Total: %d" % pool.total()
+		var held: int = reserved.count(type)
+		label.text = "x%d" % pool.count(type) if held == 0 else "x%d (-%d)" % [pool.count(type), held]
+	chakra_total.text = "Total: %d" % pool.total() if reserved.is_empty() else "Total: %d (reserved %d)" % [pool.total(), reserved.size()]
+
+
+func _refresh_timer() -> void:
+	timer_label.text = "%02d" % maxi(ceili(time_left), 0)
+
+
+func _refresh_controls() -> void:
+	end_turn_button.disabled = not can_act()
+	for fighter: Fighter in battle.teams[player_team].fighters:
+		panels[fighter].refresh(lock_reason)
+
+
+func _refresh_selection() -> void:
+	for fighter: Fighter in panels:
+		var panel: FighterPanel = panels[fighter]
+		panel.set_highlight(targets.has(fighter))
+		for button: AbilityButton in panel.ability_buttons:
+			button.set_selected(fighter == selected_fighter and button.state == selected_state)
+
+
+func _refresh_queue() -> void:
+	for child: Node in queue_list.get_children():
+		queue_list.remove_child(child)
+		child.queue_free()
+	queue_remove_buttons.clear()
+	for i: int in queue.actions.size():
+		var action: Action = queue.actions[i]
+		var row: HBoxContainer = HBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
+		var icon: TextureRect = TextureRect.new()
+		icon.texture = Art.ability_icon(action.ability.data.display_name)
+		icon.custom_minimum_size = Vector2(28, 28)
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		row.add_child(icon)
+		var label: Label = Label.new()
+		label.theme_type_variation = "LightLabel"
+		label.add_theme_font_size_override("font_size", 13)
+		label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		label.clip_text = true
+		var target_name: String = action.target.display_name() if action.target != null and action.target != action.source else ""
+		label.text = action.ability.data.display_name
+		label.tooltip_text = "%s uses %s" % [action.source.display_name(), action.ability.data.display_name]
+		if target_name != "":
+			label.tooltip_text += " on %s" % target_name
+		label.mouse_filter = Control.MOUSE_FILTER_PASS
+		row.add_child(label)
+		var remove: Button = Button.new()
+		remove.text = "X"
+		remove.tooltip_text = "Remove this action"
+		remove.pressed.connect(remove_action.bind(i))
+		row.add_child(remove)
+		queue_list.add_child(row)
+		queue_remove_buttons.append(remove)
 
 
 func _disconnect_battle() -> void:
@@ -181,6 +483,7 @@ func _disconnect_battle() -> void:
 	battle.fighter_died.disconnect(_on_fighter_died)
 	battle.chakra_changed.disconnect(_on_chakra_changed)
 	battle.turn_started.disconnect(_on_turn_started)
+	queue.changed.disconnect(_on_queue_changed)
 
 
 func _on_hp_changed(fighter: Fighter, _old_hp: int, _new_hp: int) -> void:
@@ -201,7 +504,9 @@ func _on_chakra_changed(_team_idx: int) -> void:
 		_refresh_fighter(fighter)
 
 
-func _on_turn_started(_team_idx: int, _turn: int) -> void:
+func _on_turn_started(team_idx: int, _turn: int) -> void:
+	if team_idx == player_team:
+		time_left = turn_length
 	refresh_all()
 
 

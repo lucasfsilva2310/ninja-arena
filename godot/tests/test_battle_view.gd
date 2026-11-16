@@ -214,7 +214,7 @@ func test_turn_and_timer_labels_and_disabled_stubs() -> void:
 	var view: BattleView = Helpers.mount_battle(battle)
 	assert_eq(view.turn_label.text, "Turn 1")
 	assert_eq(view.timer_label.text, "60")
-	assert_true(view.end_turn_button.disabled)
+	assert_false(view.end_turn_button.disabled)
 	assert_true(view.surrender_button.disabled)
 	assert_true(view.history_button.disabled)
 	assert_true(view.example_button.disabled)

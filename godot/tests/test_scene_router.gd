@@ -54,3 +54,28 @@ func test_router_without_a_host_does_not_crash() -> void:
 	router.go_to_select()
 	assert_null(router.current)
 	router.free()
+
+
+func test_router_returns_to_select_from_the_game_over_panel() -> void:
+	var pair: Array = _router_with_host()
+	var router: Node = pair[0]
+	var host: Control = pair[1]
+	router.seed_override = 5
+	router.go_to_battle(Helpers.team_of(["Naruto", "Sasuke", "Sakura"]))
+	var view: BattleView = router.current as BattleView
+	assert_true(view != null)
+	view.exit_requested.emit()
+	assert_true(router.current is CharacterSelect)
+	_cleanup(router, host)
+
+
+func test_router_seed_override_makes_the_battle_deterministic() -> void:
+	var pair: Array = _router_with_host()
+	var router: Node = pair[0]
+	var host: Control = pair[1]
+	router.seed_override = 5
+	router.go_to_battle(Helpers.team_of(["Naruto", "Sasuke", "Sakura"]))
+	var first: Array[ChakraType.Type] = (router.current as BattleView).battle.teams[0].pool.chakras.duplicate()
+	router.go_to_battle(Helpers.team_of(["Naruto", "Sasuke", "Sakura"]))
+	assert_eq((router.current as BattleView).battle.teams[0].pool.chakras, first)
+	_cleanup(router, host)

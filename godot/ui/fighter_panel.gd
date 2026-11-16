@@ -2,6 +2,8 @@ class_name FighterPanel
 extends PanelContainer
 
 signal ability_hovered(state: AbilityState)
+signal ability_pressed(fighter: Fighter, state: AbilityState)
+signal clicked(fighter: Fighter)
 
 const AVATAR_SIZE: int = 72
 
@@ -14,6 +16,7 @@ var hp_label: Label
 var effects_box: HFlowContainer
 var abilities_row: HBoxContainer
 var ability_buttons: Array[AbilityButton] = []
+var highlighted: bool = false
 
 var _built_states: Array[AbilityState] = []
 
@@ -22,6 +25,7 @@ func _init(new_fighter: Fighter, enemy: bool = false) -> void:
 	fighter = new_fighter
 	is_enemy = enemy
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
+	gui_input.connect(_on_gui_input)
 	var column: VBoxContainer = VBoxContainer.new()
 	column.add_theme_constant_override("separation", 4)
 	add_child(column)
@@ -35,6 +39,7 @@ func _init(new_fighter: Fighter, enemy: bool = false) -> void:
 	avatar_rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	avatar_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	avatar_rect.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	avatar_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 	var info: VBoxContainer = VBoxContainer.new()
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -43,6 +48,7 @@ func _init(new_fighter: Fighter, enemy: bool = false) -> void:
 	name_label = Label.new()
 	name_label.theme_type_variation = "TitleLabel"
 	name_label.clip_text = true
+	name_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	info.add_child(name_label)
 
 	hp_bar = ProgressBar.new()
@@ -51,6 +57,7 @@ func _init(new_fighter: Fighter, enemy: bool = false) -> void:
 	hp_bar.max_value = Fighter.MAX_HP
 	hp_bar.show_percentage = false
 	hp_bar.custom_minimum_size = Vector2(60, 18)
+	hp_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hp_label = Label.new()
 	hp_label.theme_type_variation = "LightLabel"
 	hp_label.add_theme_font_size_override("font_size", 13)
@@ -82,6 +89,14 @@ func _init(new_fighter: Fighter, enemy: bool = false) -> void:
 	abilities_row.alignment = BoxContainer.ALIGNMENT_BEGIN
 	abilities_row.visible = not is_enemy
 	column.add_child(abilities_row)
+
+
+func set_highlight(value: bool) -> void:
+	highlighted = value
+	if highlighted:
+		add_theme_stylebox_override("panel", GameTheme.box(Color(1, 0.95, 0.7, 0.97), Color("f59e0b"), 4, 10, 10))
+	else:
+		remove_theme_stylebox_override("panel")
 
 
 func refresh(lock_for: Callable = Callable()) -> void:
@@ -132,6 +147,13 @@ func _rebuild_abilities() -> void:
 	for state: AbilityState in fighter.abilities:
 		var button: AbilityButton = AbilityButton.new()
 		button.setup(state)
+		button.activated.connect(func(pressed_state: AbilityState) -> void: ability_pressed.emit(fighter, pressed_state))
 		button.hovered.connect(func(hovered_state: AbilityState) -> void: ability_hovered.emit(hovered_state))
 		abilities_row.add_child(button)
 		ability_buttons.append(button)
+
+
+func _on_gui_input(event: InputEvent) -> void:
+	var mouse: InputEventMouseButton = event as InputEventMouseButton
+	if mouse != null and mouse.pressed and mouse.button_index == MOUSE_BUTTON_LEFT:
+		clicked.emit(fighter)
