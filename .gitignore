@@ -106,8 +106,8 @@ Thumbs.db
 Icon
 ._*
 
-# Godot-specific (already handled in Godot/.gitignore)
-# But keeping here for completeness
+# Godot
 .godot/
-*.uid
-.import/ 
+/godot/.godot/
+*.tmp
+# *.import and *.uid files are kept on purpose
