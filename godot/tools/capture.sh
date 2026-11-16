@@ -18,4 +18,4 @@ if [ -n "${CAPTURE_SIZE:-}" ]; then
 	SIZE_ARGS=(--resolution "$CAPTURE_SIZE")
 fi
 
-"$GODOT" --path "$PROJ" "${SIZE_ARGS[@]}" --script res://tools/capture.gd -- "$SCENE" "$OUT" "$FRAMES"
+"$GODOT" --path "$PROJ" "${SIZE_ARGS[@]}" --script res://tools/capture.gd -- "$SCENE" "$OUT" "$FRAMES" "${@:4}"

@@ -5,7 +5,7 @@ const Helpers: GDScript = preload("res://tests/ui_helpers.gd")
 const BATTLE_NODES: Array[String] = [
 	"Background", "PlayerAvatar", "EnemyAvatar", "TurnLabel", "TimerLabel", "PlayerBoard", "EnemyBoard",
 	"ChakraRow", "ChakraTotal", "ExchangeButton", "ArenaPlayer", "ArenaEnemy", "EndTurnButton",
-	"SurrenderButton", "HistoryButton", "ExampleButton", "DescIcon", "DescName", "DescCosts", "DescMeta", "DescText",
+	"SurrenderButton", "HistoryButton", "DescIcon", "DescName", "DescCosts", "DescMeta", "DescText",
 ]
 
 const SELECT_NODES: Array[String] = [

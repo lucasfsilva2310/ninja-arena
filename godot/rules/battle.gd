@@ -82,6 +82,29 @@ func submit_turn(team_idx: int, actions: Array[Action], random_payment: Array[Ch
 	return events
 
 
+func surrender(team_idx: int) -> Array[BattleEvent]:
+	var events: Array[BattleEvent] = []
+	if result.ended or team_idx != current_team:
+		events.append(BattleEvent.new(BattleEvent.Type.REJECTED, null, null, 0, "cannot surrender now"))
+		return events
+	var outcome: BattleResult = BattleResult.new()
+	outcome.ended = true
+	outcome.winner = 1 - team_idx
+	result = outcome
+	events.append(BattleEvent.new(BattleEvent.Type.BATTLE_ENDED, null, null, outcome.winner, "team %d surrendered" % team_idx))
+	battle_ended.emit(outcome)
+	return events
+
+
+func exchange_chakra(team_idx: int, five_chakras: Array[ChakraType.Type], target: ChakraType.Type) -> bool:
+	if result.ended or team_idx != current_team:
+		return false
+	if not teams[team_idx].pool.exchange(five_chakras, target):
+		return false
+	chakra_changed.emit(team_idx)
+	return true
+
+
 func check_winner() -> BattleResult:
 	var outcome: BattleResult = BattleResult.new()
 	var first_down: bool = teams[0].is_defeated()

@@ -9,6 +9,8 @@ var _started_at: int = 0
 var _taken: Dictionary = {}
 var _queued: int = 0
 var _player_turns: int = 0
+var _payments: int = 0
+var _payment_cancels: int = 0
 
 
 func _ready() -> void:
@@ -42,6 +44,8 @@ func _run() -> void:
 	await _frames(3)
 	var view: BattleView = SceneRouter.current as BattleView
 	_check(view != null, "start button opens the battle")
+	_check_footer_inside_window(view)
+	await _tour_modals(view)
 	var planner: AiPlayer = AiPlayer.new()
 	var plan_rng: Rng = Rng.new(8)
 	while not view.battle.result.ended:
@@ -67,6 +71,10 @@ func _run() -> void:
 			_taken["queue"] = true
 		await _click(view.end_turn_button)
 		await _frames(2)
+		if view.modal != null:
+			await _pay_through_modal(view, plan)
+		_check(view.modal == null, "no modal left open after the turn")
+		_check_fits(view)
 		_check(not view.resolving or view.battle.result.ended, "turn resolved and input unlocked")
 	await _frames(2)
 	_check(view.game_over_panel != null and view.game_over_panel.visible, "game over panel is visible")
@@ -76,8 +84,105 @@ func _run() -> void:
 	await _click(view.back_button)
 	await _frames(3)
 	_check(SceneRouter.current is CharacterSelect, "back button returns to the select screen")
-	print("DRIVE OK result=%s player_turns=%d battle_turn=%d queued=%d seconds=%.1f" % [label, _player_turns, final_turn, _queued, _elapsed()])
+	await _surrender_game()
+	print("DRIVE OK result=%s player_turns=%d battle_turn=%d queued=%d payment_modals=%d payment_cancels=%d seconds=%.1f" % [label, _player_turns, final_turn, _queued, _payments, _payment_cancels, _elapsed()])
 	get_tree().quit(0)
+
+
+func _check_footer_inside_window(view: BattleView) -> void:
+	var bottom: float = get_viewport_rect().size.y
+	for button: Button in [view.surrender_button, view.history_button, view.exchange_button, view.end_turn_button]:
+		var rect: Rect2 = button.get_global_rect()
+		_check(rect.end.y <= bottom and rect.position.y >= 0.0, "%s is inside the window (bottom %.0f of %.0f)" % [button.text, rect.end.y, bottom])
+
+
+func _check_fits(view: BattleView) -> void:
+	var layout: Control = view.get_node("Margin/Layout") as Control
+	var needed: float = view.get_node("Margin").get_combined_minimum_size().y
+	if needed > get_viewport_rect().size.y:
+		var parts: String = "header=%.0f body=%.0f footer=%.0f" % [layout.get_node("Header").get_combined_minimum_size().y, layout.get_node("Body").get_combined_minimum_size().y, layout.get_node("Footer").get_combined_minimum_size().y]
+		_check(false, "battle layout needs %.0f px, window has %.0f (%s)" % [needed, get_viewport_rect().size.y, parts])
+
+
+func _tour_modals(view: BattleView) -> void:
+	await _click(view.history_button)
+	_check(view.modal is HistoryModal, "history button opens the history modal")
+	await _click((view.modal as HistoryModal).close_button)
+	_check(view.modal == null, "history close button closes the modal")
+
+	await _click(view.surrender_button)
+	_check(view.modal is SurrenderModal, "surrender button opens the confirmation")
+	await _click((view.modal as SurrenderModal).no_button)
+	_check(view.modal == null and not view.battle.result.ended, "No keeps the battle going")
+
+	await _click(view.exchange_button)
+	_check(view.modal is ExchangeModal, "exchange button opens the exchange modal")
+	await _click((view.modal as ExchangeModal).cancel_button)
+	_check(view.modal == null, "exchange cancel closes the modal")
+
+	var pool: ChakraPool = view.battle.teams[0].pool
+	for i: int in 5:
+		pool.add(ChakraType.Type.NINJUTSU)
+	view.battle.chakra_changed.emit(0)
+	var before_total: int = pool.total()
+	var before_blood: int = pool.count(ChakraType.Type.BLOODLINE)
+	await _click(view.exchange_button)
+	var exchange: ExchangeModal = view.modal as ExchangeModal
+	_check(exchange != null, "exchange modal opens with chakra in the pool")
+	for i: int in 4:
+		await _click(exchange.picker.add_buttons[ChakraType.Type.NINJUTSU])
+	await _click(exchange.target_buttons[ChakraType.Type.BLOODLINE])
+	await _shot("real-exchange-modal")
+	_check(exchange.confirm_button.disabled, "four chakras keep Transform disabled")
+	await _click(exchange.picker.add_buttons[ChakraType.Type.NINJUTSU])
+	_check(not exchange.confirm_button.disabled, "five chakras and a target enable Transform")
+	await _click(exchange.confirm_button)
+	_check(view.modal == null, "Transform closes the modal")
+	_check(pool.total() == before_total - 4, "exchange removed 5 and added 1 (total %d to %d)" % [before_total, pool.total()])
+	_check(pool.count(ChakraType.Type.BLOODLINE) == before_blood + 1, "exchange added one Bloodline")
+
+
+func _pay_through_modal(view: BattleView, plan: TurnPlan) -> void:
+	var payment: PaymentModal = view.modal as PaymentModal
+	_check(payment != null, "the only modal after End Turn is the payment modal")
+	_payments += 1
+	_check(payment.confirm_button.disabled, "payment Confirm is disabled before any pick")
+	if _payment_cancels == 0:
+		await _click(payment.cancel_button)
+		_payment_cancels += 1
+		_check(view.modal == null and view.queue.actions.size() == plan.actions.size(), "payment Cancel keeps the queue")
+		await _click(view.end_turn_button)
+		await _frames(2)
+		payment = view.modal as PaymentModal
+		_check(payment != null, "End Turn opens the payment modal again")
+	if not _taken.has("payment"):
+		await _shot("real-payment-modal")
+		_taken["payment"] = true
+	var wanted: Array[ChakraType.Type] = view.queue.random_candidates().slice(0, payment.slots)
+	for type: ChakraType.Type in wanted:
+		await _click(payment.picker.add_buttons[type])
+	_check(payment.picker.selected.size() == payment.slots, "picked the right number of chakras")
+	await _click(payment.confirm_button)
+	await _frames(2)
+
+
+func _surrender_game() -> void:
+	var select: CharacterSelect = SceneRouter.current as CharacterSelect
+	for i: int in 3:
+		await _click(select.cards[i])
+	await _click(select.start_button)
+	await _frames(3)
+	var view: BattleView = SceneRouter.current as BattleView
+	_check(view != null, "second battle opens")
+	await _click(view.surrender_button)
+	await _click((view.modal as SurrenderModal).yes_button)
+	await _frames(2)
+	_check(view.battle.result.ended and view.battle.result.winner == 1, "Yes ends the battle as a loss")
+	_check(view.game_over_panel != null and view.game_over_panel.visible and view.result_label.text == "Defeat", "surrender shows Defeat")
+	await _shot("surrender-defeat")
+	await _click(view.back_button)
+	await _frames(3)
+	_check(SceneRouter.current is CharacterSelect, "back to select after surrender")
 
 
 func _find_button(view: BattleView, action: Action) -> AbilityButton:

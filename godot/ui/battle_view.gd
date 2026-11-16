@@ -24,6 +24,8 @@ var selected_state: AbilityState
 var targets: Array[Fighter] = []
 var resolving: bool = false
 var log_lines: Array[String] = []
+var history: Array[String] = []
+var modal: ModalBase
 var queue_remove_buttons: Array[Button] = []
 var game_over_panel: PanelContainer
 var result_label: Label
@@ -47,7 +49,6 @@ var _pending_next: Callable
 @onready var end_turn_button: Button = %EndTurnButton
 @onready var surrender_button: Button = %SurrenderButton
 @onready var history_button: Button = %HistoryButton
-@onready var example_button: Button = %ExampleButton
 @onready var desc_icon: TextureRect = %DescIcon
 @onready var desc_name: Label = %DescName
 @onready var desc_costs: CostRow = %DescCosts
@@ -72,6 +73,8 @@ func bind(new_battle: Battle, team_idx: int = 0) -> void:
 	selected_state = null
 	targets = []
 	log_lines.clear()
+	history.clear()
+	_close_modal(false)
 	time_left = turn_length
 	_connect_turn_player()
 	if is_node_ready():
@@ -107,6 +110,10 @@ func set_turn_length(seconds: float) -> void:
 
 
 func can_act() -> bool:
+	return turn_is_open() and modal == null
+
+
+func turn_is_open() -> bool:
 	return _built and not resolving and not battle.result.ended and battle.current_team == player_team
 
 
@@ -174,7 +181,85 @@ func remove_action(index: int) -> void:
 func end_turn() -> void:
 	if not can_act():
 		return
-	var plan: TurnPlan = queue.to_plan()
+	if queue.needs_random_choice():
+		clear_selection()
+		_open_modal(PaymentModal.new(queue.random_candidates(), queue.random_slots()))
+		var payment_modal: PaymentModal = modal as PaymentModal
+		payment_modal.confirmed.connect(_on_payment_confirmed)
+		payment_modal.cancelled.connect(_close_modal)
+		return
+	_submit_player_turn(queue.to_plan())
+
+
+func open_exchange() -> void:
+	if not can_act():
+		return
+	clear_selection()
+	_open_modal(ExchangeModal.new(battle.teams[player_team].pool.chakras.duplicate(), queue.exchange_error))
+	var exchange: ExchangeModal = modal as ExchangeModal
+	exchange.confirmed.connect(_on_exchange_confirmed)
+	exchange.cancelled.connect(_close_modal)
+
+
+func open_surrender() -> void:
+	if not can_act():
+		return
+	clear_selection()
+	_open_modal(SurrenderModal.new())
+	var surrender: SurrenderModal = modal as SurrenderModal
+	surrender.confirmed.connect(_on_surrender_confirmed)
+	surrender.cancelled.connect(_close_modal)
+
+
+func open_history() -> void:
+	if not _built or modal != null:
+		return
+	_open_modal(HistoryModal.new(history))
+	modal.cancelled.connect(_close_modal)
+
+
+func _open_modal(new_modal: ModalBase) -> void:
+	_close_modal(false)
+	modal = new_modal
+	add_child(modal)
+	_refresh_controls()
+
+
+func _close_modal(refresh: bool = true) -> void:
+	if modal == null:
+		return
+	remove_child(modal)
+	modal.queue_free()
+	modal = null
+	if _built and refresh:
+		_refresh_controls()
+
+
+func _on_payment_confirmed(payment: Array[ChakraType.Type]) -> void:
+	if not queue.is_valid_random_payment(payment):
+		return
+	_close_modal()
+	_submit_player_turn(queue.plan_with_payment(payment))
+
+
+func _on_exchange_confirmed(chakras: Array[ChakraType.Type], target: ChakraType.Type) -> void:
+	if queue.exchange_error(chakras, target) != "":
+		return
+	_close_modal()
+	battle.exchange_chakra(player_team, chakras, target)
+
+
+func _on_surrender_confirmed() -> void:
+	_close_modal()
+	if not can_act():
+		return
+	resolving = true
+	for event: BattleEvent in battle.surrender(player_team):
+		_on_event_played(event)
+	_finish_if_over()
+
+
+func _submit_player_turn(plan: TurnPlan) -> void:
 	clear_selection()
 	resolving = true
 	var events: Array[BattleEvent] = battle.submit_turn(player_team, plan.actions, plan.random_payment)
@@ -190,12 +275,13 @@ func end_turn() -> void:
 
 
 func advance_timer(delta: float) -> void:
-	if not _built or not can_act():
+	if not turn_is_open():
 		return
 	time_left -= delta
 	_refresh_timer()
 	if time_left <= 0.0:
-		end_turn()
+		_close_modal()
+		_submit_player_turn(queue.to_plan())
 
 
 func _process(delta: float) -> void:
@@ -289,10 +375,15 @@ func _say(text: String) -> void:
 	log_text.text = "\n".join(log_lines)
 
 
+func _record(text: String) -> void:
+	history.append(text)
+	_say(text)
+
+
 func _on_event_played(event: BattleEvent) -> void:
 	var text: String = EventText.describe(event)
 	if text != "":
-		_say(text)
+		_record(text)
 	refresh_all()
 
 
@@ -342,7 +433,10 @@ func _build() -> void:
 	exchange_button.disabled = true
 	surrender_button.disabled = true
 	history_button.disabled = true
-	example_button.disabled = true
+	if not exchange_button.pressed.is_connected(open_exchange):
+		exchange_button.pressed.connect(open_exchange)
+		surrender_button.pressed.connect(open_surrender)
+		history_button.pressed.connect(open_history)
 	_build_chakra_row()
 	_build_team(player_team, false, player_board, arena_player)
 	_build_team(1 - player_team, true, enemy_board, arena_enemy)
@@ -428,6 +522,9 @@ func _refresh_timer() -> void:
 
 func _refresh_controls() -> void:
 	end_turn_button.disabled = not can_act()
+	exchange_button.disabled = not can_act()
+	surrender_button.disabled = not can_act()
+	history_button.disabled = not _built or modal != null
 	for fighter: Fighter in battle.teams[player_team].fighters:
 		panels[fighter].refresh(lock_reason)
 

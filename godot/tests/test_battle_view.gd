@@ -209,16 +209,15 @@ func test_footer_shows_the_hovered_ability() -> void:
 	Helpers.unmount(view)
 
 
-func test_turn_and_timer_labels_and_disabled_stubs() -> void:
+func test_turn_and_timer_labels_and_modal_buttons() -> void:
 	var battle: Battle = Helpers.real_battle()
 	var view: BattleView = Helpers.mount_battle(battle)
 	assert_eq(view.turn_label.text, "Turn 1")
 	assert_eq(view.timer_label.text, "60")
 	assert_false(view.end_turn_button.disabled)
-	assert_true(view.surrender_button.disabled)
-	assert_true(view.history_button.disabled)
-	assert_true(view.example_button.disabled)
-	assert_true(view.exchange_button.disabled)
+	assert_false(view.surrender_button.disabled)
+	assert_false(view.history_button.disabled)
+	assert_false(view.exchange_button.disabled)
 	battle.submit_turn(0, Helpers.actions([]), Helpers.payment())
 	assert_eq(view.turn_label.text, "Turn 2")
 	Helpers.unmount(view)

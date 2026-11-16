@@ -6,6 +6,8 @@ signal ability_pressed(fighter: Fighter, state: AbilityState)
 signal clicked(fighter: Fighter)
 
 const AVATAR_SIZE: int = 72
+const PLAYER_EFFECTS_HEIGHT: int = 22
+const ENEMY_EFFECTS_HEIGHT: int = 70
 
 var fighter: Fighter
 var is_enemy: bool = false
@@ -72,8 +74,12 @@ func _init(new_fighter: Fighter, enemy: bool = false) -> void:
 	effects_box = HFlowContainer.new()
 	effects_box.add_theme_constant_override("h_separation", 4)
 	effects_box.add_theme_constant_override("v_separation", 3)
-	effects_box.custom_minimum_size = Vector2(0, 22)
-	info.add_child(effects_box)
+	effects_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var effects_scroll: ScrollContainer = ScrollContainer.new()
+	effects_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	effects_scroll.custom_minimum_size = Vector2(0, ENEMY_EFFECTS_HEIGHT if is_enemy else PLAYER_EFFECTS_HEIGHT)
+	effects_scroll.add_child(effects_box)
+	info.add_child(effects_scroll)
 
 	if is_enemy:
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT

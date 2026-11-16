@@ -512,6 +512,7 @@ func test_full_game_through_the_ui_with_a_scripted_player() -> void:
 	var guard: int = 0
 	var queued: int = 0
 	var refused: int = 0
+	var payment_modals: int = 0
 	while not battle.result.ended and guard < 400:
 		guard += 1
 		assert_eq(battle.current_team, 0)
@@ -527,6 +528,13 @@ func test_full_game_through_the_ui_with_a_scripted_player() -> void:
 			else:
 				refused += 1
 		_press(view.end_turn_button)
+		if view.modal is PaymentModal:
+			payment_modals += 1
+			var modal: PaymentModal = view.modal as PaymentModal
+			for type: ChakraType.Type in plan.random_payment:
+				modal.picker.add_chakra(type)
+			_press(modal.confirm_button)
+		assert_null(view.modal)
 		if not battle.result.ended:
 			assert_false(view.resolving)
 	assert_true(battle.result.ended)
@@ -534,6 +542,7 @@ func test_full_game_through_the_ui_with_a_scripted_player() -> void:
 	assert_ne(view.result_label.text, "")
 	assert_eq(refused, 0)
 	assert_true(queued > 0)
+	assert_true(payment_modals > 0)
 	var joined: String = "\n".join(view.log_lines)
 	assert_false(joined.contains("Turn rejected"))
 	assert_false(joined.contains("Cannot queue"))
