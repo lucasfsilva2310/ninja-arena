@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_i7b4g"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_x1pi6"]
+
+[sub_resource type="Resource" id="Resource_g10ea"]
+script = ExtResource("1_i7b4g")
+kind = 2
+duration = 1
+invulnerable = true
+description = "This character cannot be hurt."
+
+[resource]
+script = ExtResource("2_x1pi6")
+display_name = "Kawarimi"
+description = "The caster swaps places with a log and cannot be hurt for 1 turn."
+cost = Array[int]([4])
+cooldown = 1
+target_type = 2
+effects = Array[ExtResource("1_i7b4g")]([SubResource("Resource_g10ea")])

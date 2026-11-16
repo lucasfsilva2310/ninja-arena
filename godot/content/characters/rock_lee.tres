@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="1_05ftq"]
+[ext_resource type="Resource" path="res://content/abilities/konoha_senpu.tres" id="2_6x6al"]
+[ext_resource type="Resource" path="res://content/abilities/primary_lotus.tres" id="3_5nqg2"]
+[ext_resource type="Resource" path="res://content/abilities/release_weights.tres" id="4_f3eic"]
+[ext_resource type="Resource" path="res://content/abilities/backflip.tres" id="5_nd7bi"]
+[ext_resource type="Script" path="res://rules/character_data.gd" id="6_t3jfx"]
+
+[resource]
+script = ExtResource("6_t3jfx")
+display_name = "Rock Lee"
+abilities = Array[ExtResource("1_05ftq")]([ExtResource("2_6x6al"), ExtResource("3_5nqg2"), ExtResource("4_f3eic"), ExtResource("5_nd7bi")])

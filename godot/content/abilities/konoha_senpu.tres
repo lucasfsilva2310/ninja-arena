@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_xqvq5"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_ul5ek"]
+
+[sub_resource type="Resource" id="Resource_8oc5u"]
+script = ExtResource("1_xqvq5")
+value = 20
+
+[resource]
+script = ExtResource("2_ul5ek")
+display_name = "Konoha Senpu"
+description = "Rock Lee kicks one enemy and deals 20 damage. Each time he uses it, it deals 5 more damage for the rest of the battle."
+cost = Array[int]([1])
+cooldown = 1
+effects = Array[ExtResource("1_xqvq5")]([SubResource("Resource_8oc5u")])
+stacking = true

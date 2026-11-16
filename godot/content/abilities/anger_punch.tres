@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_lma30"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_8newj"]
+
+[sub_resource type="Resource" id="Resource_n7rdn"]
+script = ExtResource("1_lma30")
+value = 15
+
+[resource]
+script = ExtResource("2_8newj")
+display_name = "Anger Punch"
+description = "Sakura punches one enemy and deals 15 damage. While Inner Strength lasts, it deals 10 more damage."
+cost = Array[int]([1])
+effects = Array[ExtResource("1_lma30")]([SubResource("Resource_n7rdn")])

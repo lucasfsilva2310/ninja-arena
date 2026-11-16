@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_y3hpi"]
+[ext_resource type="Resource" path="res://content/abilities/hidden_lotus.tres" id="2_02af1"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="3_norc8"]
+
+[sub_resource type="Resource" id="Resource_f4lo4"]
+script = ExtResource("1_y3hpi")
+kind = 5
+value = 30
+duration = 2
+replacement = ExtResource("2_02af1")
+description = "Primary Lotus becomes Hidden Lotus for 1 turn."
+
+[resource]
+script = ExtResource("3_norc8")
+display_name = "Primary Lotus"
+description = "Rock Lee wraps one enemy in bandages and deals 30 damage. On his next turn, this ability becomes Hidden Lotus for 1 turn."
+cost = Array[int]([1])
+cooldown = 1
+effects = Array[ExtResource("1_y3hpi")]([SubResource("Resource_f4lo4")])

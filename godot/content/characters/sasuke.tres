@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="1_npak5"]
+[ext_resource type="Resource" path="res://content/abilities/fireball.tres" id="2_pmc7y"]
+[ext_resource type="Resource" path="res://content/abilities/chidori.tres" id="3_2o3ox"]
+[ext_resource type="Resource" path="res://content/abilities/sharingan.tres" id="4_7apsi"]
+[ext_resource type="Resource" path="res://content/abilities/kawarimi.tres" id="5_4owei"]
+[ext_resource type="Script" path="res://rules/character_data.gd" id="6_xox4n"]
+
+[resource]
+script = ExtResource("6_xox4n")
+display_name = "Sasuke"
+abilities = Array[ExtResource("1_npak5")]([ExtResource("2_pmc7y"), ExtResource("3_2o3ox"), ExtResource("4_7apsi"), ExtResource("5_4owei")])

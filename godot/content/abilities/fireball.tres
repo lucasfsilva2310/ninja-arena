@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_oo0q5"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_4xu3l"]
+
+[sub_resource type="Resource" id="Resource_si36a"]
+script = ExtResource("1_oo0q5")
+value = 25
+
+[resource]
+script = ExtResource("2_4xu3l")
+display_name = "Fireball"
+description = "Sasuke throws a fireball at one enemy and deals 25 damage."
+cost = Array[int]([0])
+cooldown = 1
+effects = Array[ExtResource("1_oo0q5")]([SubResource("Resource_si36a")])

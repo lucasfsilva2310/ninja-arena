@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" format=3]
+
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="1_hqqaf"]
+[ext_resource type="Resource" path="res://content/abilities/anger_punch.tres" id="2_eknan"]
+[ext_resource type="Resource" path="res://content/abilities/heal.tres" id="3_g3jmi"]
+[ext_resource type="Resource" path="res://content/abilities/inner_strength.tres" id="4_fdo8a"]
+[ext_resource type="Resource" path="res://content/abilities/kawarimi.tres" id="5_d77tr"]
+[ext_resource type="Script" path="res://rules/character_data.gd" id="6_opy8d"]
+
+[resource]
+script = ExtResource("6_opy8d")
+display_name = "Sakura"
+abilities = Array[ExtResource("1_hqqaf")]([ExtResource("2_eknan"), ExtResource("3_g3jmi"), ExtResource("4_fdo8a"), ExtResource("5_d77tr")])

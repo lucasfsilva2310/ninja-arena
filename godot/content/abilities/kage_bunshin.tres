@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_yt66j"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_up03a"]
+
+[sub_resource type="Resource" id="Resource_tpnbk"]
+script = ExtResource("1_yt66j")
+kind = 2
+value = 15
+duration = 3
+is_percent = true
+description = "This character has 15% damage reduction."
+
+[sub_resource type="Resource" id="Resource_rkt4f"]
+script = ExtResource("1_yt66j")
+kind = 3
+value = 10
+duration = 3
+ability_names = Array[String](["Naruto Kick"])
+description = "Naruto Kick deals 10 more damage."
+
+[sub_resource type="Resource" id="Resource_quw4r"]
+script = ExtResource("1_yt66j")
+kind = 4
+duration = 3
+ability_names = Array[String](["Rasengan"])
+description = "This character can use Rasengan."
+
+[resource]
+script = ExtResource("2_up03a")
+display_name = "Kage Bunshin"
+description = "Naruto makes clones. For 3 turns he has 15% damage reduction, Naruto Kick deals 10 more damage, and he can use Rasengan."
+cost = Array[int]([4])
+cooldown = 5
+target_type = 2
+effects = Array[ExtResource("1_yt66j")]([SubResource("Resource_tpnbk"), SubResource("Resource_rkt4f"), SubResource("Resource_quw4r")])

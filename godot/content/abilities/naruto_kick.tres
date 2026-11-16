@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_e8jo4"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_r1flp"]
+
+[sub_resource type="Resource" id="Resource_f60gq"]
+script = ExtResource("1_e8jo4")
+value = 20
+
+[resource]
+script = ExtResource("2_r1flp")
+display_name = "Naruto Kick"
+description = "Naruto kicks one enemy and deals 20 damage. While Kage Bunshin lasts, it deals 10 more damage."
+cost = Array[int]([1, 4])
+effects = Array[ExtResource("1_e8jo4")]([SubResource("Resource_f60gq")])

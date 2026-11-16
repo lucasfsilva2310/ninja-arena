@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_nfdgo"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_8lc1v"]
+
+[sub_resource type="Resource" id="Resource_xeuy5"]
+script = ExtResource("1_nfdgo")
+kind = 1
+value = 15
+
+[resource]
+script = ExtResource("2_8lc1v")
+display_name = "Heal"
+description = "Sakura heals one ally for 15 health. She cannot heal an ally at full health."
+cost = Array[int]([0])
+target_type = 1
+effects = Array[ExtResource("1_nfdgo")]([SubResource("Resource_xeuy5")])

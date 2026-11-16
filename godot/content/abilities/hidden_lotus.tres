@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityData" format=3]
+
+[ext_resource type="Script" path="res://rules/effect_data.gd" id="1_d1dne"]
+[ext_resource type="Script" path="res://rules/ability_data.gd" id="2_w8d75"]
+
+[sub_resource type="Resource" id="Resource_4kx51"]
+script = ExtResource("1_d1dne")
+value = 40
+
+[resource]
+script = ExtResource("2_w8d75")
+display_name = "Hidden Lotus"
+description = "Rock Lee opens the fifth chakra gate and deals 40 damage to one enemy."
+cost = Array[int]([1, 4])
+effects = Array[ExtResource("1_d1dne")]([SubResource("Resource_4kx51")])
