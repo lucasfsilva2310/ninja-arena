@@ -43,6 +43,39 @@ static func heal(amount: int, cost: Array = []) -> AbilityData:
 	return ability("Heal%d" % amount, cost, 0, AbilityData.Target.ALLY, [effect(EffectData.Kind.HEAL, amount)])
 
 
+static func names(list: Array) -> Array[String]:
+	var result: Array[String] = []
+	for item: Variant in list:
+		result.append(item)
+	return result
+
+
+static func buff(value: int, duration: int, ability_names: Array) -> EffectData:
+	var data: EffectData = effect(EffectData.Kind.BUFF, value, duration)
+	data.ability_names = names(ability_names)
+	return data
+
+
+static func enable(duration: int, ability_names: Array) -> EffectData:
+	var data: EffectData = effect(EffectData.Kind.ENABLE_ABILITY, 0, duration)
+	data.ability_names = names(ability_names)
+	return data
+
+
+static func stun(duration: int) -> EffectData:
+	return effect(EffectData.Kind.STUN, 0, duration)
+
+
+static func transform(replacement: AbilityData, duration: int, damage: int = 0) -> EffectData:
+	var data: EffectData = effect(EffectData.Kind.TRANSFORM, damage, duration)
+	data.replacement = replacement
+	return data
+
+
+static func self_cast(ability_name: String, effects: Array, cooldown: int = 0) -> AbilityData:
+	return ability(ability_name, [], cooldown, AbilityData.Target.SELF, effects)
+
+
 static func character(character_name: String, abilities: Array) -> CharacterData:
 	var data: CharacterData = CharacterData.new()
 	data.display_name = character_name

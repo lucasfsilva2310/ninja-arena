@@ -12,6 +12,8 @@ enum Type {
 	FIGHTER_DIED,
 	BATTLE_ENDED,
 	REJECTED,
+	EFFECT_ADDED,
+	EFFECT_EXPIRED,
 }
 
 var type: Type

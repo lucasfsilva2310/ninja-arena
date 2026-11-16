@@ -31,7 +31,7 @@ func start() -> Array[BattleEvent]:
 
 func valid_targets(team_idx: int, fighter: Fighter, ability: AbilityState) -> Array[Fighter]:
 	var result_list: Array[Fighter] = []
-	if not fighter.is_alive():
+	if not fighter.is_alive() or fighter.is_stunned() or not fighter.can_use_ability(ability.data):
 		return result_list
 	var is_heal: bool = ability.data.has_effect(EffectData.Kind.HEAL)
 	match ability.data.target_type:
@@ -66,6 +66,10 @@ func submit_turn(team_idx: int, actions: Array[Action], random_payment: Array[Ch
 
 	for action: Action in actions:
 		_resolve(team_idx, action, events)
+
+	for fighter: Fighter in team.living_fighters():
+		for expired: ActiveEffect in fighter.tick_stuns():
+			_report_expired(fighter, expired, events)
 
 	var outcome: BattleResult = check_winner()
 	if outcome.ended:
@@ -104,10 +108,10 @@ func _begin_turn(team_idx: int, events: Array[BattleEvent]) -> void:
 		team.pool.add(type)
 	events.append(BattleEvent.new(BattleEvent.Type.CHAKRA_GAINED, null, null, gained))
 	chakra_changed.emit(team_idx)
-	for fighter: Fighter in team.fighters:
+	for fighter: Fighter in team.living_fighters():
 		fighter.tick_cooldowns()
 		for expired: ActiveEffect in fighter.tick_effects():
-			events.append(BattleEvent.new(BattleEvent.Type.REDUCTION_EXPIRED, fighter, fighter, 0, expired.source_name))
+			_report_expired(fighter, expired, events)
 	events.append(BattleEvent.new(BattleEvent.Type.TURN_STARTED, null, null, turn))
 	turn_started.emit(team_idx, turn)
 
@@ -115,6 +119,8 @@ func _begin_turn(team_idx: int, events: Array[BattleEvent]) -> void:
 func _queue_cost(actions: Array[Action]) -> Array[ChakraType.Type]:
 	var cost: Array[ChakraType.Type] = []
 	for action: Action in actions:
+		if action.source != null and action.source.is_stunned():
+			continue
 		cost.append_array(action.ability.data.cost)
 	return cost
 
@@ -136,8 +142,12 @@ func _validate(team_idx: int, actions: Array[Action], random_payment: Array[Chak
 		seen.append(action.source)
 		if not action.source.abilities.has(action.ability):
 			return "ability does not belong to the fighter"
+		if action.source.is_stunned():
+			return "fighter is stunned"
 		if not action.ability.is_ready():
 			return "ability is on cooldown"
+		if not action.source.can_use_ability(action.ability.data):
+			return "ability is not enabled"
 		var targets: Array[Fighter] = valid_targets(team_idx, action.source, action.ability)
 		if targets.is_empty():
 			return "no valid target"
@@ -161,9 +171,10 @@ func _resolve(team_idx: int, action: Action, events: Array[BattleEvent]) -> void
 	var targets: Array[Fighter] = _resolve_targets(team_idx, action)
 	events.append(BattleEvent.new(BattleEvent.Type.ABILITY_USED, source, action.target, 0, action.ability.data.display_name))
 	action.ability.start_cooldown()
-	for target: Fighter in targets:
+	if not targets.is_empty():
 		for effect: EffectData in action.ability.data.effects:
-			_apply_effect(source, target, action.ability.data, effect, events)
+			_apply_effect(source, targets, action.ability, effect, events)
+	source.record_use(action.ability.data)
 
 
 func _resolve_targets(team_idx: int, action: Action) -> Array[Fighter]:
@@ -183,27 +194,68 @@ func _resolve_targets(team_idx: int, action: Action) -> Array[Fighter]:
 	return targets
 
 
-func _apply_effect(source: Fighter, target: Fighter, ability: AbilityData, effect: EffectData, events: Array[BattleEvent]) -> void:
+func _apply_effect(source: Fighter, targets: Array[Fighter], used: AbilityState, effect: EffectData, events: Array[BattleEvent]) -> void:
+	var ability: AbilityData = used.data
 	match effect.kind:
 		EffectData.Kind.DAMAGE:
-			if not target.is_alive():
-				return
-			var old_hp: int = target.hp
-			var dealt: int = target.take_damage(effect.value)
-			events.append(BattleEvent.new(BattleEvent.Type.DAMAGE, source, target, dealt, ability.display_name))
-			_report_hp(target, old_hp, events)
+			var bonus: int = source.buff_bonus(ability) + source.stack_bonus(ability)
+			for target: Fighter in targets:
+				_deal_damage(source, target, ability, effect.value + bonus, events)
 		EffectData.Kind.HEAL:
-			if not target.is_alive() or target.is_full_hp():
-				return
-			var old_hp: int = target.hp
-			var healed: int = target.heal(effect.value)
-			events.append(BattleEvent.new(BattleEvent.Type.HEAL, source, target, healed, ability.display_name))
-			_report_hp(target, old_hp, events)
+			for target: Fighter in targets:
+				if not target.is_alive() or target.is_full_hp():
+					continue
+				var old_hp: int = target.hp
+				var healed: int = target.heal(effect.value)
+				events.append(BattleEvent.new(BattleEvent.Type.HEAL, source, target, healed, ability.display_name))
+				_report_hp(target, old_hp, events)
 		EffectData.Kind.DAMAGE_REDUCTION:
-			if not target.is_alive():
-				return
-			target.add_reduction(ability.display_name, effect.value, effect.duration, effect.is_percent, effect.invulnerable)
-			events.append(BattleEvent.new(BattleEvent.Type.REDUCTION_ADDED, source, target, effect.value, ability.display_name))
+			for target: Fighter in targets:
+				if not target.is_alive():
+					continue
+				target.add_reduction(ability.display_name, effect.value, effect.duration, effect.is_percent, effect.invulnerable, effect.description)
+				events.append(BattleEvent.new(BattleEvent.Type.REDUCTION_ADDED, source, target, effect.value, ability.display_name))
+		EffectData.Kind.STUN:
+			for target: Fighter in targets:
+				if not target.is_alive():
+					continue
+				var stun: ActiveEffect = target.add_stun(ability.display_name, effect.duration, effect.description)
+				_report_added(source, target, stun, events)
+		EffectData.Kind.BUFF:
+			_report_added(source, source, source.add_buff(ability.display_name, effect.value, effect.duration, effect.ability_names, effect.description), events)
+		EffectData.Kind.ENABLE_ABILITY:
+			_report_added(source, source, source.add_enable(ability.display_name, effect.duration, effect.ability_names, effect.description), events)
+		EffectData.Kind.TRANSFORM:
+			if effect.value > 0:
+				for target: Fighter in targets:
+					_deal_damage(source, target, ability, effect.value, events)
+			var transform: ActiveEffect = source.add_transform(ability.display_name, used, effect.replacement, effect.duration, effect.description)
+			if transform != null:
+				_report_added(source, source, transform, events)
+
+
+func _deal_damage(source: Fighter, target: Fighter, ability: AbilityData, amount: int, events: Array[BattleEvent]) -> void:
+	if not target.is_alive():
+		return
+	var old_hp: int = target.hp
+	var dealt: int = target.take_damage(amount)
+	events.append(BattleEvent.new(BattleEvent.Type.DAMAGE, source, target, dealt, ability.display_name))
+	_report_hp(target, old_hp, events)
+
+
+func _report_added(source: Fighter, target: Fighter, effect: ActiveEffect, events: Array[BattleEvent]) -> void:
+	var text: String = "%s: %s for %s" % [effect.source_name, effect.description, effect.turns_text()]
+	events.append(BattleEvent.new(BattleEvent.Type.EFFECT_ADDED, source, target, effect.value, text))
+
+
+func _report_expired(fighter: Fighter, effect: ActiveEffect, events: Array[BattleEvent]) -> void:
+	if effect.kind == EffectData.Kind.DAMAGE_REDUCTION:
+		events.append(BattleEvent.new(BattleEvent.Type.REDUCTION_EXPIRED, fighter, fighter, 0, effect.source_name))
+		return
+	var text: String = "%s ended: %s" % [effect.source_name, effect.description]
+	if effect.kind == EffectData.Kind.TRANSFORM:
+		text = "%s ended: %s is back" % [effect.source_name, effect.original_state.data.display_name]
+	events.append(BattleEvent.new(BattleEvent.Type.EFFECT_EXPIRED, fighter, fighter, 0, text))
 
 
 func _report_hp(fighter: Fighter, old_hp: int, events: Array[BattleEvent]) -> void:

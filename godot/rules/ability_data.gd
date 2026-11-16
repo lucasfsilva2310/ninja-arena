@@ -10,6 +10,7 @@ enum Target { ENEMY, ALLY, SELF, ALL_ENEMIES, ALL_ALLIES }
 @export var target_type: Target = Target.ENEMY
 @export var effects: Array[EffectData] = []
 @export var stacking: bool = false
+@export var required_enabler: String = ""
 
 
 func has_effect(kind: EffectData.Kind) -> bool:
