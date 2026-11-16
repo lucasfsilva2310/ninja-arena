@@ -13,4 +13,9 @@ OUT_DIR="$(cd "$(dirname "$2")" && pwd)"
 OUT="$(wslpath -w "$OUT_DIR")\\$(basename "$2")"
 FRAMES="${3:-3}"
 
-"$GODOT" --path "$PROJ" --script res://tools/capture.gd -- "$SCENE" "$OUT" "$FRAMES"
+SIZE_ARGS=()
+if [ -n "${CAPTURE_SIZE:-}" ]; then
+	SIZE_ARGS=(--resolution "$CAPTURE_SIZE")
+fi
+
+"$GODOT" --path "$PROJ" "${SIZE_ARGS[@]}" --script res://tools/capture.gd -- "$SCENE" "$OUT" "$FRAMES"

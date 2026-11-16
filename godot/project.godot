@@ -3,17 +3,21 @@ config_version=5
 
 [application]
 
-run/main_scene="res://ui/main.tscn"
+run/main_scene="res://ui/app.tscn"
 
 config/name="Ninja Arena"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[autoload]
+
+SceneRouter="*res://ui/scene_router.gd"
 
 [display]
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
+window/stretch/aspect="expand"
 
 [rendering]
 

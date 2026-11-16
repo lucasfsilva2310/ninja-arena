@@ -1,0 +1,291 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/battle_view.gd" id="1_view"]
+[ext_resource type="Script" path="res://ui/cost_row.gd" id="2_cost"]
+
+[node name="Battle" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_view")
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 10
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PlayerInfo" type="PanelContainer" parent="Margin/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+theme_type_variation = &"DarkPanel"
+
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Header/PlayerInfo"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="PlayerAvatar" type="TextureRect" parent="Margin/Layout/Header/PlayerInfo/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Margin/Layout/Header/PlayerInfo/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"LightLabel"
+text = "Player 1"
+
+[node name="Rank" type="Label" parent="Margin/Layout/Header/PlayerInfo/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"LightLabel"
+text = "Chunin"
+
+[node name="TimerPanel" type="PanelContainer" parent="Margin/Layout/Header"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"DarkPanel"
+
+[node name="Column" type="VBoxContainer" parent="Margin/Layout/Header/TimerPanel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TurnLabel" type="Label" parent="Margin/Layout/Header/TimerPanel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"LightLabel"
+horizontal_alignment = 1
+text = "Turn 1"
+
+[node name="TimerLabel" type="Label" parent="Margin/Layout/Header/TimerPanel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+text = "60"
+
+[node name="EnemyInfo" type="PanelContainer" parent="Margin/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+theme_type_variation = &"DarkPanel"
+
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Header/EnemyInfo"]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 2
+
+[node name="Rank" type="Label" parent="Margin/Layout/Header/EnemyInfo/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"LightLabel"
+text = "Jonin"
+
+[node name="Name" type="Label" parent="Margin/Layout/Header/EnemyInfo/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"LightLabel"
+text = "Player 2"
+
+[node name="EnemyAvatar" type="TextureRect" parent="Margin/Layout/Header/EnemyInfo/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Body" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 12
+
+[node name="PlayerBoard" type="VBoxContainer" parent="Margin/Layout/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+theme_override_constants/separation = 8
+
+[node name="Center" type="VBoxContainer" parent="Margin/Layout/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 4.0
+theme_override_constants/separation = 8
+
+[node name="ChakraPanel" type="PanelContainer" parent="Margin/Layout/Body/Center"]
+layout_mode = 2
+
+[node name="Column" type="VBoxContainer" parent="Margin/Layout/Body/Center/ChakraPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ChakraTitle" type="Label" parent="Margin/Layout/Body/Center/ChakraPanel/Column"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+horizontal_alignment = 1
+text = "Chakra"
+
+[node name="ChakraRow" type="HBoxContainer" parent="Margin/Layout/Body/Center/ChakraPanel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="ChakraTotal" type="Label" parent="Margin/Layout/Body/Center/ChakraPanel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+text = "Total: 0"
+
+[node name="ExchangeButton" type="Button" parent="Margin/Layout/Body/Center/ChakraPanel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Exchange chakra"
+
+[node name="ArenaPanel" type="PanelContainer" parent="Margin/Layout/Body/Center"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_type_variation = &"DarkPanel"
+
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Center/ArenaPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ArenaPlayer" type="VBoxContainer" parent="Margin/Layout/Body/Center/ArenaPanel/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="ArenaGap" type="Control" parent="Margin/Layout/Body/Center/ArenaPanel/Row"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="ArenaEnemy" type="VBoxContainer" parent="Margin/Layout/Body/Center/ArenaPanel/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="EndTurnButton" type="Button" parent="Margin/Layout/Body/Center"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_type_variation = &"EndTurnButton"
+text = "End Turn"
+
+[node name="EnemyBoard" type="VBoxContainer" parent="Margin/Layout/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+theme_override_constants/separation = 8
+
+[node name="Footer" type="HBoxContainer" parent="Margin/Layout"]
+custom_minimum_size = Vector2(0, 112)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Options" type="VBoxContainer" parent="Margin/Layout/Footer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SurrenderButton" type="Button" parent="Margin/Layout/Footer/Options"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Surrender"
+
+[node name="HistoryButton" type="Button" parent="Margin/Layout/Footer/Options"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "History"
+
+[node name="ExampleButton" type="Button" parent="Margin/Layout/Footer/Options"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Example"
+
+[node name="DescPanel" type="PanelContainer" parent="Margin/Layout/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Footer/DescPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DescIcon" type="TextureRect" parent="Margin/Layout/Footer/DescPanel/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Column" type="VBoxContainer" parent="Margin/Layout/Footer/DescPanel/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="TitleRow" type="HBoxContainer" parent="Margin/Layout/Footer/DescPanel/Row/Column"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DescName" type="Label" parent="Margin/Layout/Footer/DescPanel/Row/Column/TitleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+
+[node name="DescCosts" type="HBoxContainer" parent="Margin/Layout/Footer/DescPanel/Row/Column/TitleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("2_cost")
+
+[node name="DescMeta" type="Label" parent="Margin/Layout/Footer/DescPanel/Row/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+
+[node name="DescText" type="Label" parent="Margin/Layout/Footer/DescPanel/Row/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3

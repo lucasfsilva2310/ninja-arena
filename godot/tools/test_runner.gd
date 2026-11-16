@@ -5,9 +5,18 @@ const TestCaseScript: GDScript = preload("res://tools/test_case.gd")
 
 var _failures: int = 0
 var _passed: int = 0
+var _started: bool = false
 
 
-func _init() -> void:
+func _process(_delta: float) -> bool:
+	if _started:
+		return true
+	_started = true
+	_run_all()
+	return true
+
+
+func _run_all() -> void:
 	var files: Array[String] = _find_test_files()
 	for path: String in files:
 		_run_file(path)

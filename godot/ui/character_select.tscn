@@ -1,0 +1,157 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://ui/character_select.gd" id="1_sel"]
+[ext_resource type="Script" path="res://ui/cost_row.gd" id="2_cost"]
+
+[node name="CharacterSelect" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_sel")
+
+[node name="Background" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 14
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="HeaderPanel" type="PanelContainer" parent="Margin/Layout"]
+custom_minimum_size = Vector2(420, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Column" type="VBoxContainer" parent="Margin/Layout/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Margin/Layout/HeaderPanel/Column"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+horizontal_alignment = 1
+text = "Selected characters"
+
+[node name="SlotsRow" type="HBoxContainer" parent="Margin/Layout/HeaderPanel/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="StartButton" type="Button" parent="Margin/Layout/HeaderPanel/Column"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_type_variation = &"StartButton"
+disabled = true
+text = "Start Game"
+
+[node name="GridPanel" type="PanelContainer" parent="Margin/Layout"]
+custom_minimum_size = Vector2(0, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Column" type="VBoxContainer" parent="Margin/Layout/GridPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="GridTitle" type="Label" parent="Margin/Layout/GridPanel/Column"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+horizontal_alignment = 1
+text = "Select 3 characters"
+
+[node name="Scroll" type="ScrollContainer" parent="Margin/Layout/GridPanel/Column"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CardsGrid" type="HFlowContainer" parent="Margin/Layout/GridPanel/Column/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="Spacer" type="Control" parent="Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="AbilityPanel" type="PanelContainer" parent="Margin/Layout"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/AbilityPanel"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Left" type="VBoxContainer" parent="Margin/Layout/AbilityPanel/Row"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PreviewName" type="Label" parent="Margin/Layout/AbilityPanel/Row/Left"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+
+[node name="AbilitiesRow" type="HBoxContainer" parent="Margin/Layout/AbilityPanel/Row/Left"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Right" type="VBoxContainer" parent="Margin/Layout/AbilityPanel/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 2
+
+[node name="TitleRow" type="HBoxContainer" parent="Margin/Layout/AbilityPanel/Row/Right"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="DescName" type="Label" parent="Margin/Layout/AbilityPanel/Row/Right/TitleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+
+[node name="DescCosts" type="HBoxContainer" parent="Margin/Layout/AbilityPanel/Row/Right/TitleRow"]
+unique_name_in_owner = true
+layout_mode = 2
+script = ExtResource("2_cost")
+
+[node name="DescMeta" type="Label" parent="Margin/Layout/AbilityPanel/Row/Right"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SmallLabel"
+
+[node name="DescText" type="Label" parent="Margin/Layout/AbilityPanel/Row/Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 3
+autowrap_mode = 3
