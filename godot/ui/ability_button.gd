@@ -46,12 +46,13 @@ func setup(new_state: AbilityState) -> void:
 	refresh("")
 
 
-func refresh(new_lock_reason: String) -> void:
+func refresh(new_lock_reason: String, cooldown_offset: int = 0) -> void:
 	lock_reason = new_lock_reason
 	var locked: bool = lock_reason != ""
 	button.disabled = locked
-	cooldown_label.visible = state.cooldown > 0
-	cooldown_label.text = str(state.cooldown)
+	var shown: int = maxi(state.cooldown - cooldown_offset, 0)
+	cooldown_label.visible = shown > 0
+	cooldown_label.text = str(shown)
 	var tip: String = state.data.display_name
 	if locked:
 		tip += "\n" + lock_reason

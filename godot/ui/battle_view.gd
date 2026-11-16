@@ -15,6 +15,10 @@ var sprites: Dictionary = {}
 var stage: BattleStage
 var animated: bool = false
 var shown_hp: Dictionary = {}
+var shown_effects: Dictionary = {}
+var described: AbilityState
+var described_fighter: Fighter
+var described_slot: int = -1
 var chakra_labels: Dictionary = {}
 var queue: ActionQueue
 var turn_player: TurnPlayer = TurnPlayer.new()
@@ -59,6 +63,7 @@ var _pending_next: Callable
 @onready var desc_text: Label = %DescText
 @onready var queue_list: VBoxContainer = %QueueList
 @onready var log_text: RichTextLabel = %LogText
+@onready var speed_button: Button = %SpeedButton
 
 
 func bind(new_battle: Battle, team_idx: int = 0) -> void:
@@ -90,6 +95,12 @@ func _ready() -> void:
 		bind(MatchFactory.new_match(MatchFactory.default_team(), 1))
 	else:
 		_build()
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if modal != null and event.is_action_pressed("ui_cancel"):
+		get_viewport().set_input_as_handled()
+		modal.cancelled.emit()
 
 
 func set_turn_player(player: TurnPlayer) -> void:
@@ -132,7 +143,7 @@ func lock_reason(fighter: Fighter, state: AbilityState) -> String:
 	if fighter.is_stunned():
 		return "Stunned"
 	if not state.is_ready():
-		return "Cooldown: %d" % state.cooldown
+		return "Cooldown: %d" % maxi(state.cooldown - cooldown_offset(), 0)
 	if not fighter.can_use_ability(state.data):
 		return "Not available yet"
 	if resolving:
@@ -154,10 +165,17 @@ func select_ability(fighter: Fighter, state: AbilityState) -> void:
 	if selected_state == state and selected_fighter == fighter:
 		clear_selection()
 		return
+	show_ability(state)
+	if not ActionQueue.needs_pick(state.data):
+		clear_selection()
+		var own_target: Fighter = fighter if state.data.target_type == AbilityData.Target.SELF else null
+		var error: String = queue.try_add(Action.new(fighter, state, own_target))
+		if error != "":
+			_say("Cannot queue: %s." % error)
+		return
 	selected_fighter = fighter
 	selected_state = state
 	targets = battle.valid_targets(player_team, fighter, state)
-	show_ability(state)
 	_refresh_selection()
 
 
@@ -271,6 +289,7 @@ func _on_surrender_confirmed() -> void:
 func _submit_player_turn(plan: TurnPlan) -> void:
 	clear_selection()
 	_sync_shown_hp()
+	_sync_shown_effects()
 	resolving = true
 	var events: Array[BattleEvent] = battle.submit_turn(player_team, plan.actions, plan.random_payment)
 	if not events.is_empty() and events[0].type == BattleEvent.Type.REJECTED:
@@ -317,7 +336,13 @@ func _after_player_events() -> void:
 	if battle.current_team != player_team:
 		var enemy_team: int = battle.current_team
 		var plan: TurnPlan = ai.plan_turn(battle, enemy_team, ai_rng)
+		if plan.actions.is_empty() and ai.exchange_if_stuck(battle, enemy_team):
+			_record("Player 2 exchanges chakra.")
+			plan = ai.plan_turn(battle, enemy_team, ai_rng)
 		var events: Array[BattleEvent] = battle.submit_turn(enemy_team, plan.actions, plan.random_payment)
+		if not events.is_empty() and events[0].type == BattleEvent.Type.REJECTED:
+			_say(EventText.describe(events[0]))
+			events = battle.submit_turn(enemy_team, [] as Array[Action], [] as Array[ChakraType.Type])
 		_play(events, _after_enemy_events)
 		return
 	_unlock()
@@ -332,6 +357,7 @@ func _after_enemy_events() -> void:
 func _unlock() -> void:
 	resolving = false
 	_sync_shown_hp()
+	_sync_shown_effects()
 	time_left = turn_length
 	refresh_all()
 
@@ -341,6 +367,7 @@ func _finish_if_over() -> bool:
 		return false
 	resolving = true
 	_sync_shown_hp()
+	_sync_shown_effects()
 	refresh_all()
 	show_game_over(battle.result)
 	game_over.emit(battle.result)
@@ -394,6 +421,7 @@ func _record(text: String) -> void:
 
 func _on_event_played(event: BattleEvent) -> void:
 	_apply_event_to_shown_hp(event)
+	_apply_event_to_shown_effects(event)
 	var text: String = EventText.describe(event)
 	if text != "":
 		_record(text)
@@ -408,6 +436,13 @@ func _on_queue_changed() -> void:
 
 
 func show_ability(state: AbilityState) -> void:
+	described = state
+	described_fighter = null
+	described_slot = -1
+	for fighter: Fighter in battle.teams[player_team].fighters:
+		if fighter.abilities.has(state):
+			described_fighter = fighter
+			described_slot = fighter.abilities.find(state)
 	var data: AbilityData = state.data
 	desc_icon.texture = Art.ability_icon(data.display_name)
 	desc_name.text = data.display_name
@@ -427,6 +462,16 @@ func refresh_all() -> void:
 	_refresh_queue()
 	_refresh_controls()
 	_refresh_selection()
+	_refresh_description()
+
+
+func _refresh_description() -> void:
+	if described == null or described_fighter == null:
+		return
+	if described_fighter.abilities.has(described):
+		return
+	if described_slot >= 0 and described_slot < described_fighter.abilities.size():
+		show_ability(described_fighter.abilities[described_slot])
 
 
 func _build() -> void:
@@ -459,9 +504,14 @@ func _build() -> void:
 	if animated:
 		set_turn_player(AnimatedTurnPlayer.new(stage))
 	_reset_description()
+	_sync_shown_effects()
+	if not speed_button.pressed.is_connected(_on_speed_pressed):
+		speed_button.pressed.connect(_on_speed_pressed)
+	_refresh_speed_button()
 	log_text.add_theme_color_override("default_color", Color.WHITE)
 	log_text.add_theme_font_size_override("normal_font_size", 14)
 	log_text.text = ""
+	_record("--- Turn %d ---" % battle.turn)
 	if game_over_panel != null:
 		game_over_panel.visible = false
 	time_left = turn_length
@@ -512,10 +562,23 @@ func _clear() -> void:
 	panels.clear()
 	sprites.clear()
 	shown_hp.clear()
+	shown_effects.clear()
 	chakra_labels.clear()
 
 
+func _on_speed_pressed() -> void:
+	AnimConfig.toggle_speed()
+	_refresh_speed_button()
+
+
+func _refresh_speed_button() -> void:
+	speed_button.text = "Speed: Fast" if AnimConfig.is_fast_speed() else "Speed: Normal"
+
+
 func _reset_description() -> void:
+	described = null
+	described_fighter = null
+	described_slot = -1
 	desc_icon.texture = null
 	desc_name.text = ""
 	desc_costs.show_cost([])
@@ -526,6 +589,7 @@ func _reset_description() -> void:
 func _refresh_fighter(fighter: Fighter) -> void:
 	var panel: FighterPanel = panels[fighter]
 	panel.shown_hp = display_hp(fighter)
+	_show_effects(panel, fighter)
 	panel.refresh(lock_reason)
 	var sprite: FighterSprite = sprites[fighter]
 	sprite.set_alive(display_hp(fighter) > 0)
@@ -535,6 +599,43 @@ func display_hp(fighter: Fighter) -> int:
 	if resolving and shown_hp.has(fighter):
 		return int(shown_hp[fighter])
 	return fighter.hp
+
+
+func cooldown_offset() -> int:
+	return 1 if not battle.result.ended and battle.current_team != player_team else 0
+
+
+func _show_effects(panel: FighterPanel, fighter: Fighter) -> void:
+	panel.cooldown_offset = cooldown_offset()
+	panel.has_shown_effects = true
+	panel.shown_effects = display_effects(fighter)
+
+
+func display_effects(fighter: Fighter) -> Array[Dictionary]:
+	if resolving and shown_effects.has(fighter):
+		var shown: Array[Dictionary] = []
+		shown.assign(shown_effects[fighter])
+		return shown
+	return FighterPanel.entries_of(fighter.active_effects())
+
+
+func _sync_shown_effects() -> void:
+	for fighter: Fighter in panels:
+		shown_effects[fighter] = FighterPanel.entries_of(fighter.active_effects())
+
+
+func _apply_event_to_shown_effects(event: BattleEvent) -> void:
+	if event.effect == null or event.target == null or not shown_effects.has(event.target):
+		return
+	var list: Array = shown_effects[event.target]
+	match event.type:
+		BattleEvent.Type.EFFECT_ADDED, BattleEvent.Type.REDUCTION_ADDED:
+			list.append(FighterPanel.entry_of(event.effect))
+		BattleEvent.Type.EFFECT_EXPIRED, BattleEvent.Type.REDUCTION_EXPIRED:
+			for entry: Dictionary in list:
+				if entry["effect"] == event.effect:
+					list.erase(entry)
+					break
 
 
 func _sync_shown_hp() -> void:
@@ -575,6 +676,7 @@ func _refresh_controls() -> void:
 	history_button.disabled = not _built or modal != null
 	for fighter: Fighter in battle.teams[player_team].fighters:
 		panels[fighter].shown_hp = display_hp(fighter)
+		_show_effects(panels[fighter], fighter)
 		panels[fighter].refresh(lock_reason)
 
 

@@ -366,12 +366,22 @@ func test_history_lists_events_in_order_and_keeps_them_across_turns() -> void:
 func test_history_with_no_events_says_so_and_closes() -> void:
 	var battle: Battle = Helpers.real_battle()
 	var view: BattleView = Helpers.mount_battle(battle)
+	view.history.clear()
 	_press(view.history_button)
 	var modal: HistoryModal = view.modal as HistoryModal
 	assert_eq(modal.entries.get_child_count(), 1)
 	assert_eq((modal.entries.get_child(0) as Label).text, "No battle history yet.")
 	_press(modal.close_button)
 	assert_null(view.modal)
+	Helpers.unmount(view)
+
+
+func test_history_and_log_start_with_the_turn_one_line() -> void:
+	var battle: Battle = Helpers.real_battle()
+	var view: BattleView = Helpers.mount_battle(battle)
+	assert_eq(view.history, ["--- Turn 1 ---"])
+	assert_eq(view.log_lines, ["--- Turn 1 ---"])
+	assert_true(view.log_text.text.contains("Turn 1"))
 	Helpers.unmount(view)
 
 

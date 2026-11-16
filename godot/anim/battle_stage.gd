@@ -93,7 +93,7 @@ func _run_effect(effect: Dictionary, actor: FighterSprite, victim: FighterSprite
 	var to: Vector2 = victim.body_center() if victim != null and str(effect["kind"]) == "projectile" else from
 	var node: AnimatedSprite2D = spawn_effect(actor.character_slug, effect, from, to, EFFECT_PIXEL_SCALE)
 	if node != null:
-		var duration: float = float(effect["duration_ms"])
+		var duration: float = AnimConfig.seconds(float(effect["duration_ms"])) * 1000.0
 		var count: int = node.sprite_frames.get_frame_count(node.animation)
 		var started: int = Time.get_ticks_msec()
 		var elapsed: float = 0.0

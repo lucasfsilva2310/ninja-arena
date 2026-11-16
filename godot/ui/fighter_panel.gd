@@ -20,6 +20,10 @@ var abilities_row: HBoxContainer
 var ability_buttons: Array[AbilityButton] = []
 var highlighted: bool = false
 var shown_hp: int = -1
+var cooldown_offset: int = 0
+var shown_effects: Array[Dictionary] = []
+var has_shown_effects: bool = false
+var chip_names: Array[String] = []
 
 var _built_states: Array[AbilityState] = []
 
@@ -120,20 +124,56 @@ func refresh(lock_for: Callable = Callable()) -> void:
 		_refresh_abilities(lock_for)
 
 
+func effect_groups() -> Array[Dictionary]:
+	var groups: Array[Dictionary] = []
+	if (shown_hp if shown_hp >= 0 else fighter.hp) <= 0:
+		return groups
+	var source: Array[Dictionary] = shown_effects if has_shown_effects else entries_of(fighter.active_effects())
+	for entry: Dictionary in source:
+		var group: Dictionary = {}
+		for existing: Dictionary in groups:
+			if existing["name"] == entry["name"]:
+				group = existing
+				break
+		if group.is_empty():
+			group = {"name": entry["name"], "remaining": entry["remaining"], "descriptions": []}
+			groups.append(group)
+		group["remaining"] = mini(int(group["remaining"]), int(entry["remaining"]))
+		var text: String = str(entry["description"])
+		if text != "" and not (group["descriptions"] as Array).has(text):
+			(group["descriptions"] as Array).append(text)
+	return groups
+
+
+static func entry_of(effect: ActiveEffect) -> Dictionary:
+	return {"effect": effect, "name": effect.source_name, "description": effect.description, "remaining": effect.remaining}
+
+
+static func entries_of(effects: Array[ActiveEffect]) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for effect: ActiveEffect in effects:
+		result.append(entry_of(effect))
+	return result
+
+
 func _refresh_effects() -> void:
 	for child: Node in effects_box.get_children():
 		effects_box.remove_child(child)
 		child.queue_free()
-	for effect: ActiveEffect in fighter.active_effects():
+	chip_names.clear()
+	for group: Dictionary in effect_groups():
+		var left: int = int(group["remaining"])
+		var turns: String = "1 turn" if left == 1 else "%d turns" % left
 		var chip: PanelContainer = PanelContainer.new()
 		chip.theme_type_variation = "ChipPanel"
 		chip.mouse_filter = Control.MOUSE_FILTER_PASS
-		chip.tooltip_text = "%s: %s (%s left)" % [effect.source_name, effect.description, effect.turns_text()]
+		chip.tooltip_text = "%s (%s left)\n%s" % [group["name"], turns, "\n".join(group["descriptions"])]
 		var label: Label = Label.new()
 		label.theme_type_variation = "SmallLabel"
-		label.text = "%s %d" % [effect.source_name, effect.remaining]
+		label.text = "%s %d" % [group["name"], left]
 		chip.add_child(label)
 		effects_box.add_child(chip)
+		chip_names.append(str(group["name"]))
 
 
 func _refresh_abilities(lock_for: Callable) -> void:
@@ -143,7 +183,7 @@ func _refresh_abilities(lock_for: Callable) -> void:
 		var reason: String = ""
 		if lock_for.is_valid():
 			reason = lock_for.call(fighter, button.state)
-		button.refresh(reason)
+		button.refresh(reason, cooldown_offset)
 
 
 func _rebuild_abilities() -> void:

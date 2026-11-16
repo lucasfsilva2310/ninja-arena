@@ -5,6 +5,13 @@ const FAST_TIMEOUT_SECONDS: float = 300.0
 const ANIMATED_TIMEOUT_SECONDS: float = 1500.0
 const RESOLVE_TIMEOUT_SECONDS: float = 120.0
 const DRIVE_SEED: int = 21
+const COVER_TEAMS: Array = [["Naruto", "Sasuke", "Sakura"], ["Rock Lee", "Naruto", "Sakura"]]
+const COVER_ATTEMPTS: int = 5
+const COVER_SHOT_DELAY: float = 0.9
+const ALL_ABILITIES: Array[String] = [
+	"Kage Bunshin", "Naruto Kick", "Rasengan", "Escape Clone", "Fireball", "Chidori", "Sharingan", "Kawarimi",
+	"Anger Punch", "Heal", "Inner Strength", "Konoha Senpu", "Primary Lotus", "Release Weights", "Backflip", "Hidden Lotus",
+]
 
 var _shots_dir: String = ""
 var _timeout: float = FAST_TIMEOUT_SECONDS
@@ -16,6 +23,9 @@ var _queued: int = 0
 var _player_turns: int = 0
 var _payments: int = 0
 var _payment_cancels: int = 0
+var _cover: bool = false
+var _covered: Dictionary = {}
+var _cover_games: int = 0
 
 
 func _ready() -> void:
@@ -29,8 +39,13 @@ func _ready() -> void:
 	SceneRouter.seed_override = int(args[seed_arg + 1]) if seed_arg != -1 and seed_arg + 1 < args.size() else DRIVE_SEED
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child((load("res://ui/app.tscn") as PackedScene).instantiate())
+	_cover = args.has("--cover")
 	_started_at = Time.get_ticks_msec()
-	_run.call_deferred()
+	if _cover:
+		_timeout = ANIMATED_TIMEOUT_SECONDS * 2.0
+		_run_cover.call_deferred()
+	else:
+		_run.call_deferred()
 
 
 func _process(_delta: float) -> void:
@@ -64,14 +79,17 @@ func _run() -> void:
 		for action: Action in plan.actions:
 			var button: AbilityButton = _find_button(view, action)
 			_check(button != null and not button.button.disabled, "planned ability button is enabled")
+			var queued_before: int = view.queue.actions.size()
 			await _click(button.button)
+			if not ActionQueue.needs_pick(action.ability.data):
+				_check(view.queue.actions.size() == queued_before + 1, "a self or area ability queues on the ability click")
 			if plan.actions.size() >= 2 and not _taken.has("selected"):
 				await _shot("ability-selected")
 				_taken["selected"] = true
-			var target: Fighter = action.target if action.target != null else view.targets[0]
-			var before: int = view.queue.actions.size()
-			await _click((view.panels[target] as FighterPanel).name_label)
-			_check(view.queue.actions.size() == before + 1, "target click queued the action")
+			if ActionQueue.needs_pick(action.ability.data):
+				var before: int = view.queue.actions.size()
+				await _click((view.panels[action.target] as FighterPanel).name_label)
+				_check(view.queue.actions.size() == before + 1, "target click queued the action")
 			_queued += 1
 		if plan.actions.size() >= 2 and not _taken.has("queue"):
 			await _shot("queue-two-actions")
@@ -98,12 +116,142 @@ func _run() -> void:
 	get_tree().quit(0)
 
 
+func _run_cover() -> void:
+	await _frames(3)
+	var base_seed: int = SceneRouter.seed_override
+	for team_names: Array in COVER_TEAMS:
+		var attempts: int = 0
+		while attempts < COVER_ATTEMPTS and not _team_covered(team_names):
+			attempts += 1
+			SceneRouter.seed_override = base_seed + _cover_games * 7
+			_cover_games += 1
+			await _cover_battle(team_names)
+	for ability_name: String in ALL_ABILITIES:
+		_check(_covered.has(ability_name), "ability %s was played and resolved in a real battle" % ability_name)
+	print("COVER OK fast=%s abilities=%d games=%d seconds=%.1f" % [str(AnimConfig.fast), _covered.size(), _cover_games, _elapsed()])
+	get_tree().quit(0)
+
+
+func _team_covered(team_names: Array) -> bool:
+	for character: CharacterData in Content.characters():
+		if not team_names.has(character.display_name):
+			continue
+		for ability: AbilityData in character.abilities:
+			if not _covered.has(ability.display_name):
+				return false
+	return not (team_names.has("Rock Lee") and not _covered.has("Hidden Lotus"))
+
+
+func _cover_battle(team_names: Array) -> void:
+	var select: CharacterSelect = SceneRouter.current as CharacterSelect
+	_check(select != null, "cover battle starts from the select screen")
+	for card: CharacterCard in select.cards:
+		if team_names.has(card.character.display_name):
+			await _click(card)
+	_check(select.selected.size() == 3, "cover team picked")
+	await _click(select.start_button)
+	await _frames(3)
+	var view: BattleView = SceneRouter.current as BattleView
+	_check(view != null, "cover battle opens")
+	var planner: AiPlayer = AiPlayer.new()
+	var plan_rng: Rng = Rng.new(_cover_games)
+	var turns: int = 0
+	_payment_cancels = 1
+	while not view.battle.result.ended:
+		turns += 1
+		_check(turns < MAX_PLAYER_TURNS, "cover battle finishes")
+		_check(_elapsed() < _timeout, "cover run finishes before the timeout")
+		_check(view.can_act(), "player can act at the start of each cover turn")
+		_top_up_chakra(view)
+		var fresh: Action = _first_uncovered_action(view)
+		var plan: Array[Action] = []
+		if fresh != null:
+			plan.append(fresh)
+		else:
+			plan.assign(planner.plan_turn(view.battle, 0, plan_rng).actions)
+		for action: Action in plan:
+			var button: AbilityButton = _find_button(view, action)
+			_check(button != null and not button.button.disabled, "cover ability button %s is enabled" % action.ability.data.display_name)
+			var queued_before: int = view.queue.actions.size()
+			await _click(button.button)
+			if ActionQueue.needs_pick(action.ability.data):
+				await _click((view.panels[action.target] as FighterPanel).name_label)
+			_check(view.queue.actions.size() == queued_before + 1, "%s was queued" % action.ability.data.display_name)
+		var log_mark: int = view.history.size()
+		await _click(view.end_turn_button)
+		await _frames(2)
+		if view.modal != null:
+			await _pay_through_modal(view, TurnPlan.new())
+		_check(view.modal == null, "no modal left open after the cover turn")
+		if fresh != null and not AnimConfig.fast and _shots_dir != "":
+			await get_tree().create_timer(COVER_SHOT_DELAY).timeout
+			await _shot("cover-%s" % fresh.ability.data.display_name.to_lower().replace(" ", "-"))
+		await _wait_for_resolution(view)
+		_check_fits(view)
+		_check_sprites_match_state(view)
+		var text: String = "\n".join(view.history.slice(log_mark))
+		_check(not text.contains("rejected") and not text.contains("Cannot queue"), "no rejected turn in the log: %s" % text)
+		for action: Action in plan:
+			var used: String = action.ability.data.display_name
+			_check(text.contains("%s uses %s" % [action.source.display_name(), used]), "%s resolved (log has the use line)" % used)
+			_covered[used] = int(_covered.get(used, 0)) + 1
+		_check_lotus_display(view)
+	_check(view.game_over_panel != null and view.game_over_panel.visible, "game over panel is visible after a cover battle")
+	await _click(view.back_button)
+	await _frames(3)
+	_check(SceneRouter.current is CharacterSelect, "back to select after a cover battle")
+
+
+func _check_lotus_display(view: BattleView) -> void:
+	for fighter: Fighter in view.battle.teams[0].fighters:
+		var panel: FighterPanel = view.panels[fighter]
+		var names: Array[String] = []
+		for button: AbilityButton in panel.ability_buttons:
+			names.append(button.state.data.display_name)
+		var expected: Array[String] = []
+		for state: AbilityState in fighter.abilities:
+			expected.append(state.data.display_name)
+		_check(names == expected, "%s ability bar matches its abilities %s vs %s" % [fighter.display_name(), str(names), str(expected)])
+		var has_transform: bool = false
+		for effect: ActiveEffect in fighter.active_effects():
+			if effect.kind == EffectData.Kind.TRANSFORM:
+				has_transform = true
+		_check(names.has("Hidden Lotus") == has_transform, "%s shows Hidden Lotus exactly while the transform lasts" % fighter.display_name())
+		for chip: String in panel.chip_names:
+			_check(chip != "", "chip has a name")
+	if view.described != null and view.described_fighter != null:
+		_check(view.described_fighter.abilities.has(view.described), "the footer describes an ability that is still on the bar")
+
+
+func _top_up_chakra(view: BattleView) -> void:
+	var pool: ChakraPool = view.battle.teams[0].pool
+	for type: ChakraType.Type in ChakraType.real_types():
+		while pool.count(type) < 2:
+			pool.add(type)
+	view.battle.chakra_changed.emit(0)
+
+
+func _first_uncovered_action(view: BattleView) -> Action:
+	for fighter: Fighter in view.battle.teams[0].fighters:
+		for state: AbilityState in fighter.abilities:
+			if _covered.has(state.data.display_name) or view.lock_reason(fighter, state) != "":
+				continue
+			var targets: Array[Fighter] = view.battle.valid_targets(0, fighter, state)
+			var target: Fighter = null
+			if ActionQueue.needs_pick(state.data):
+				target = targets[0]
+				if state.data.target_type == AbilityData.Target.ENEMY:
+					target = targets[targets.size() - 1]
+			return Action.new(fighter, state, target)
+	return null
+
+
 func _wait_for_resolution(view: BattleView) -> void:
 	var waited_from: float = _elapsed()
 	var probed: bool = false
 	while view.turn_player.playing or (view.resolving and not view.battle.result.ended):
 		_check(_elapsed() - waited_from < RESOLVE_TIMEOUT_SECONDS, "a turn finishes its animations within %.0f seconds" % RESOLVE_TIMEOUT_SECONDS)
-		if not probed and not AnimConfig.fast:
+		if not probed and not AnimConfig.fast and not _cover:
 			probed = true
 			await _probe_lock(view)
 		await _frames(1)

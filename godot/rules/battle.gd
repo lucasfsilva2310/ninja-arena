@@ -236,8 +236,10 @@ func _apply_effect(source: Fighter, targets: Array[Fighter], used: AbilityState,
 			for target: Fighter in targets:
 				if not target.is_alive():
 					continue
-				target.add_reduction(ability.display_name, effect.value, effect.duration, effect.is_percent, effect.invulnerable, effect.description)
-				events.append(BattleEvent.new(BattleEvent.Type.REDUCTION_ADDED, source, target, effect.value, ability.display_name))
+				var reduction: ActiveEffect = target.add_reduction(ability.display_name, effect.value, effect.duration, effect.is_percent, effect.invulnerable, effect.description)
+				var added: BattleEvent = BattleEvent.new(BattleEvent.Type.REDUCTION_ADDED, source, target, effect.value, ability.display_name)
+				added.effect = reduction
+				events.append(added)
 		EffectData.Kind.STUN:
 			for target: Fighter in targets:
 				if not target.is_alive():
@@ -267,18 +269,24 @@ func _deal_damage(source: Fighter, target: Fighter, ability: AbilityData, amount
 
 
 func _report_added(source: Fighter, target: Fighter, effect: ActiveEffect, events: Array[BattleEvent]) -> void:
-	var text: String = "%s: %s for %s" % [effect.source_name, effect.description, effect.turns_text()]
-	events.append(BattleEvent.new(BattleEvent.Type.EFFECT_ADDED, source, target, effect.value, text))
+	var text: String = "%s: %s (%s)" % [effect.source_name, effect.description.trim_suffix("."), effect.turns_text()]
+	var added: BattleEvent = BattleEvent.new(BattleEvent.Type.EFFECT_ADDED, source, target, effect.value, text)
+	added.effect = effect
+	events.append(added)
 
 
 func _report_expired(fighter: Fighter, effect: ActiveEffect, events: Array[BattleEvent]) -> void:
 	if effect.kind == EffectData.Kind.DAMAGE_REDUCTION:
-		events.append(BattleEvent.new(BattleEvent.Type.REDUCTION_EXPIRED, fighter, fighter, 0, effect.source_name))
+		var reduction_ended: BattleEvent = BattleEvent.new(BattleEvent.Type.REDUCTION_EXPIRED, fighter, fighter, 0, effect.source_name)
+		reduction_ended.effect = effect
+		events.append(reduction_ended)
 		return
-	var text: String = "%s ended: %s" % [effect.source_name, effect.description]
+	var text: String = "%s ended: %s" % [effect.source_name, effect.description.trim_suffix(".")]
 	if effect.kind == EffectData.Kind.TRANSFORM:
 		text = "%s ended: %s is back" % [effect.source_name, effect.original_state.data.display_name]
-	events.append(BattleEvent.new(BattleEvent.Type.EFFECT_EXPIRED, fighter, fighter, 0, text))
+	var ended: BattleEvent = BattleEvent.new(BattleEvent.Type.EFFECT_EXPIRED, fighter, fighter, 0, text)
+	ended.effect = effect
+	events.append(ended)
 
 
 func _report_hp(fighter: Fighter, old_hp: int, events: Array[BattleEvent]) -> void:

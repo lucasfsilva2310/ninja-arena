@@ -13,6 +13,9 @@ fi
 if [ -n "${DRIVE_FAST:-}" ]; then
 	EXTRA+=(--fast)
 fi
+if [ -n "${DRIVE_COVER:-}" ]; then
+	EXTRA+=(--cover)
+fi
 if [ -n "${DRIVE_SEED:-}" ]; then
 	EXTRA+=(--seed "$DRIVE_SEED")
 fi
@@ -30,7 +33,7 @@ if grep -qE 'SCRIPT ERROR|ERROR:|DRIVE FAIL' "$OUT"; then
 	echo "drive_game.sh: output contains an error line"
 	STATUS=1
 fi
-if ! grep -q 'DRIVE OK' "$OUT"; then
+if ! grep -qE 'DRIVE OK|COVER OK' "$OUT"; then
 	echo "drive_game.sh: no DRIVE OK line"
 	STATUS=1
 fi

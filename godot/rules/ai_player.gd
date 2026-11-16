@@ -23,6 +23,41 @@ func plan_turn(battle: Battle, team_idx: int, rng: Rng) -> TurnPlan:
 	return plan
 
 
+func exchange_if_stuck(battle: Battle, team_idx: int) -> bool:
+	var pool: ChakraPool = battle.teams[team_idx].pool
+	if pool.total() < ChakraPool.EXCHANGE_SIZE:
+		return false
+	var demand: Dictionary = {}
+	for fighter: Fighter in battle.teams[team_idx].fighters:
+		if not fighter.is_alive() or fighter.is_stunned():
+			continue
+		for state: AbilityState in fighter.abilities:
+			if not state.is_ready() or battle.valid_targets(team_idx, fighter, state).is_empty():
+				continue
+			if AVOID_INVULNERABLE_ABILITIES and grants_invulnerability(state.data):
+				continue
+			for type: ChakraType.Type in state.data.cost:
+				if type != ChakraType.Type.RANDOM:
+					demand[type] = int(demand.get(type, 0)) + 1
+	var wanted: ChakraType.Type = ChakraType.Type.RANDOM
+	for type: ChakraType.Type in ChakraType.real_types():
+		if demand.has(type) and (wanted == ChakraType.Type.RANDOM or int(demand[type]) > int(demand[wanted])):
+			wanted = type
+	if wanted == ChakraType.Type.RANDOM:
+		return false
+	var give: Array[ChakraType.Type] = []
+	var left: Array[ChakraType.Type] = pool.chakras.duplicate()
+	for type: ChakraType.Type in ChakraType.real_types():
+		if type == wanted:
+			continue
+		while give.size() < ChakraPool.EXCHANGE_SIZE and left.has(type):
+			give.append(type)
+			left.remove_at(left.find(type))
+	if give.size() < ChakraPool.EXCHANGE_SIZE:
+		return false
+	return battle.exchange_chakra(team_idx, give, wanted)
+
+
 func grants_invulnerability(ability: AbilityData) -> bool:
 	for effect: EffectData in ability.effects:
 		if effect.kind == EffectData.Kind.DAMAGE_REDUCTION and effect.invulnerable:

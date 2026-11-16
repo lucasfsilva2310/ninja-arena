@@ -2,6 +2,10 @@ class_name AnimConfig
 extends RefCounted
 
 static var fast: bool = false
+static var speed: float = NORMAL_SPEED
+
+const NORMAL_SPEED: float = 1.0
+const FAST_SPEED: float = 3.0
 
 const FRAME_MS: int = 150
 const FALLBACK_ATTACK_MS: int = 500
@@ -85,4 +89,12 @@ static func effects_of(character_slug: String, ability_slug: String) -> Array:
 
 
 static func seconds(milliseconds: float) -> float:
-	return 0.0 if fast else milliseconds / 1000.0
+	return 0.0 if fast else milliseconds / 1000.0 / speed
+
+
+static func is_fast_speed() -> bool:
+	return speed > NORMAL_SPEED
+
+
+static func toggle_speed() -> void:
+	speed = NORMAL_SPEED if is_fast_speed() else FAST_SPEED

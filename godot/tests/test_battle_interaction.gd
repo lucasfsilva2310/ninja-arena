@@ -521,8 +521,8 @@ func test_full_game_through_the_ui_with_a_scripted_player() -> void:
 			var before: int = view.queue.actions.size()
 			var button: AbilityButton = _ability_button(view, action.source, action.ability.data.display_name)
 			_press(button.button)
-			var target: Fighter = action.target if action.target != null else view.targets[0]
-			_click_fighter(view, target)
+			if ActionQueue.needs_pick(action.ability.data):
+				_click_fighter(view, action.target)
 			if view.queue.actions.size() == before + 1:
 				queued += 1
 			else:

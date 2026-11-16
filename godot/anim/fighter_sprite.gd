@@ -58,6 +58,7 @@ func play_once(animation: String) -> float:
 	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(animation):
 		return 0.0
 	busy = true
+	sprite.speed_scale = AnimConfig.speed
 	sprite.play(animation)
 	_align_frame()
 	return sprite.sprite_frames.get_frame_count(animation) * float(AnimConfig.FRAME_MS)
@@ -88,6 +89,7 @@ func _show_resting_pose() -> void:
 	if sprite.sprite_frames == null:
 		return
 	var animation: String = "idle" if alive else "defeated"
+	sprite.speed_scale = 1.0
 	if sprite.animation != animation or not sprite.is_playing():
 		sprite.play(animation)
 	_align_frame()

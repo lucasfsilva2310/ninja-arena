@@ -21,6 +21,7 @@ var source: Fighter
 var target: Fighter
 var amount: int = 0
 var text: String = ""
+var effect: ActiveEffect
 
 
 func _init(event_type: Type, event_source: Fighter = null, event_target: Fighter = null, event_amount: int = 0, event_text: String = "") -> void:
