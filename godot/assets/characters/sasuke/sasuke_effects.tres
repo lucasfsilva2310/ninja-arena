@@ -1,0 +1,87 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-0.png" id="1_axbx3"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-1.png" id="2_drwmi"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-2.png" id="3_64g6f"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-3.png" id="4_xfhua"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-4.png" id="5_schtf"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-5.png" id="6_tbmww"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-6.png" id="7_5qb1y"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-7.png" id="8_plypp"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-8.png" id="9_4hecg"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-9.png" id="10_1vshi"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-10.png" id="11_onhas"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/fireball/effects/fireball/sasuke-sprites-11.png" id="12_eaunb"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/kawarimi/effects/smoke/sasuke-sprites-0.png" id="13_7yr15"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/kawarimi/effects/smoke/sasuke-sprites-1.png" id="14_vayxe"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/kawarimi/effects/smoke/sasuke-sprites-2.png" id="15_3miit"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/kawarimi/effects/smoke/sasuke-sprites-3.png" id="16_co71q"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/kawarimi/effects/smoke/sasuke-sprites-4.png" id="17_k2hkl"]
+[ext_resource type="Texture2D" path="res://assets/characters/sasuke/sprites/kawarimi/effects/smoke/sasuke-sprites-5.png" id="18_ek1ft"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_axbx3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_drwmi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_64g6f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_xfhua")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_schtf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_tbmww")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_5qb1y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_plypp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_4hecg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_1vshi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_onhas")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_eaunb")
+}],
+"loop": 1,
+"name": &"fireball",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_7yr15")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_vayxe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_3miit")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_co71q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_k2hkl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_ek1ft")
+}],
+"loop": 1,
+"name": &"smoke",
+"speed": 6.666666666666667
+}]

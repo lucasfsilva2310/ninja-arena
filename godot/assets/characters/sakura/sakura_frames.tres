@@ -1,0 +1,257 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-0.png" id="1_nucda"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-1.png" id="2_sovxo"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-2.png" id="3_vevvq"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-3.png" id="4_eytk2"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-4.png" id="5_4efuc"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-5.png" id="6_gk74w"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-6.png" id="7_eek66"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-7.png" id="8_eldpq"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/angerpunch/sakura-sprites-8.png" id="9_qu52x"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/damaged/sakura-sprites-0.png" id="10_y35up"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/damaged/sakura-sprites-1.png" id="11_c4uf0"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/damaged/sakura-sprites-2.png" id="12_sfdo1"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/damaged/sakura-sprites-3.png" id="13_1cwjp"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/damaged/sakura-sprites-4.png" id="14_mvqrj"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/damaged/sakura-sprites-5.png" id="15_brq7i"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/damaged/sakura-sprites-6.png" id="16_sk2vq"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/defeated/defeated.png" id="17_u5j7u"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-0.png" id="18_irgna"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-1.png" id="19_k50w7"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-2.png" id="20_pme7t"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-3.png" id="21_k8tkj"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-4.png" id="22_brr7c"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-5.png" id="23_t4xv8"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-6.png" id="24_8lts1"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/heal/sakura-sprites-7.png" id="25_gx2hj"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/idle/sakura-sprites-0.png" id="26_tpu48"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/idle/sakura-sprites-1.png" id="27_yvt20"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/idle/sakura-sprites-2.png" id="28_1rcmi"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/idle/sakura-sprites-3.png" id="29_82e32"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/idle/sakura-sprites-4.png" id="30_3yb7j"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/idle/sakura-sprites-5.png" id="31_xu8o2"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-0.png" id="32_qyfxc"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-1.png" id="33_1mw03"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-2.png" id="34_5cwcj"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-3.png" id="35_j4kwj"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-4.png" id="36_bi18p"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-5.png" id="37_ck3u2"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-6.png" id="38_nd5au"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-7.png" id="39_40ng4"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/innerstrength/sakura-sprites-8.png" id="40_gxt7g"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-0.png" id="41_ntutk"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-1.png" id="42_nxhp3"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-2.png" id="43_7t8io"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-3.png" id="44_ts7g2"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-4.png" id="45_0b2tu"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-5.png" id="46_kx8xd"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-6.png" id="47_4dwe4"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/sakura-sprites-7.png" id="48_ovcng"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/recover/sakura-sprites-0.png" id="49_ffk3i"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/recover/sakura-sprites-1.png" id="50_rbops"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/recover/sakura-sprites-2.png" id="51_y0aba"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/recover/sakura-sprites-3.png" id="52_5xide"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/recover/sakura-sprites-4.png" id="53_p1px4"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_nucda")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_sovxo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_vevvq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_eytk2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_4efuc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_gk74w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_eek66")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_eldpq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_qu52x")
+}],
+"loop": 0,
+"name": &"angerpunch",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_y35up")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_c4uf0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_sfdo1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_1cwjp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_mvqrj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_brq7i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_sk2vq")
+}],
+"loop": 0,
+"name": &"damaged",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_u5j7u")
+}],
+"loop": 0,
+"name": &"defeated",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("18_irgna")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_k50w7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_pme7t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_k8tkj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("22_brr7c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_t4xv8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_8lts1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_gx2hj")
+}],
+"loop": 0,
+"name": &"heal",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("26_tpu48")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_yvt20")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_1rcmi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_82e32")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_3yb7j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_xu8o2")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("32_qyfxc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_1mw03")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_5cwcj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_j4kwj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_bi18p")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_ck3u2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_nd5au")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_40ng4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_gxt7g")
+}],
+"loop": 0,
+"name": &"innerstrength",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("41_ntutk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_nxhp3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_7t8io")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_ts7g2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_0b2tu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_kx8xd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_4dwe4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_ovcng")
+}],
+"loop": 0,
+"name": &"kawarimi",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("49_ffk3i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_rbops")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_y0aba")
+}, {
+"duration": 1.0,
+"texture": ExtResource("52_5xide")
+}, {
+"duration": 1.0,
+"texture": ExtResource("53_p1px4")
+}],
+"loop": 0,
+"name": &"recover",
+"speed": 6.666666666666667
+}]

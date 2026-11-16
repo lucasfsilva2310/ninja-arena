@@ -1,10 +1,15 @@
 extends Control
 
 const MAX_PLAYER_TURNS: int = 400
-const TIMEOUT_SECONDS: float = 300.0
+const FAST_TIMEOUT_SECONDS: float = 300.0
+const ANIMATED_TIMEOUT_SECONDS: float = 1500.0
+const RESOLVE_TIMEOUT_SECONDS: float = 120.0
 const DRIVE_SEED: int = 21
 
 var _shots_dir: String = ""
+var _timeout: float = FAST_TIMEOUT_SECONDS
+var _lock_checks: int = 0
+var _animated_shots: int = 0
 var _started_at: int = 0
 var _taken: Dictionary = {}
 var _queued: int = 0
@@ -18,6 +23,8 @@ func _ready() -> void:
 	var index: int = args.find("--shots")
 	if index != -1 and index + 1 < args.size():
 		_shots_dir = args[index + 1]
+	AnimConfig.fast = args.has("--fast")
+	_timeout = FAST_TIMEOUT_SECONDS if AnimConfig.fast else ANIMATED_TIMEOUT_SECONDS
 	var seed_arg: int = args.find("--seed")
 	SceneRouter.seed_override = int(args[seed_arg + 1]) if seed_arg != -1 and seed_arg + 1 < args.size() else DRIVE_SEED
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -27,7 +34,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _started_at != 0 and _elapsed() > TIMEOUT_SECONDS + 20.0:
+	if _started_at != 0 and _elapsed() > _timeout + 20.0:
 		printerr("DRIVE FAIL: watchdog timeout, the driver script stopped early")
 		get_tree().quit(2)
 
@@ -49,7 +56,7 @@ func _run() -> void:
 	var planner: AiPlayer = AiPlayer.new()
 	var plan_rng: Rng = Rng.new(8)
 	while not view.battle.result.ended:
-		_check(_elapsed() < TIMEOUT_SECONDS, "game finishes before the timeout")
+		_check(_elapsed() < _timeout, "game finishes before the timeout")
 		_check(_player_turns < MAX_PLAYER_TURNS, "game finishes within %d player turns" % MAX_PLAYER_TURNS)
 		_check(view.can_act(), "player can act at the start of each turn")
 		_player_turns += 1
@@ -74,8 +81,10 @@ func _run() -> void:
 		if view.modal != null:
 			await _pay_through_modal(view, plan)
 		_check(view.modal == null, "no modal left open after the turn")
+		await _wait_for_resolution(view)
 		_check_fits(view)
 		_check(not view.resolving or view.battle.result.ended, "turn resolved and input unlocked")
+		_check_sprites_match_state(view)
 	await _frames(2)
 	_check(view.game_over_panel != null and view.game_over_panel.visible, "game over panel is visible")
 	await _shot("game-over")
@@ -85,8 +94,46 @@ func _run() -> void:
 	await _frames(3)
 	_check(SceneRouter.current is CharacterSelect, "back button returns to the select screen")
 	await _surrender_game()
-	print("DRIVE OK result=%s player_turns=%d battle_turn=%d queued=%d payment_modals=%d payment_cancels=%d seconds=%.1f" % [label, _player_turns, final_turn, _queued, _payments, _payment_cancels, _elapsed()])
+	print("DRIVE OK fast=%s lock_checks=%d result=%s player_turns=%d battle_turn=%d queued=%d payment_modals=%d payment_cancels=%d seconds=%.1f" % [str(AnimConfig.fast), _lock_checks, label, _player_turns, final_turn, _queued, _payments, _payment_cancels, _elapsed()])
 	get_tree().quit(0)
+
+
+func _wait_for_resolution(view: BattleView) -> void:
+	var waited_from: float = _elapsed()
+	var probed: bool = false
+	while view.turn_player.playing or (view.resolving and not view.battle.result.ended):
+		_check(_elapsed() - waited_from < RESOLVE_TIMEOUT_SECONDS, "a turn finishes its animations within %.0f seconds" % RESOLVE_TIMEOUT_SECONDS)
+		if not probed and not AnimConfig.fast:
+			probed = true
+			await _probe_lock(view)
+		await _frames(1)
+	await _frames(1)
+
+
+func _probe_lock(view: BattleView) -> void:
+	_check(not view.can_act(), "input is locked while animations play")
+	_check(view.end_turn_button.disabled and view.exchange_button.disabled and view.surrender_button.disabled, "footer buttons are disabled while animations play")
+	var turn_before: int = view.battle.turn
+	var queued_before: int = view.queue.actions.size()
+	for panel_fighter: Fighter in view.battle.teams[0].fighters:
+		for button: AbilityButton in (view.panels[panel_fighter] as FighterPanel).ability_buttons:
+			_check(button.button.disabled, "ability buttons are disabled while animations play")
+	await _click(view.end_turn_button)
+	await _click(view.exchange_button)
+	_check(view.modal == null, "clicking locked buttons opens no modal")
+	_check(view.battle.turn == turn_before and view.queue.actions.size() == queued_before, "clicking during animations changes nothing")
+	_lock_checks += 1
+	if _animated_shots < 3 and _shots_dir != "":
+		_animated_shots += 1
+		await _shot("animating-%d" % _animated_shots)
+
+
+func _check_sprites_match_state(view: BattleView) -> void:
+	for fighter: Fighter in view.sprites:
+		var sprite: FighterSprite = view.sprites[fighter]
+		_check(not sprite.busy, "no sprite is stuck in an animation after the turn")
+		_check(sprite.current_animation() == ("idle" if fighter.is_alive() else "defeated"), "%s rests as %s" % [fighter.display_name(), "idle" if fighter.is_alive() else "defeated"])
+		_check(view.display_hp(fighter) == fighter.hp, "shown HP matches real HP after the turn")
 
 
 func _check_footer_inside_window(view: BattleView) -> void:

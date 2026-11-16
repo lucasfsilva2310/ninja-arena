@@ -10,6 +10,9 @@ EXTRA=()
 if [ -n "${DRIVE_SHOTS:-}" ]; then
 	EXTRA+=(--shots "$(wslpath -w "$DRIVE_SHOTS")")
 fi
+if [ -n "${DRIVE_FAST:-}" ]; then
+	EXTRA+=(--fast)
+fi
 if [ -n "${DRIVE_SEED:-}" ]; then
 	EXTRA+=(--seed "$DRIVE_SEED")
 fi

@@ -10,16 +10,17 @@ var _started: bool = false
 
 func _process(_delta: float) -> bool:
 	if _started:
-		return true
+		return false
 	_started = true
+	AnimConfig.fast = true
 	_run_all()
-	return true
+	return false
 
 
 func _run_all() -> void:
 	var files: Array[String] = _find_test_files()
 	for path: String in files:
-		_run_file(path)
+		await _run_file(path)
 	print("")
 	print("Tests: %d passed, %d failed" % [_passed, _failures])
 	quit(1 if _failures > 0 else 0)
@@ -55,7 +56,7 @@ func _run_file(path: String) -> void:
 			_failures += 1
 			print("FAIL  %s: test script must extend res://tools/test_case.gd" % path)
 			return
-		instance.call(method_name)
+		await instance.call(method_name)
 		var failures: Array[String] = []
 		failures.assign(instance.get("failures"))
 		var label: String = "%s::%s" % [path.get_file(), method_name]

@@ -1,0 +1,682 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-0.png" id="1_2xf28"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-1.png" id="2_nn5yn"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-2.png" id="3_020kb"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-3.png" id="4_l7xgu"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-4.png" id="5_1rvvb"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-5.png" id="6_yo4eg"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-6.png" id="7_2e5w6"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-7.png" id="8_lr7t5"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-8.png" id="9_2ehi0"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-9.png" id="10_bfrev"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-10.png" id="11_bxgl8"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-11.png" id="12_k6br3"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/backflip/rocklee-sprites-12.png" id="13_tlofj"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/damaged/rocklee-sprites-0.png" id="14_isloe"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/damaged/rocklee-sprites-1.png" id="15_eswmo"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/damaged/rocklee-sprites-2.png" id="16_4nycl"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/damaged/rocklee-sprites-3.png" id="17_kqtsc"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/damaged/rocklee-sprites-4.png" id="18_tetja"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/damaged/rocklee-sprites-5.png" id="19_2u0f6"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/damaged/rocklee-sprites-6.png" id="20_jsev4"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/defeated/defeated.png" id="21_rn8pi"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-0.png" id="22_nj5rj"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-1.png" id="23_hm58c"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-2.png" id="24_51k7f"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-3.png" id="25_fpp83"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-4.png" id="26_4jr5v"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-5.png" id="27_xd5pg"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-6.png" id="28_k8wlu"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-7.png" id="29_a7tiq"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-8.png" id="30_jni02"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-9.png" id="31_c356r"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-10.png" id="32_qko6s"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-11.png" id="33_mlw7x"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-12.png" id="34_rjsot"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-13.png" id="35_eh4pr"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-14.png" id="36_7e2hp"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-15.png" id="37_e7r1x"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-16.png" id="38_nae7h"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-17.png" id="39_evrrd"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-18.png" id="40_i50es"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-19.png" id="41_t05su"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-20.png" id="42_6wkec"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-21.png" id="43_37gi0"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-22.png" id="44_mf2xc"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-23.png" id="45_7thhv"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-24.png" id="46_dy4dm"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-25.png" id="47_b3r2l"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-26.png" id="48_20cl4"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-27.png" id="49_tebgo"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-28.png" id="50_fj0bj"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-29.png" id="51_ehlxx"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-30.png" id="52_nbvrl"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-31.png" id="53_lb7lv"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-32.png" id="54_erdf2"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-33.png" id="55_1oviv"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-34.png" id="56_c7rq4"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-35.png" id="57_06628"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-36.png" id="58_1c00s"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-37.png" id="59_l6231"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-38.png" id="60_2eb0y"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-39.png" id="61_t5mou"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-40.png" id="62_hkj0r"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-41.png" id="63_aney0"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-42.png" id="64_wgwr3"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/hiddenlotus/rocklee-sprites-43.png" id="65_bh70h"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/idle/rocklee-sprites-0.png" id="66_imucn"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/idle/rocklee-sprites-1.png" id="67_827mg"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/idle/rocklee-sprites-2.png" id="68_4nela"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/idle/rocklee-sprites-3.png" id="69_5moty"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/idle/rocklee-sprites-4.png" id="70_j6hsl"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/idle/rocklee-sprites-5.png" id="71_rvf0v"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-0.png" id="72_ho72v"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-1.png" id="73_8jkbp"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-2.png" id="74_qgxgp"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-3.png" id="75_wenog"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-4.png" id="76_i1btv"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-5.png" id="77_o2x8j"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-6.png" id="78_4br0t"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-7.png" id="79_l80au"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-8.png" id="80_8fwy2"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-9.png" id="81_60nxv"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-10.png" id="82_8vmcr"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-11.png" id="83_dbkq2"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-12.png" id="84_p1vsy"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-13.png" id="85_0f0y7"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-14.png" id="86_f64lj"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-15.png" id="87_t4n3e"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-16.png" id="88_6ersq"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-17.png" id="89_r6myr"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-18.png" id="90_p1nu5"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-19.png" id="91_nbld4"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-20.png" id="92_5agrj"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-21.png" id="93_dj3xb"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-22.png" id="94_bwo1y"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/konohasenpu/rocklee-sprites-23.png" id="95_outcr"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-0.png" id="96_jv3x5"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-1.png" id="97_tkpnb"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-2.png" id="98_b2gp3"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-3.png" id="99_ln3mo"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-4.png" id="100_ys73f"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-5.png" id="101_0kk7y"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-6.png" id="102_qvut1"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-7.png" id="103_fdpun"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-8.png" id="104_nxi1e"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-9.png" id="105_27cdx"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-10.png" id="106_881wa"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-11.png" id="107_g22kb"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-12.png" id="108_o630f"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-13.png" id="109_kp2uu"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-14.png" id="110_fyw38"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-15.png" id="111_ajcwe"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-16.png" id="112_u450n"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-17.png" id="113_k5gem"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-18.png" id="114_3ici1"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-19.png" id="115_txgif"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-20.png" id="116_4wewh"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-21.png" id="117_5eoi7"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-22.png" id="118_024et"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-23.png" id="119_uy1fo"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-24.png" id="120_qdlmi"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-25.png" id="121_myisx"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-26.png" id="122_2pm0v"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-27.png" id="123_4mnbh"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-28.png" id="124_cnlkn"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-29.png" id="125_b7c4f"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/primarylotus/rocklee-sprites-30.png" id="126_ywbvc"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/recover/rocklee-sprites-0.png" id="127_mrnp5"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/recover/rocklee-sprites-1.png" id="128_1r3os"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/recover/rocklee-sprites-2.png" id="129_b6wle"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/recover/rocklee-sprites-3.png" id="130_2skot"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/recover/rocklee-sprites-4.png" id="131_5spro"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-0.png" id="132_m04ct"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-1.png" id="133_rxnve"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-2.png" id="134_juhkr"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-3.png" id="135_joblv"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-4.png" id="136_1ly0j"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-5.png" id="137_2ydji"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-6.png" id="138_j23cw"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-7.png" id="139_uoh65"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-8.png" id="140_b2y5o"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-9.png" id="141_id1xg"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-10.png" id="142_yttmm"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-11.png" id="143_x2eqf"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-12.png" id="144_qvw86"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-13.png" id="145_ncsbi"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-14.png" id="146_u07bf"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-15.png" id="147_hn4kq"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-16.png" id="148_i0eeg"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-17.png" id="149_lt3wu"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-18.png" id="150_j762q"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-19.png" id="151_bkbs0"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-20.png" id="152_hlv85"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-21.png" id="153_asf45"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-22.png" id="154_0rhmc"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-23.png" id="155_1ompu"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-24.png" id="156_36kt6"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-25.png" id="157_52cpv"]
+[ext_resource type="Texture2D" path="res://assets/characters/rocklee/sprites/releaseweights/rocklee-sprites-26.png" id="158_ncthe"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_2xf28")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_nn5yn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_020kb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_l7xgu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_1rvvb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_yo4eg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_2e5w6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_lr7t5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_2ehi0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_bfrev")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_bxgl8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_k6br3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_tlofj")
+}],
+"loop": 0,
+"name": &"backflip",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_isloe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_eswmo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_4nycl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_kqtsc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_tetja")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_2u0f6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_jsev4")
+}],
+"loop": 0,
+"name": &"damaged",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("21_rn8pi")
+}],
+"loop": 0,
+"name": &"defeated",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("22_nj5rj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_hm58c")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_51k7f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_fpp83")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_4jr5v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_xd5pg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_k8wlu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_a7tiq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_jni02")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_c356r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("32_qko6s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_mlw7x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_rjsot")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_eh4pr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_7e2hp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_e7r1x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_nae7h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_evrrd")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_i50es")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_t05su")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_6wkec")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_37gi0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("44_mf2xc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_7thhv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_dy4dm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_b3r2l")
+}, {
+"duration": 1.0,
+"texture": ExtResource("48_20cl4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("49_tebgo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("50_fj0bj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("51_ehlxx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("52_nbvrl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("53_lb7lv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("54_erdf2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("55_1oviv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("56_c7rq4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("57_06628")
+}, {
+"duration": 1.0,
+"texture": ExtResource("58_1c00s")
+}, {
+"duration": 1.0,
+"texture": ExtResource("59_l6231")
+}, {
+"duration": 1.0,
+"texture": ExtResource("60_2eb0y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("61_t5mou")
+}, {
+"duration": 1.0,
+"texture": ExtResource("62_hkj0r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("63_aney0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("64_wgwr3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("65_bh70h")
+}],
+"loop": 0,
+"name": &"hiddenlotus",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("66_imucn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("67_827mg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("68_4nela")
+}, {
+"duration": 1.0,
+"texture": ExtResource("69_5moty")
+}, {
+"duration": 1.0,
+"texture": ExtResource("70_j6hsl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("71_rvf0v")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("72_ho72v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("73_8jkbp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("74_qgxgp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("75_wenog")
+}, {
+"duration": 1.0,
+"texture": ExtResource("76_i1btv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("77_o2x8j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("78_4br0t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("79_l80au")
+}, {
+"duration": 1.0,
+"texture": ExtResource("80_8fwy2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("81_60nxv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("82_8vmcr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("83_dbkq2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("84_p1vsy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("85_0f0y7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("86_f64lj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("87_t4n3e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("88_6ersq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("89_r6myr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("90_p1nu5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("91_nbld4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("92_5agrj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("93_dj3xb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("94_bwo1y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("95_outcr")
+}],
+"loop": 0,
+"name": &"konohasenpu",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("96_jv3x5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("97_tkpnb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("98_b2gp3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("99_ln3mo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("100_ys73f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("101_0kk7y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("102_qvut1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("103_fdpun")
+}, {
+"duration": 1.0,
+"texture": ExtResource("104_nxi1e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("105_27cdx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("106_881wa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("107_g22kb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("108_o630f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("109_kp2uu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("110_fyw38")
+}, {
+"duration": 1.0,
+"texture": ExtResource("111_ajcwe")
+}, {
+"duration": 1.0,
+"texture": ExtResource("112_u450n")
+}, {
+"duration": 1.0,
+"texture": ExtResource("113_k5gem")
+}, {
+"duration": 1.0,
+"texture": ExtResource("114_3ici1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("115_txgif")
+}, {
+"duration": 1.0,
+"texture": ExtResource("116_4wewh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("117_5eoi7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("118_024et")
+}, {
+"duration": 1.0,
+"texture": ExtResource("119_uy1fo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("120_qdlmi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("121_myisx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("122_2pm0v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("123_4mnbh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("124_cnlkn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("125_b7c4f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("126_ywbvc")
+}],
+"loop": 0,
+"name": &"primarylotus",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("127_mrnp5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("128_1r3os")
+}, {
+"duration": 1.0,
+"texture": ExtResource("129_b6wle")
+}, {
+"duration": 1.0,
+"texture": ExtResource("130_2skot")
+}, {
+"duration": 1.0,
+"texture": ExtResource("131_5spro")
+}],
+"loop": 0,
+"name": &"recover",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("132_m04ct")
+}, {
+"duration": 1.0,
+"texture": ExtResource("133_rxnve")
+}, {
+"duration": 1.0,
+"texture": ExtResource("134_juhkr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("135_joblv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("136_1ly0j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("137_2ydji")
+}, {
+"duration": 1.0,
+"texture": ExtResource("138_j23cw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("139_uoh65")
+}, {
+"duration": 1.0,
+"texture": ExtResource("140_b2y5o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("141_id1xg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("142_yttmm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("143_x2eqf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("144_qvw86")
+}, {
+"duration": 1.0,
+"texture": ExtResource("145_ncsbi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("146_u07bf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("147_hn4kq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("148_i0eeg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("149_lt3wu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("150_j762q")
+}, {
+"duration": 1.0,
+"texture": ExtResource("151_bkbs0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("152_hlv85")
+}, {
+"duration": 1.0,
+"texture": ExtResource("153_asf45")
+}, {
+"duration": 1.0,
+"texture": ExtResource("154_0rhmc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("155_1ompu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("156_36kt6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("157_52cpv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("158_ncthe")
+}],
+"loop": 0,
+"name": &"releaseweights",
+"speed": 6.666666666666667
+}]

@@ -1,0 +1,34 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/effects/smoke/sakura-sprites-0.png" id="1_cxnsk"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/effects/smoke/sakura-sprites-1.png" id="2_dryvx"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/effects/smoke/sakura-sprites-2.png" id="3_bgpaj"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/effects/smoke/sakura-sprites-3.png" id="4_fk88w"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/effects/smoke/sakura-sprites-4.png" id="5_yhlpv"]
+[ext_resource type="Texture2D" path="res://assets/characters/sakura/sprites/kawarimi/effects/smoke/sakura-sprites-5.png" id="6_iljud"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_cxnsk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_dryvx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_bgpaj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_fk88w")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_yhlpv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_iljud")
+}],
+"loop": 1,
+"name": &"smoke",
+"speed": 6.666666666666667
+}]

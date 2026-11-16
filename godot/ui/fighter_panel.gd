@@ -19,6 +19,7 @@ var effects_box: HFlowContainer
 var abilities_row: HBoxContainer
 var ability_buttons: Array[AbilityButton] = []
 var highlighted: bool = false
+var shown_hp: int = -1
 
 var _built_states: Array[AbilityState] = []
 
@@ -106,11 +107,12 @@ func set_highlight(value: bool) -> void:
 
 
 func refresh(lock_for: Callable = Callable()) -> void:
-	var alive: bool = fighter.is_alive()
+	var hp: int = shown_hp if shown_hp >= 0 else fighter.hp
+	var alive: bool = hp > 0
 	name_label.text = fighter.display_name()
-	hp_bar.value = fighter.hp
+	hp_bar.value = hp
 	hp_bar.theme_type_variation = "HpBar" if alive else "DeadHpBar"
-	hp_label.text = "%d / %d" % [fighter.hp, Fighter.MAX_HP]
+	hp_label.text = "%d / %d" % [hp, Fighter.MAX_HP]
 	avatar_rect.texture = Art.avatar(fighter.display_name()) if alive else Art.dead_avatar()
 	modulate = Color.WHITE if alive else Color(0.65, 0.65, 0.65)
 	_refresh_effects()

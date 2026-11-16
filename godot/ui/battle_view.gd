@@ -12,6 +12,9 @@ var player_team: int = 0
 var background_name: String = ""
 var panels: Dictionary = {}
 var sprites: Dictionary = {}
+var stage: BattleStage
+var animated: bool = false
+var shown_hp: Dictionary = {}
 var chakra_labels: Dictionary = {}
 var queue: ActionQueue
 var turn_player: TurnPlayer = TurnPlayer.new()
@@ -95,6 +98,12 @@ func set_turn_player(player: TurnPlayer) -> void:
 		turn_player.finished.disconnect(_on_play_finished)
 	turn_player = player
 	_connect_turn_player()
+
+
+func use_animations() -> void:
+	animated = true
+	if stage != null:
+		set_turn_player(AnimatedTurnPlayer.new(stage))
 
 
 func _connect_turn_player() -> void:
@@ -261,6 +270,7 @@ func _on_surrender_confirmed() -> void:
 
 func _submit_player_turn(plan: TurnPlan) -> void:
 	clear_selection()
+	_sync_shown_hp()
 	resolving = true
 	var events: Array[BattleEvent] = battle.submit_turn(player_team, plan.actions, plan.random_payment)
 	if not events.is_empty() and events[0].type == BattleEvent.Type.REJECTED:
@@ -321,6 +331,7 @@ func _after_enemy_events() -> void:
 
 func _unlock() -> void:
 	resolving = false
+	_sync_shown_hp()
 	time_left = turn_length
 	refresh_all()
 
@@ -329,6 +340,7 @@ func _finish_if_over() -> bool:
 	if not battle.result.ended:
 		return false
 	resolving = true
+	_sync_shown_hp()
 	refresh_all()
 	show_game_over(battle.result)
 	game_over.emit(battle.result)
@@ -381,6 +393,7 @@ func _record(text: String) -> void:
 
 
 func _on_event_played(event: BattleEvent) -> void:
+	_apply_event_to_shown_hp(event)
 	var text: String = EventText.describe(event)
 	if text != "":
 		_record(text)
@@ -440,6 +453,11 @@ func _build() -> void:
 	_build_chakra_row()
 	_build_team(player_team, false, player_board, arena_player)
 	_build_team(1 - player_team, true, enemy_board, arena_enemy)
+	stage = BattleStage.new()
+	stage.sprites = sprites
+	add_child(stage)
+	if animated:
+		set_turn_player(AnimatedTurnPlayer.new(stage))
 	_reset_description()
 	log_text.add_theme_color_override("default_color", Color.WHITE)
 	log_text.add_theme_font_size_override("normal_font_size", 14)
@@ -458,9 +476,10 @@ func _build_team(team_idx: int, enemy: bool, board: VBoxContainer, arena: VBoxCo
 		panel.clicked.connect(click_target)
 		board.add_child(panel)
 		panels[fighter] = panel
-		var sprite: PlaceholderSprite = PlaceholderSprite.new(fighter)
+		var sprite: FighterSprite = FighterSprite.new(fighter, enemy)
 		arena.add_child(sprite)
 		sprites[fighter] = sprite
+		shown_hp[fighter] = fighter.hp
 
 
 func _build_chakra_row() -> void:
@@ -486,8 +505,13 @@ func _clear() -> void:
 		for child: Node in node.get_children():
 			node.remove_child(child)
 			child.queue_free()
+	if stage != null:
+		remove_child(stage)
+		stage.queue_free()
+		stage = null
 	panels.clear()
 	sprites.clear()
+	shown_hp.clear()
 	chakra_labels.clear()
 
 
@@ -501,9 +525,33 @@ func _reset_description() -> void:
 
 func _refresh_fighter(fighter: Fighter) -> void:
 	var panel: FighterPanel = panels[fighter]
+	panel.shown_hp = display_hp(fighter)
 	panel.refresh(lock_reason)
-	var sprite: PlaceholderSprite = sprites[fighter]
-	sprite.refresh()
+	var sprite: FighterSprite = sprites[fighter]
+	sprite.set_alive(display_hp(fighter) > 0)
+
+
+func display_hp(fighter: Fighter) -> int:
+	if resolving and shown_hp.has(fighter):
+		return int(shown_hp[fighter])
+	return fighter.hp
+
+
+func _sync_shown_hp() -> void:
+	for fighter: Fighter in panels:
+		shown_hp[fighter] = fighter.hp
+
+
+func _apply_event_to_shown_hp(event: BattleEvent) -> void:
+	if event.target == null or not shown_hp.has(event.target):
+		return
+	match event.type:
+		BattleEvent.Type.DAMAGE:
+			shown_hp[event.target] = maxi(int(shown_hp[event.target]) - event.amount, 0)
+		BattleEvent.Type.HEAL:
+			shown_hp[event.target] = mini(int(shown_hp[event.target]) + event.amount, Fighter.MAX_HP)
+		BattleEvent.Type.FIGHTER_DIED:
+			shown_hp[event.target] = 0
 
 
 func _refresh_chakra() -> void:
@@ -526,6 +574,7 @@ func _refresh_controls() -> void:
 	surrender_button.disabled = not can_act()
 	history_button.disabled = not _built or modal != null
 	for fighter: Fighter in battle.teams[player_team].fighters:
+		panels[fighter].shown_hp = display_hp(fighter)
 		panels[fighter].refresh(lock_reason)
 
 

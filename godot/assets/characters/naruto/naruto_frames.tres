@@ -1,0 +1,233 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/damaged/naruto-sprites-0.png" id="1_nd0gk"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/damaged/naruto-sprites-1.png" id="2_g3uxp"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/damaged/naruto-sprites-2.png" id="3_ger2k"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/damaged/naruto-sprites-3.png" id="4_cag3m"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/damaged/naruto-sprites-4.png" id="5_8gm6v"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/damaged/naruto-sprites-5.png" id="6_by5fl"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/damaged/naruto-sprites-6.png" id="7_jliqg"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/defeated/defeated.png" id="8_5v8w8"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/escapeclone/naruto-sprites-0.png" id="9_uenvf"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/escapeclone/naruto-sprites-1.png" id="10_vf8nm"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/escapeclone/naruto-sprites-2.png" id="11_xgydu"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/escapeclone/naruto-sprites-3.png" id="12_fpt27"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/escapeclone/naruto-sprites-4.png" id="13_7ni1h"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/idle/naruto-sprites-0.png" id="14_c8dpb"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/idle/naruto-sprites-1.png" id="15_6dgs3"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/idle/naruto-sprites-2.png" id="16_6vfvr"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/kagebunshin/naruto-sprites-0.png" id="17_r5ncy"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/kagebunshin/naruto-sprites-1.png" id="18_yi03d"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/kagebunshin/naruto-sprites-2.png" id="19_08sos"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/kagebunshin/naruto-sprites-3.png" id="20_fofvj"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/kagebunshin/naruto-sprites-4.png" id="21_gnkv3"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-0.png" id="22_mh8dx"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-1.png" id="23_vccpm"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-2.png" id="24_bpvor"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-3.png" id="25_5yuki"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-4.png" id="26_hyo1v"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-5.png" id="27_j0cu4"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-6.png" id="28_ixhdo"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-7.png" id="29_lgp54"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-8.png" id="30_cnsqj"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/narutokick/naruto-sprites-9.png" id="31_djmow"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-0.png" id="32_nh2u6"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-1.png" id="33_1ldlq"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-2.png" id="34_1h2ou"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-3.png" id="35_fidw4"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-4.png" id="36_2lrxu"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-5.png" id="37_8ic1d"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-6.png" id="38_8uon3"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-7.png" id="39_l17x6"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-8.png" id="40_f8004"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-9.png" id="41_2ymyw"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-10.png" id="42_jv3vs"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/rasengan/naruto-sprites-11.png" id="43_1eqfv"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/recover/naruto-sprites-0.png" id="44_jifxi"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/recover/naruto-sprites-1.png" id="45_ludmc"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/recover/naruto-sprites-2.png" id="46_wnlfs"]
+[ext_resource type="Texture2D" path="res://assets/characters/naruto/sprites/recover/naruto-sprites-3.png" id="47_53q4l"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_nd0gk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_g3uxp")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ger2k")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_cag3m")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_8gm6v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_by5fl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_jliqg")
+}],
+"loop": 0,
+"name": &"damaged",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_5v8w8")
+}],
+"loop": 0,
+"name": &"defeated",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_uenvf")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_vf8nm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_xgydu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_fpt27")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_7ni1h")
+}],
+"loop": 0,
+"name": &"escapeclone",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_c8dpb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_6dgs3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_6vfvr")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("17_r5ncy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_yi03d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_08sos")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_fofvj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_gnkv3")
+}],
+"loop": 0,
+"name": &"kagebunshin",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("22_mh8dx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("23_vccpm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("24_bpvor")
+}, {
+"duration": 1.0,
+"texture": ExtResource("25_5yuki")
+}, {
+"duration": 1.0,
+"texture": ExtResource("26_hyo1v")
+}, {
+"duration": 1.0,
+"texture": ExtResource("27_j0cu4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("28_ixhdo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("29_lgp54")
+}, {
+"duration": 1.0,
+"texture": ExtResource("30_cnsqj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("31_djmow")
+}],
+"loop": 0,
+"name": &"narutokick",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("32_nh2u6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("33_1ldlq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("34_1h2ou")
+}, {
+"duration": 1.0,
+"texture": ExtResource("35_fidw4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("36_2lrxu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("37_8ic1d")
+}, {
+"duration": 1.0,
+"texture": ExtResource("38_8uon3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("39_l17x6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("40_f8004")
+}, {
+"duration": 1.0,
+"texture": ExtResource("41_2ymyw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("42_jv3vs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("43_1eqfv")
+}],
+"loop": 0,
+"name": &"rasengan",
+"speed": 6.666666666666667
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("44_jifxi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("45_ludmc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("46_wnlfs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("47_53q4l")
+}],
+"loop": 0,
+"name": &"recover",
+"speed": 6.666666666666667
+}]

@@ -33,7 +33,7 @@ func test_view_shows_names_hp_and_one_panel_per_fighter() -> void:
 		assert_eq(panel.hp_bar.value, 100.0)
 	assert_eq(player_names, ["Naruto", "Sasuke", "Sakura"] as Array[String])
 	assert_eq(_panel(view, battle, 1, 2).name_label.text, "Sakura")
-	assert_eq(view.sprites[battle.teams[0].fighters[0]].name_label.text, "Naruto")
+	assert_eq((view.sprites[battle.teams[0].fighters[0]] as FighterSprite).fighter.display_name(), "Naruto")
 	Helpers.unmount(view)
 
 
@@ -63,7 +63,7 @@ func test_view_marks_a_dead_fighter() -> void:
 	assert_eq(panel.hp_label.text, "0 / 100")
 	assert_eq(panel.hp_bar.theme_type_variation, &"DeadHpBar")
 	assert_eq(panel.avatar_rect.texture, Art.dead_avatar())
-	assert_eq(view.sprites[target].name_label.text, "F0 (down)")
+	assert_false((view.sprites[target] as FighterSprite).alive)
 	Helpers.unmount(view)
 
 

@@ -26,6 +26,7 @@ func go_to_battle(team: Array[CharacterData]) -> void:
 	var view: BattleView = BATTLE_SCENE.instantiate() as BattleView
 	view.ai_rng = Rng.new(seed_value + 1)
 	view.bind(MatchFactory.new_match(chosen_team, seed_value))
+	view.use_animations()
 	view.exit_requested.connect(go_to_select)
 	_show(view)
 
